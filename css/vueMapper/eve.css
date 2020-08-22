@@ -1,0 +1,145 @@
+.c-popups-container {
+    z-index: 1;
+}
+
+.c-popup-body {
+    border: 1px solid #d4d4d4;
+    background: #fff;
+    overflow: hidden;
+    border-radius: 3px;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.c-popup-head {
+    /*border-bottom: 1px solid #e6e6e6;*/
+}
+
+.c-button {
+    transition: background-color 100ms;
+    cursor: pointer;
+    border-radius: 3px;
+    background-color: rgba(221, 221, 221, 0);
+}
+
+.c-button:hover {
+    background-color: rgba(187, 187, 187, 0.38);
+}
+
+.c-popup-content {
+    padding: 0 5px;
+}
+
+.c-popup-title {
+    padding: 2px 5px;
+    /*font-weight: bold;*/
+    color: #939393;
+}
+
+.c-popup-animate {
+    opacity: 0;
+    transform: translate(-30px, 0);
+    animation-duration: 250ms;
+    animation-name: c-popup-animation-body;
+}
+
+@keyframes c-popup-animation-body {
+    from {
+        opacity: 0;
+        transform: translate(-30px, 0);
+    }
+
+    to {
+        opacity: 100%;
+        transform: translate(0px, 0);
+    }
+}
+
+.c-hidden-input {
+    outline: none;
+    appearance: none;
+    border: none;
+    position: absolute;
+    left: -10000px;
+}
+
+.c-context-body {
+    border: 1px solid #d4d4d4;
+    background: #fff;
+    overflow: hidden;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.c-contexts-container  {
+    z-index: 2;
+}
+
+
+.c-context-body > .c-context-item {
+    transition: background-color 250ms;
+    background-color: rgba(0,0,0,0);
+
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+}
+
+.c-context-body > .c-context-item:hover {
+    background-color: rgba(130, 130, 130, 0.15);
+}
+
+.c-context-body > .c-context-item:active {
+    background-color: rgba(120, 120, 120, 0.25);
+}
+
+.c-context-body > .c-context-item > span {
+    vertical-align: middle;
+    justify-content: center;
+    flex-direction: column;
+    display: flex;
+}
+
+.c-context-body > .c-context-item > i {
+    margin: initial;
+    margin-left: 10px;
+}
+
+.c-context-animate {
+    opacity: 0;
+    transform: scale(1, 0) translateX(-30px);
+    animation-duration: 250ms;
+    animation-name: c-context-animation-body;
+}
+
+@keyframes c-context-animation-body {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 100%;
+        transform: translateX(0px);
+    }
+}
+
+.c-context-animate-fade {
+    opacity: 100%;
+    transform: translateX(0px);
+    animation-duration: 250ms;
+    animation-name: c-context-animation-body-fade;
+}
+
+@keyframes c-context-animation-body-fade {
+    from {
+        opacity: 100%;
+        transform: translateX(0px);
+    }
+
+    to {
+        opacity: 0%;
+        transform: translateX(30px);
+    }
+}
