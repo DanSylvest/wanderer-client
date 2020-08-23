@@ -5,10 +5,11 @@
 
 var deps = [
     "env/tools/standardTypeExtend",
-    "config",
+    "conf/main",
+    "conf/custom",
     "api",
     "handlers",
-    "env/tools/exist",
+    "env/tools/extend",
     "core/pageController",
     "core/pageExecutor",
     "core/componentController",
@@ -17,13 +18,16 @@ var deps = [
     "ui/vue/components/cAreaSelection",
 ];
 require(deps, function() {
-    var config         = require("config");
+    var mainConf       = require("conf/main");
+    var customConf     = require("conf/custom");
     var API            = require("api");
     var handlers       = require("handlers");
-    var exist          = require("env/tools/exist");
+    var extend         = require("env/tools/extend");
     var PageController = require("core/pageController");
     var PageExecutor   = require("core/pageExecutor");
     var ComponentController   = require("core/componentController");
+
+    window.config = extend(mainConf, customConf);
 
     window.api = new API({
         protocol: config.connection.socket.proto,

@@ -1,5 +1,5 @@
 (function () {
-    var modulePath = "config";
+    var modulePath = "conf/main";
 
     define(modulePath, [], function () {
         var config = {
