@@ -3,6 +3,9 @@
 
     define(modulePath, [], function () {
         var config = {
+            app: {
+                title: "Wanderer the mapper"
+            },
             connection: {
                 socket: {
                     host: "",

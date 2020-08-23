@@ -3,6 +3,9 @@
 
     define(modulePath, [], function () {
         var config = {
+            app: {
+                title: "Wanderer the mapper"
+            },
             product: {
                 version: "1.0.0",
                 state: "beta",

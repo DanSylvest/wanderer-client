@@ -51,5 +51,7 @@ require(deps, function() {
         }.bind(this));
 
     });
+
+    document.title = config.app.title;
 });
 
