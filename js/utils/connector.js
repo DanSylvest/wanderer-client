@@ -35,11 +35,17 @@
                 this.create_socket();
             },
             create_socket: function () {
-                this._socket = new WebSocket(this._protocol + "://" + this._host + ":" + this._port);
+                this._socket = new WebSocket(this.generateUrl());
                 this._socket.addEventListener("open", this._on_open.bind(this));
                 this._socket.addEventListener("close", this._on_close.bind(this));
                 this._socket.addEventListener("message", this._on_message.bind(this));
                 this._socket.addEventListener("error", this._on_error.bind(this));
+            },
+            generateUrl: function () {
+                if(this._host === "")
+                    this._host = "localhost";
+
+                return this._protocol + "://" + this._host + ":" + this._port;
             },
             close: function () {
                 this._socket.close();
@@ -48,7 +54,7 @@
                 return this._socket;
             },
             _on_open: function (_data) {
-                log(log.INFO, "Connection [" + this._protocol + "://" + this._host + ":" + this._port + "] opened");
+                log(log.INFO, "Connection [" + this.generateUrl() + "] opened");
                 this.emit("open", _data.data);
             },
             _on_close: function (_data) {

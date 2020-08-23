@@ -6,11 +6,11 @@
             product: {
                 version: "1.0.0",
                 state: "beta",
-                name: "mapper"
+                name: "wanderer"
             },
             connection: {
                 socket: {
-                    host: "127.0.0.1",
+                    host: "",
                     proto: "ws",
                     port: "1400"
                 }
