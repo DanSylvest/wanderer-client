@@ -11,11 +11,11 @@ var deps = [
     "handlers",
     "env/tools/extend",
     "core/pageController",
-    "core/pageExecutor",
+    // "core/pageExecutor",
+    "core/pageLoader",
     "core/componentController",
     "defaultLayout",
-    "env/tabKeeper",
-    "ui/vue/components/cAreaSelection",
+    "env/tabKeeper"
 ];
 require(deps, function() {
     var mainConf       = require("conf/main");
@@ -24,7 +24,8 @@ require(deps, function() {
     var handlers       = require("handlers");
     var extend         = require("env/tools/extend");
     var PageController = require("core/pageController");
-    var PageExecutor   = require("core/pageExecutor");
+    // var PageExecutor   = require("core/pageExecutor");
+    var PageLoader     = require("core/pageLoader");
     var ComponentController   = require("core/componentController");
 
     window.config = extend(mainConf, customConf);
@@ -39,15 +40,14 @@ require(deps, function() {
     api.init();
 
     api.on("ready", function () {
-        window.pageExecutor = new PageExecutor();
-        window.componentController = new ComponentController();
+        pageExecutor = new PageLoader();
+        componentController = new ComponentController();
 
-        window.pageController = new PageController({
+        pageController = new PageController({
             query: location.search
         });
-        window.pageController.run().then(function(_data) {
-
-            window.pageExecutor.execute(_data.page);
+        pageController.run().then(function(_data) {
+            pageExecutor.load(_data.page);
         }.bind(this));
 
     });
