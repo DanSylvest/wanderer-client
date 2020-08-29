@@ -1,5 +1,5 @@
 (function () {
-    var componentId = "ui/components/currentMap";
+    var componentId = "ui/components/currentMap/controller/link";
 
     var deps = [
         "env/tools/class",
