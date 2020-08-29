@@ -34,11 +34,11 @@
     >
         <md-tabs v-if="enabled" @md-changed="onTabChange" class="fh">
             <md-tab id="tab-overview" md-label="Overview"  exact>
-                <c-system-panel-signatures v-if="enabled" ref="systemInfo"></c-system-panel-signatures>
+                <c-system-panel-signatures v-if="enabled" ref="signatures"></c-system-panel-signatures>
             </md-tab>
             
             <md-tab id="tab-signatures" md-label="Signatures">
-                <c-system-panel-overview v-if="enabled" ref="signatures"></c-system-panel-overview>
+                <c-system-panel-overview v-if="enabled" ref="systemInfo"></c-system-panel-overview>
             </md-tab>     
             
             <md-tab id="tab-online" md-label="Online">
