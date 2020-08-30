@@ -34,14 +34,8 @@
     <c-group-edit-dialog ref="groupsEditDialogRef" ></c-group-edit-dialog>
     
     <c-context-menu :c-activated.sync="groupContextMenuEnable" :c-offset-x="contextOffsetX" :c-offset-y="contextOffsetY">
-        <md-content class="c-context-item md-hover" @click="onGroupContextMenuEdit">
-            <span>Edit</span>
-            <md-icon class="md-primary">edit</md-icon>
-        </md-content>
-        <md-content class="c-context-item md-hover" @click="onGroupContextMenuRemove">
-            <span>Remove</span>
-            <md-icon class="md-accent">delete</md-icon>
-        </md-content>
+        <c-context-menu-item c-title="Edit" c-icon="edit" @click="onGroupContextMenuEdit" />
+        <c-context-menu-item c-title="Remove" c-icon="delete" @click="onGroupContextMenuRemove" />
     </c-context-menu>
 
 </div>

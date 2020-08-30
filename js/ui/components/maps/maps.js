@@ -41,14 +41,8 @@
     <c-maps-edit-dialog ref="mapsEditDialogRef"></c-maps-edit-dialog>
        
     <c-context-menu :c-activated.sync="mapContextMenuEnable" :c-offset-x="contextOffsetX" :c-offset-y="contextOffsetY">
-        <md-content class="c-context-item md-hover" @click="onMapContextMenuEdit">
-            <span>Edit</span>
-            <md-icon class="md-primary">edit</md-icon>
-        </md-content>
-        <md-content class="c-context-item md-hover" @click="onMapContextMenuRemove">
-            <span>Remove</span>
-            <md-icon class="md-accent">delete</md-icon>
-        </md-content>
+        <c-context-menu-item c-title="Edit" c-icon="edit" @click="onMapContextMenuEdit" />
+        <c-context-menu-item c-title="Remove" c-icon="delete" @click="onMapContextMenuRemove" />
     </c-context-menu>
 
 </div>

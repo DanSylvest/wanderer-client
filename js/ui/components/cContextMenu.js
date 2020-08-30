@@ -1,16 +1,35 @@
 (function () {
     var moduleName = "ui/components/cContextMenu";
 
-    var deps = [];
+    var deps = [
+        "env/mouseObserver"
+    ];
 
     define(moduleName, deps, function () {
-        var template = `
+        var MouseObserver = require("env/mouseObserver");
 
-<div class="c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
-    <slot></slot>
-</div>
-        
-`;
+        var getContextContainer = function () {
+            var arr = document.getElementsByClassName("c-contexts-container");
+
+            if (arr.length === 0) {
+                var element = document.createElement("div");
+                document.body.appendChild(element);
+
+                element.setAttribute("class", "c-contexts-container absolute top left");
+                element.style.width = "100%";
+                element.style.height = "0px";
+            } else {
+                element = arr[0];
+            }
+
+            return element;
+        }
+
+        var template = `
+        <div class="c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
+            <slot></slot>
+        </div>
+        `;
         Vue.component("cContextMenu", {
             props: {
                 cActivated: {
@@ -36,8 +55,9 @@
             template: template,
             mounted: function () {
                 this._tid = -1;
+                this.isEnable = true;
 
-                this.contextBody = this.$el/*.querySelector(".c-context-body")*/;
+                this.contextBody = this.$el;
                 var parent = this.$el.parentElement;
 
                 parent.removeChild(this.contextBody);
@@ -57,13 +77,22 @@
                 this.contextBody.addEventListener("mouseup", this._mouseupHandler);
 
                 document.body.addEventListener("click", this._bodyClickHandler);
+
+                for (var a = 0; a < this.$children.length; a++) {
+                    this.$children[a].$on("over", this.onSmChildrenOver.bind(this, this.$children[a]));
+                }
+
+                this.handlers = {
+                    onShowAnimationEnd: this._onShowAnimationEnd.bind(this),
+                    onHideAnimationEnd: this._onHideAnimationEnd.bind(this),
+                }
             },
             beforeDestroy: function () {
                 this._tid !== -1 && clearTimeout(this._tid);
                 this._tid = -1;
 
                 if (this.contextBody.parentElement !== null)
-                    this.getContextsContainer().removeChild(this.contextBody);
+                    getContextContainer().removeChild(this.contextBody);
 
                 this.contextBody.removeEventListener("mousedown", this._mousedownHandler);
                 this.contextBody.removeEventListener("mouseup", this._mouseupHandler);
@@ -78,55 +107,54 @@
                     this.$emit('update:c-activated', false);
                     this.$emit('c-closed');
                 },
-                getContextsContainer: function () {
-                    var arr = document.getElementsByClassName("c-contexts-container");
-
-                    if (arr.length === 0) {
-                        var element = document.createElement("div");
-                        document.body.appendChild(element);
-
-                        element.setAttribute("class", "c-contexts-container absolute top left");
-                        element.style.width = "100%";
-                        element.style.height = "0px";
-                    } else {
-                        element = arr[0];
+                onSmChildrenOver: function (_child) {
+                    for (var a = 0; a < this.$children.length; a++) {
+                        if (_child !== this.$children[a]) {
+                            this.$children[a].collapse();
+                        }
                     }
-
-                    return element;
                 },
                 show: function () {
                     if (this.contextBody.parentElement === null)
-                        this.getContextsContainer().appendChild(this.contextBody);
+                        getContextContainer().appendChild(this.contextBody);
 
                     this.contextBody.classList.add("c-context-animate");
+                    this.contextBody.addEventListener('animationend', this.handlers.onShowAnimationEnd);
 
-                    var handler = function () {
-                        this.contextBody.classList.remove("c-context-animate");
-                        this.contextBody.removeEventListener('animationend', handler);
-                    }.bind(this);
+                    for (var a = 0; a < this.$children.length; a++) {
+                        this.$children[a].enable();
+                    }
+                },
+                _onShowAnimationEnd: function () {
+                    this.contextBody.classList.remove("c-context-animate");
+                    this.contextBody.removeEventListener('animationend', this.handlers.onShowAnimationEnd);
+                },
+                _onHideAnimationEnd: function () {
+                    this.contextBody.classList.remove("c-context-animate-fade");
+                    this.contextBody.removeEventListener('animationend', this.handlers.onHideAnimationEnd);
 
-                    this.contextBody.addEventListener('animationend', handler);
+                    if (this.contextBody.parentElement !== null)
+                        getContextContainer().removeChild(this.contextBody);
                 },
                 hide: function () {
                     this.contextBody.classList.add("c-context-animate-fade");
-
-                    var handler = function () {
-                        this.contextBody.classList.remove("c-context-animate-fade");
-                        this.contextBody.removeEventListener('animationend', handler);
-
-                        if (this.contextBody.parentElement !== null)
-                            this.getContextsContainer().removeChild(this.contextBody);
-                    }.bind(this);
-
-                    this.contextBody.addEventListener('animationend', handler);
+                    this.contextBody.addEventListener('animationend', this.handlers.onHideAnimationEnd);
+                    for (var a = 0; a < this.$children.length; a++) {
+                        this.$children[a].disable();
+                    }
                 },
                 update: function () {
+                    this.contextBody.removeEventListener('animationend', this.handlers.onShowAnimationEnd);
+                    this.contextBody.removeEventListener('animationend', this.handlers.onHideAnimationEnd);
+                    this.contextBody.classList.remove("c-context-animate");
+                    this.contextBody.classList.remove("c-context-animate-fade");
+
                     this._tid !== -1 && clearTimeout(this._tid);
                     this._tid = setTimeout(function () {
                         this._tid = -1;
                         this.activated ? this.show() : this.hide();
                         this._recalculate()
-                    }.bind(this));
+                    }.bind(this), 0);
                 },
                 _recalculate: function () {
                     this.contextBody.style.left = this.offsetX + "px";
@@ -148,5 +176,116 @@
                 }
             }
         });
+
+
+        (function () {
+
+            var template = `
+            <md-content class="c-context-item c-small-padding md-hover" @click="onClick">
+                <div class="c-context-item-content">
+                    <md-icon v-show="icon.length > 0" class="md-custom-icon md-custom-primary md-custom-size-1">{{icon}}</md-icon>
+                    <span>{{title}}</span>
+                </div>
+                
+                <md-icon v-if="isSubmenu" class="md-custom-icon md-custom-secondary md-custom-small">play_arrow</md-icon>
+             
+                <c-context-menu ref="submenu" :c-activated.sync="smActive" :c-offset-x="smX" :c-offset-y="smY" @c-closed="onSmClosed">
+                    <slot></slot>
+                </c-context-menu>    
+            </md-content>
+            `;
+            Vue.component("cContextMenuItem", {
+                template: template,
+                props: {
+                    cTitle: {
+                        type: String,
+                        default: ""
+                    },
+                    cIcon: {
+                        type: String,
+                        default: ""
+                    },
+                    cIsSubmenu: {
+                        type: Boolean,
+                        default: false
+                    }
+                },
+                data: function () {
+                    return {
+                        smActive: false,
+                        smX: 0,
+                        smY: 0,
+
+                        title: this.cTitle,
+                        icon: this.cIcon,
+                        isSubmenu: this.cIsSubmenu,
+                    }
+                },
+                mounted: function () {
+                    this.isExpand = false;
+                    this.isEnable = true;
+                    this.itemBody = this.$el;
+
+                    this.mouseObserver = new MouseObserver(this.itemBody);
+                    this.mouseObserver.on("mouseIn", this._onMouseIn.bind(this));
+                    this.mouseObserver.on("mouseOut", this._onMouseOut.bind(this));
+
+                    if(this.isSubmenu) {
+                        for (var a = 0; a < this.$refs.submenu.$children.length; a++) {
+                            var child = this.$refs.submenu.$children[a];
+                            child.$on("over", this.onSmChildrenOver.bind(this, child));
+                        }
+                    }
+                },
+                beforeDestroy: function () {
+                    this.mouseObserver.destructor();
+                },
+                methods: {
+                    onClick: function (_event) {
+                        this.$emit("click", _event);
+                    },
+                    _onMouseIn: function () {
+                        if(!this.isEnable)
+                            return;
+
+                        if(this.isSubmenu && !this.isExpand) {
+                            this.smActive = true;
+                            this.isExpand = true;
+                            var itemBodyBounds = this.itemBody.getBoundingClientRect();
+                            this.smX = itemBodyBounds.x + itemBodyBounds.width;
+                            this.smY = itemBodyBounds.y;
+                        }
+
+                        this.$emit("over");
+                    },
+                    collapse: function () {
+                        if(this.isSubmenu && this.isExpand) {
+                            this.isExpand = false;
+                            this.smActive = false;
+                        }
+                    },
+                    enable: function () {
+                        this.isEnable = true;
+                    },
+                    disable: function () {
+                        this.isEnable = false;
+                        this.collapse();
+                    },
+                    _onMouseOut: function () {
+
+                    },
+                    onSmClosed: function () {
+
+                    },
+                    onSmChildrenOver: function (child) {
+                        for (var a = 0; a < this.$refs.submenu.$children.length; a++) {
+                            if(child !== this.$refs.submenu.$children[a]) {
+                                this.$refs.submenu.$children[a].collapse();
+                            }
+                        }
+                    }
+                }
+            })
+        })(this);
     });
 })(window);

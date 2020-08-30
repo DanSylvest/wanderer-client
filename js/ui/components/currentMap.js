@@ -64,51 +64,35 @@
         </md-empty-state>
     </div>
     <div style="height: 0px">
-        <c-system-panel ref="systemPanel"></c-system-panel>
+        <c-system-panel ref="systemPanel" />
         
         <c-context-menu :c-activated.sync="linkCMActive" :c-offset-x="linkCMOffsetX" :c-offset-y="linkCMOffsetY" @c-closed="onClosedLinkContext">
-            <md-content class="c-context-item md-hover" @click="onLinkContextMenuEdit">
-                <span>Edit connection</span>
-                <md-icon class="md-primary">edit</md-icon>
-            </md-content>
-            
-            <md-content class="c-context-item md-hover" @click="onLinkContextMenuRemove">
-                <span>Disconnect connection</span>
-                <md-icon class="md-accent">delete</md-icon>
-            </md-content>
+            <c-context-menu-item c-title="Edit connection" c-icon="edit" @click="onLinkContextMenuEdit" />
+            <c-context-menu-item c-title="Disconnect connection" c-icon="delete" @click="onLinkContextMenuRemove" />
         </c-context-menu>
         
         <c-context-menu :c-activated.sync="systemsCMActive" :c-offset-x="systemsCMOffsetX" :c-offset-y="systemsCMOffsetY" @c-closed="onClosedSystemsContext">
-            <md-content class="c-context-item md-hover" @click="onSystemsContextMenuRemove">
-                <span >Remove systems</span>
-                <md-icon class="md-accent">delete</md-icon>
-            </md-content>
+            <c-context-menu-item c-title="Remove systems" c-icon="delete" @click="onSystemsContextMenuRemove" />
         </c-context-menu> 
-        
+                  
         <c-context-menu :c-activated.sync="systemCMActive" :c-offset-x="systemCMOffsetX" :c-offset-y="systemCMOffsetY" @c-closed="onClosedSystemContext">
-            <md-content class="c-context-item md-hover" @click="onSystemContextMenuEdit">
-                <span >Edit system</span>
-                <md-icon class="md-primary">edit</md-icon>
-            </md-content>
-            
-            <md-content class="c-context-item md-hover" v-if="!systemContextMenuLockedItem" @click="onSystemContextMenuLock">
-                <span>Lock system</span>
-                <md-icon class="md-accent">lock</md-icon>
-            </md-content>
-            
-            <md-content class="c-context-item md-hover" v-if="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock">
-                <span >Unlock system</span>
-                <md-icon class="md-primary">lock_open</md-icon>
-            </md-content>
-            
-            <md-content class="c-context-item md-hover" v-if="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove">
-                <span >Remove system</span>
-                <md-icon class="md-accent">delete</md-icon>
-            </md-content>
-        </c-context-menu> 
-       
+            <c-context-menu-item c-title="Edit system" c-icon="edit" @click="onSystemContextMenuEdit" />
+            <c-context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
+            <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
+            <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
+            <c-context-menu-item c-title="Tag system" c-icon="edit" :c-is-submenu="true">
+                <c-context-menu-item c-title="Clear" c-icon="block" />
+                <c-context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in letters" />
+                </c-context-menu-item>
+                <c-context-menu-item c-title="Digit" c-icon="edit" :c-is-submenu="true">
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in digits" />
+                </c-context-menu-item>
+            </c-context-menu-item>
+        </c-context-menu>
     </div>
-    <c-area-selection v-on:c-selection-completed="onSelectionCompleted" @c-selection-started="onSelectionStarted"></c-area-selection>
+    
+    <c-area-selection v-on:c-selection-completed="onSelectionCompleted" @c-selection-started="onSelectionStarted" />
 </div>
 
         `;
@@ -120,6 +104,12 @@
             ],
             data: function () {
                 return {
+                    digits: [
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+                    ],
+                    letters: [
+                        "A","B","C","D","E","F","X","Y","Z",
+                    ],
                     selectedMap: null,
                     allowedMaps: [],
                     showMapEmpty: false,
@@ -146,7 +136,6 @@
 
                 this._currentOpenSystem = null;
 
-                // this.createMap();
                 this.initialize().then(function() {
                     if(this.selectedMap !== null) {
                         this.onMapSelected(this.selectedMap);
