@@ -46,7 +46,7 @@
             },
             updateInfo: function (_info) {
                 this.info = extend(this.info, _info);
-                this._inited && this.map.updateMarker(this.markerId, this.info);
+                this._inited && this.map.updateMarker(this.markerId, _info);
             },
             updatePosition: function (_position) {
                 this.position = _position;

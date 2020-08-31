@@ -13,7 +13,6 @@ var deps = [
     "core/pageController",
     // "core/pageExecutor",
     "core/pageLoader",
-    "core/componentController",
     "defaultLayout",
     "env/tabKeeper"
 ];
@@ -26,7 +25,6 @@ require(deps, function() {
     var PageController = require("core/pageController");
     // var PageExecutor   = require("core/pageExecutor");
     var PageLoader     = require("core/pageLoader");
-    var ComponentController   = require("core/componentController");
 
     window.config = extend(mainConf, customConf);
 
@@ -41,7 +39,6 @@ require(deps, function() {
 
     api.on("ready", function () {
         pageExecutor = new PageLoader();
-        componentController = new ComponentController();
 
         pageController = new PageController({
             query: location.search

@@ -133,6 +133,7 @@
 }
 
 .c-context-item-content {
+    white-space: nowrap;
     display: flex;
     align-items: center;
 }

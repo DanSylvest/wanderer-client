@@ -2,7 +2,7 @@
     var componentId = "ui/components/currentMap";
 
     var deps = [
-        "core/map",
+        "core/map/map",
         "env/promise",
         "ui/components/currentMap/controller/mapController",
 
@@ -12,7 +12,7 @@
     ];
 
     define(componentId, deps, function () {
-        var Map           = require("core/map");
+        var Map           = require("core/map/map");
         var CustomPromise = require("env/promise");
         var MapController = require("ui/components/currentMap/controller/mapController");
 
@@ -80,13 +80,13 @@
             <c-context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
             <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
             <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
-            <c-context-menu-item c-title="Tag system" c-icon="edit" :c-is-submenu="true">
-                <c-context-menu-item c-title="Clear" c-icon="block" />
+            <c-context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">
+                <c-context-menu-item c-title="Clear" c-icon="block" @click="onClearTag"/>
                 <c-context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
-                    <c-context-menu-item :c-title="item.toString()" v-for="item in letters" />
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in letters" @click="onLetterClick(item)" />
                 </c-context-menu-item>
                 <c-context-menu-item c-title="Digit" c-icon="edit" :c-is-submenu="true">
-                    <c-context-menu-item :c-title="item.toString()" v-for="item in digits" />
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in digits" @click="onDigitClick(item)" />
                 </c-context-menu-item>
             </c-context-menu-item>
         </c-context-menu>
@@ -200,6 +200,30 @@
                 },
                 onSelectionStarted: function () {
                     this._offContexts();
+                },
+
+                onLetterClick: function (_letter) {
+                    this.selectedDigit = null;
+                    this.selectedLetter = _letter;
+
+                    api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                        tag: _letter
+                    });
+                },
+                onDigitClick: function (_digit) {
+                    this.selectedLetter = null;
+                    this.selectedDigit = _digit;
+
+                    api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                        tag: _digit
+                    });
+                },
+                onClearTag: function () {
+                    this.selectedDigit = null;
+                    this.selectedLetter = null;
+                    api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                        tag: ""
+                    });
                 },
 
                 onMapSelected: function(_mapId) {

@@ -1,5 +1,5 @@
 (function () {
-    var moduleName = "core/map";
+    var moduleName = "core/map/map";
 
     var deps = [
         "env/tools/class",
@@ -16,6 +16,9 @@
         "env/actionObserver",
         "libs/d3/collideRect",
         "libs/d3/rectForce",
+        "env/ui",
+        "core/map/marker",
+        "core/map/environment",
     ];
 
     define(moduleName, deps, function () {
@@ -34,6 +37,9 @@
         var Rectangle       = require("env/rectangle");
         var Magnifier       = require("env/magnifier");
         var ActionObserver  = require("env/actionObserver");
+        var _ui             = require("env/ui");
+        var Marker          = require("core/map/marker");
+        var environment     = require("core/map/environment");
 
         var w = 120;
         var h = 30;
@@ -179,9 +185,6 @@
             createMarker: function (customId, _options) {
                 var base = extend({
                     customId: customId,
-                    name: "",
-                    sizeMultiplier: 0,
-                    size: 15,
                     isLocked: false,
                     x: randomFloat(this.width / 2 * -1, this.width / 2),
                     y: randomFloat(this.height / 2 * -1, this.height / 2),
@@ -189,40 +192,15 @@
 
                 var mid = counter++;
 
-                var markerElement = _ui.fromText(`
-<div class="eve-marker">
-    <div class="eve-marker-body">
-        <div class="eve-marker-first-row off-events">
-            <div class="locked hidden"></div>
-            <div class="effect-color hidden"></div>
-            <div class="system-type"></div>
-            <div class="system-name"></div>
-        </div>
-        <div class="eve-marker-second-row off-events">
-            <div class="online">
-                <div class="online-icon hidden"></div>    
-                <div class="online-count hidden">${randomInt(0, 199)}</div>    
-            </div>
-            <div class="wormhole-statics"></div>
-        </div>
-    </div>
-</div>
-                `);
-
-                this.htmlContainer.append(markerElement);
-
-                var markerDownHandler = this._onMarkerDown.bind(this, mid);
-                var markerContextHandler = this._onMarkerContext.bind(this, mid);
-                markerElement.el.addEventListener("mousedown", markerDownHandler);
-                markerElement.el.addEventListener("contextmenu", markerContextHandler);
-
-                this._markers[mid] = {
-                    isSelect: false,
+                var marker = new Marker({
                     customId: customId,
-                    marker: markerElement,
-                    markerDownHandler: markerDownHandler,
-                    markerContextHandler: markerContextHandler,
-                };
+                });
+                this.htmlContainer.append(marker.wrapper);
+
+                marker.on("mousedown", this._onMarkerDown.bind(this, mid));
+                marker.on("contextmenu", this._onMarkerContext.bind(this, mid));
+
+                this._markers[mid] = marker;
 
                 this.magnifier.addObject({
                     id: mid,
@@ -238,35 +216,9 @@
                 return mid;
             },
             updateMarker: function (_markerId, _data) {
-                var markerData = this._markers[_markerId];
+                var marker = this._markers[_markerId];
 
-                var markerEl = markerData.marker;
-                if (exist(_data.name) && _data.name !== markerData.name) {
-                    var systemNameEl = _ui.fromElement(markerEl.el.querySelector(".system-name"));
-                    systemNameEl.text(_data.name);
-                }
-
-                if (exist(_data.onlineCount) && _data.onlineCount !== markerData.onlineCount) {
-                    var onlineIconEl = _ui.fromElement(markerEl.el.querySelector(".online-icon"));
-                    var onlineCountEl = _ui.fromElement(markerEl.el.querySelector(".online-count"));
-                    onlineCountEl.text(_data.onlineCount);
-                    if(_data.onlineCount === 0) {
-                        onlineIconEl.el.classList.add("hidden");
-                        onlineCountEl.el.classList.add("hidden");
-                    } else {
-                        onlineIconEl.el.classList.remove("hidden");
-                        onlineCountEl.el.classList.remove("hidden");
-                    }
-                }
-
-                // todo ???
-                if (exist(_data.systemType) && _data.systemData.effectType) {
-                    var effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
-                    effectEl.el.classList.add(print_f("eve-wh-effect-color-%s", _data.systemData.effectType));
-                    effectEl.el.classList.remove("hidden");
-                }
-
-                if (exist(_data.isLocked) && _data.isLocked !== markerData.isLocked) {
+                if (exist(_data.isLocked) && _data.isLocked !== marker.data.isLocked) {
                     var obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
                     obj.lock = _data.isLocked;
                     if(_data.isLocked) {
@@ -276,41 +228,15 @@
                         obj.fx = undefined;
                         obj.fy = undefined;
                     }
-
-                    var lockedEl = _ui.fromElement(markerEl.el.querySelector(".locked"));
-                    if (_data.isLocked)
-                        lockedEl.el.classList.remove("hidden");
-                    else
-                        lockedEl.el.classList.add("hidden");
                 }
 
-                if (exist(_data.systemType) && _data.systemType !== markerData.systemType) {
-                    var systemTypeEl = _ui.fromElement(markerEl.el.querySelector(".system-type"));
-                    var colorClass = print_f("eve-system-color-%s", _data.systemType);
-                    switch (_data.systemType) {
-                        case 0:
-                        case 1:
-                        case 2:
-                            colorClass = securityClasses[_data.security];
-                            break;
-                        case 3:
-                        case 4:
-                            colorClass = typeClasses[_data.systemData.typeName];
-                            _data.systemData && _data.systemData.statics && this._createStatics(markerData.marker, _data)
-                            break;
-                    }
-
-                    systemTypeEl.el.classList.add(colorClass);
-                    systemTypeEl.text(_data.systemData.typeName);
-                }
-
-                if (exist(_data.position) && markerData.position && (_data.position.x !== markerData.position.x || _data.position.y !== markerData.position.y)) {
+                if (exist(_data.position) && marker.data.position && (_data.position.x !== marker.data.position.x || _data.position.y !== marker.data.position.y)) {
                     var obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
                     obj.x = _data.position.x;
                     obj.y = _data.position.y;
                 }
 
-                extend(markerData, _data);
+                marker.update(_data);
 
                 this._sfForce.call();
             },
@@ -332,11 +258,11 @@
 
                 var dragOffset = new Vector2();
                 this._ao.on("dragStart", function (_event) {
-                    if(this._markers[_event.subject.id].isLocked) {
+                    if(this._markers[_event.subject.id].data.isLocked) {
                         return;
                     }
 
-                    this._markers[_event.subject.id].marker.el.classList.add("eve-zInd-top");
+                    this._markers[_event.subject.id].wrapper.el.classList.add("eve-zInd-top");
 
                     this.simulation.alphaTarget(0.3).restart();
 
@@ -348,7 +274,7 @@
                 }.bind(this));
 
                 this._ao.on("dragging", function (_event) {
-                    if(this._markers[_event.subject.id].isLocked) {
+                    if(this._markers[_event.subject.id].data.isLocked) {
                         return;
                     }
 
@@ -358,25 +284,25 @@
                     _event.subject.fx = virtual.x;
                     _event.subject.fy = virtual.y;
 
-                    var markerData = this._markers[_event.subject.id];
-                    markerData.position.x = virtual.x;
-                    markerData.position.y = virtual.y;
+                    var marker = this._markers[_event.subject.id];
+                    marker.data.position.x = virtual.x;
+                    marker.data.position.y = virtual.y;
 
                     this.render();
 
                 }.bind(this));
 
                 this._ao.on("dragEnd", function (_event) {
-                    if(this._markers[_event.subject.id].isLocked) {
+                    if(this._markers[_event.subject.id].data.isLocked) {
                         return;
                     }
 
                     this.simulation.alphaTarget(0);
 
-                    this._markers[_event.subject.id].marker.el.classList.remove("eve-zInd-top");
+                    this._markers[_event.subject.id].wrapper.el.classList.remove("eve-zInd-top");
 
-                    var markerData = this._markers[_event.subject.id];
-                    if(!markerData.isLocked) {
+                    var marker = this._markers[_event.subject.id];
+                    if(!marker.data.isLocked) {
                         _event.subject.fx = null;
                         _event.subject.fy = null;
                     }
@@ -390,26 +316,17 @@
                 }.bind(this));
             },
             removeMarker: function (_markerId) {
-                var markerData = this._markers[_markerId];
+                var marker = this._markers[_markerId];
 
-                markerData.marker.el.removeEventListener("mousedown", markerData.markerDownHandler);
-                markerData.marker.el.removeEventListener("contextmenu", markerData.markerContextHandler);
-                this.htmlContainer.remove(markerData.marker);
+                this.htmlContainer.remove(marker.wrapper);
                 this.magnifier.removeObject(_markerId);
+
+                marker.destructor();
+
                 delete this._markers[_markerId];
 
                 this._forceLinks = this.forceLinks();
                 this._sfForce.call();
-            },
-            _createStatics: function (_marker, _data) {
-                var systemTypeEl = _ui.fromElement(_marker.el.querySelector(".wormhole-statics"));
-
-                for (var a = 0; a < _data.systemData.statics.length; a++) {
-                    var staticData = _data.systemData.statics[a];
-                    var colorClass = typeClasses[staticData.leadTo]
-                    var staticEl = _ui.fromText(`<div class='static ${colorClass}'>${staticData.leadTo}</div>`)
-                    systemTypeEl.append(staticEl);
-                }
             },
             createLink: function (_customId, _source, _target) {
                 var mid = counter++;
@@ -457,22 +374,22 @@
 
                 for (var a = 0; a < nodes.length; a++) {
                     var nodeInfo = nodes[a];
-                    var markerInfo = this._markers[nodeInfo.id];
-                    out.push({markerId: nodeInfo.id, id: markerInfo.customId, x: nodeInfo.x, y: nodeInfo.y});
+                    var marker = this._markers[nodeInfo.id];
+                    out.push({markerId: nodeInfo.id, id: marker.data.customId, x: nodeInfo.x, y: nodeInfo.y});
                 }
 
                 return out;
             },
             _onMarkerClick: function (_markerId, _event) {
-                var markerData = this._markers[_markerId];
-                this.emit("markerClicked", markerData.customId, _event);
+                var marker = this._markers[_markerId];
+                this.emit("markerClicked", marker.data.customId, _event);
             },
             _onMarkerContext: function (_markerId, _event) {
                 _event.stopPropagation();
                 _event.preventDefault();
 
-                var markerData = this._markers[_markerId];
-                this.emit("systemContextMenu", markerData.customId, _event);
+                var marker = this._markers[_markerId];
+                this.emit("systemContextMenu", marker.data.customId, _event);
             },
             _onLinkClick: function (_linkId) {
                 var linkData = this._links[_linkId];
@@ -553,8 +470,8 @@
             },
             _onSimulationTick: function () {
                 this.magnifier.objects().map(function (_obj) {
-                    this._markers[_obj.id].x = _obj.x;
-                    this._markers[_obj.id].y = _obj.y;
+                    this._markers[_obj.id].data.x = _obj.x;
+                    this._markers[_obj.id].data.y = _obj.y;
                 }.bind(this));
 
                 this.render();
@@ -577,38 +494,11 @@
                 this._forceLinks.forEach(function (_link) {
                     var linkData = this._links[_link.id];
 
-                    var sourceMarker = this._markers[linkData.source];
-                    var targetMarker = this._markers[linkData.target];
+                    var sourceMarker = this._markers[linkData.source].data;
+                    var targetMarker = this._markers[linkData.target].data;
 
                     var source = this.magnifier.convertToReal(new Vector2(sourceMarker.x, sourceMarker.y));
                     var target = this.magnifier.convertToReal(new Vector2(targetMarker.x, targetMarker.y));
-
-                    // var angleByTarget = Vector2.angleBetween(source, target);
-                    // var angleBySource = Vector2.angleBetween(target, source);
-                    //
-                    // var cp1 = null, cp2 = null;
-                    // // Render source point
-                    // if(angleByTarget >= 315 && angleByTarget < 360 || angleByTarget >= 0 && angleByTarget < 45) {
-                    //     source.y += h / 2;
-                    //     target.y -= h / 2;
-                    //     cp1 = new Vector2(source.x, target.y);
-                    //     cp2 = new Vector2(target.x, source.y);
-                    // } else if(angleByTarget >= 135 && angleByTarget < 225) {
-                    //     source.y -= h / 2;
-                    //     target.y += h / 2;
-                    //     cp1 = new Vector2(source.x, target.y);
-                    //     cp2 = new Vector2(target.x, source.y);
-                    // } else if(angleByTarget >= 45 && angleByTarget < 135) {
-                    //     source.x -= w / 2;
-                    //     target.x += w / 2;
-                    //     cp1 = new Vector2(target.x, source.y);
-                    //     cp2 = new Vector2(source.x, target.y);
-                    // } else if (angleByTarget >= 225 && angleByTarget < 315) {
-                    //     source.x += w / 2;
-                    //     target.x -= w / 2;
-                    //     cp1 = new Vector2(target.x, source.y);
-                    //     cp2 = new Vector2(source.x, target.y);
-                    // }
 
                     linkData.element.attr({
                         // d:print_f("M%s,%s C%s,%s %s,%s %s,%s", source.x, source.y, cp1.x, cp1.y, cp2.x, cp2.y, target.x, target.y),
@@ -630,20 +520,18 @@
 
 
                 realCoords.forEach(function (_node) {
-                    var markerData = this._markers[_node.id];
+                    var marker = this._markers[_node.id];
 
                     var x = _node.x - w/2;
                     var y = _node.y - h/2;
 
-                    markerData.marker.css("transform", print_f("translate(%spx,%spx)", x, y));
+                    marker.wrapper.css("transform", print_f("translate(%spx,%spx)", x, y));
                 }.bind(this));
 
             },
-
             getVirtualBy: function (_vector) {
                 return this.magnifier.convertToVirtual(_vector);
             },
-
             getMarkersAndLinksByArea: function (_lt, _rb) {
                 var area = new Rectangle(_lt, _rb);
 
@@ -651,9 +539,6 @@
                 var markers = this.collectPositions();
                 for (var a = 0; a < markers.length; a++) {
                     var marker = markers[a];
-                    // var markerPos = new Vector2(marker.x, marker.y);
-                    // var markerPosSecond = markerPos["+"](new Vector2(10000000, 0));
-                    // var markerPolygon = new Polygon([markerPos, markerPosSecond]);
 
                     var markerRect = new Rectangle(
                         new Vector2(marker.x - w / 2, marker.y - h / 2),
@@ -667,39 +552,22 @@
 
                 return selected;
             },
-
             deselectAll: function () {
                 for(var markerId in this._markers) {
-                    if(this._markers[markerId].isSelect)
-                        this._markers[markerId].marker.el.classList.remove("selected");
-
-                    this._markers[markerId].isSelect = false;
+                    this._markers[markerId].data.isSelect && this._markers[markerId].select(false);
                 }
             },
-
             setSelectMarker: function (_markerId, _isSelect) {
-                var markerData = this._markers[_markerId];
-                var markerEl = markerData.marker;
-
-                if(!markerData.isLocked) {
-                    markerData.isSelect = _isSelect;
-
-                    if (_isSelect)
-                        markerEl.el.classList.add("selected");
-                    else
-                        markerEl.el.classList.remove("selected");
-                }
+                this._markers[_markerId].select(_isSelect);
             },
-
             selected: function () {
                 var out = [];
                 for (var markerId in this._markers) {
-                    if (this._markers[markerId].isSelect)
-                        out.push(this._markers[markerId].customId);
+                    if (this._markers[markerId].data.isSelect)
+                        out.push(this._markers[markerId].data.customId);
                 }
                 return out;
             },
-
             refresh: function () {
                 var bounds = this.container.parentElement.getBoundingClientRect();
                 this.setSize(bounds.width, bounds.height);
@@ -713,152 +581,6 @@
                 this.render();
             }
         });
-
-        var _ui = function (_tag) {
-            var svgElements = [
-                "g", "line", "rect", "text", "svg", "image", "path"
-            ];
-
-            var isSvg = svgElements.indexOf(_tag) !== -1;
-
-            var el = "";
-            if(_tag instanceof HTMLElement) {
-                el = _tag;
-            } else {
-                if (isSvg)
-                    el = document.createElementNS("http://www.w3.org/2000/svg", _tag);
-                else
-                    el = document.createElement(_tag);
-            }
-
-            this.attr = function (_key, _value) {
-                if(_value === undefined && _key.constructor === String)
-                    return el.getAttribute(_key);
-
-                if(_key.constructor === String && _value !== undefined) {
-                    el.setAttribute(_key, _value);
-                    return this;
-                }
-
-                if(_key.constructor === Object && _value === undefined) {
-                    for(var k in _key) {
-                        if(_key.hasOwnProperty(k)){
-                            el.setAttribute(k, _key[k]);
-                        }
-                    }
-                    return this;
-                }
-            }
-
-            this.css = function (_key, _value) {
-                if(_value === undefined && _key.constructor === String)
-                    return el.style[_key];
-
-                if(_key.constructor === String && _value !== undefined) {
-                    el.style[_key] = _value;
-                    return this;
-                }
-
-                if(_key.constructor === Object && _value === undefined) {
-                    for(var k in _key) {
-                        if(_key.hasOwnProperty(k)){
-                            el.style[k] = _key[k];
-                        }
-                    }
-                    return this;
-                }
-            }
-
-            this.append = function (_element) {
-                if(_element instanceof _ui) {
-                    el.appendChild(_element.el);
-                }
-                return this;
-            }
-
-            this.remove = function (_element) {
-                if(_element instanceof _ui) {
-                    el.removeChild(_element.el);
-                }
-                return this;
-            }
-
-            this.text = function (_val) {
-                if(_val === undefined) {
-                    return isSvg ? el.textContent : el.innerText;
-                }
-
-                if(isSvg)
-                    el.textContent = _val;
-                else
-                    el.innerText = _val;
-
-                return this;
-            };
-
-            Object.defineProperty(this, "el", {
-                get: function () {
-                    return el;
-                }
-            });
-        }
-
-        _ui.fromText = function (_text) {
-            return _ui.fromElement(document.createRange().createContextualFragment(_text).children[0]);
-        }
-
-        _ui.fromElement = function (_el) {
-            return new _ui(_el);
-        }
-
-        var securityClasses = {
-            "1.0": "eve-security-color-10",
-            "0.9": "eve-security-color-09",
-            "0.8": "eve-security-color-08",
-            "0.7": "eve-security-color-07",
-            "0.6": "eve-security-color-06",
-            "0.5": "eve-security-color-05",
-            "0.4": "eve-security-color-04",
-            "0.3": "eve-security-color-03",
-            "0.2": "eve-security-color-02",
-            "0.1": "eve-security-color-01",
-            "0.0": "eve-security-color-00",
-            "-0.1": "eve-security-color-m-01",
-            "-0.2": "eve-security-color-m-02",
-            "-0.3": "eve-security-color-m-03",
-            "-0.4": "eve-security-color-m-04",
-            "-0.5": "eve-security-color-m-05",
-            "-0.6": "eve-security-color-m-06",
-            "-0.7": "eve-security-color-m-07",
-            "-0.8": "eve-security-color-m-08",
-            "-0.9": "eve-security-color-m-09",
-            "-1.0": "eve-security-color-m-10"
-        }
-
-        var typeClasses = {
-            "C1"      : "eve-wh-type-color-c1",
-            "C2"      : "eve-wh-type-color-c2",
-            "C3"      : "eve-wh-type-color-c3",
-            "C4"      : "eve-wh-type-color-c4",
-            "C5"      : "eve-wh-type-color-c5",
-            "C6"      : "eve-wh-type-color-c6",
-            "C13"     : "eve-wh-type-color-c13",
-            "drifter" : "eve-wh-type-color-drifter",
-            "Thera"   : "eve-wh-type-color-thera",
-            "High"    : "eve-wh-type-color-high",
-            "Low"     : "eve-wh-type-color-low",
-            "Null"    : "eve-wh-type-color-null",
-        };
-
-        var kindClassed = {
-            "0" : "eve-kind-color-high",
-            "1" : "eve-kind-color-low",
-            "2" : "eve-kind-color-null",
-            "3" : "eve-kind-color-wh",
-            "4" : "eve-kind-color-thera",
-            "5" : "eve-kind-color-abyss",
-            "6" : "eve-kind-color-penalty",
-        }
 
         return Map;
     })

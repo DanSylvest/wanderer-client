@@ -4,11 +4,13 @@
     var deps = [
         "env/tools/class",
         "env/tools/emitter",
+        "env/tools/extend",
     ];
 
     define(componentId, deps, function () {
         var classCreator  = require("env/tools/class");
         var Emitter       = require("env/tools/emitter");
+        var extend        = require("env/tools/extend");
 
         var Link = classCreator("Link", Emitter, {
             constructor: function (_controller, _map, _mapId, _linkId) {

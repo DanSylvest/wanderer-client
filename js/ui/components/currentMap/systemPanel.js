@@ -32,7 +32,7 @@
         c-horizontal-alignment="right"
         @c-closed="onPopupClosed"
     >
-        <md-tabs v-if="enabled" @md-changed="onTabChange" class="fh">
+        <md-tabs v-if="enabled" @md-changed="onTabChange" class="fh" md-dynamic-height>
             <md-tab id="tab-overview" md-label="Overview"  exact>
                 <c-system-panel-overview v-if="enabled" ref="systemInfo"></c-system-panel-overview>
             </md-tab>

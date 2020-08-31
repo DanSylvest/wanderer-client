@@ -85,6 +85,11 @@
     font-weight: bold;
 }
 
+.eve-marker-first-row .system-tag {
+    color: #868686;
+    font-weight: bold;
+}
+
 .eve-marker-second-row {
     height: 50%;
     display: flex;

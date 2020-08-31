@@ -122,6 +122,7 @@
                     this.contextBody.addEventListener('animationend', this.handlers.onShowAnimationEnd);
 
                     for (var a = 0; a < this.$children.length; a++) {
+                        this.$children[a].collapse();
                         this.$children[a].enable();
                     }
                 },
@@ -157,8 +158,23 @@
                     }.bind(this), 0);
                 },
                 _recalculate: function () {
+                    // this.animId = setTimeout(function () {
+                    //     this.animId = -1;
+                    //
+                    //     var bodyBounds = document.body.getBoundingClientRect();
+                    //     var ctxBodyBounds = this.contextBody.getBoundingClientRect();
+                    //
+                    //     if(ctxBodyBounds.x + ctxBodyBounds.width > bodyBounds.width) {
+                    //         this.offsetX = bodyBounds.width - ctxBodyBounds.width;
+                    //     }
+                    //
+                    //     this.contextBody.style.left = this.offsetX + "px";
+                    //     this.contextBody.style.top = this.offsetY + "px";
+                    // }.bind(this), 0);
+
                     this.contextBody.style.left = this.offsetX + "px";
                     this.contextBody.style.top = this.offsetY + "px";
+
                 }
             },
             watch: {
