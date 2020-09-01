@@ -16,7 +16,7 @@
             eve: {
                 sso: {
                     client: {
-                        client_id: "", // application Client Id,
+                        client_id: "165d6d6cab4a4e57a6afe7992f2f8400", // application Client Id,
                     }
                 }
             }

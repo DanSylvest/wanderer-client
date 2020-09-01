@@ -26,9 +26,9 @@
         }
 
         var template = `
-        <div class="c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
-            <slot></slot>
-        </div>
+            <div class="c-context-main c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
+                <slot></slot>
+            </div>
         `;
         Vue.component("cContextMenu", {
             props: {
@@ -150,6 +150,8 @@
                     this.contextBody.classList.remove("c-context-animate");
                     this.contextBody.classList.remove("c-context-animate-fade");
 
+                    this._actualOffsets();
+
                     this._tid !== -1 && clearTimeout(this._tid);
                     this._tid = setTimeout(function () {
                         this._tid = -1;
@@ -157,21 +159,23 @@
                         this._recalculate()
                     }.bind(this), 0);
                 },
-                _recalculate: function () {
-                    // this.animId = setTimeout(function () {
-                    //     this.animId = -1;
-                    //
-                    //     var bodyBounds = document.body.getBoundingClientRect();
-                    //     var ctxBodyBounds = this.contextBody.getBoundingClientRect();
-                    //
-                    //     if(ctxBodyBounds.x + ctxBodyBounds.width > bodyBounds.width) {
-                    //         this.offsetX = bodyBounds.width - ctxBodyBounds.width;
-                    //     }
-                    //
-                    //     this.contextBody.style.left = this.offsetX + "px";
-                    //     this.contextBody.style.top = this.offsetY + "px";
-                    // }.bind(this), 0);
+                _actualOffsets: function () {
+                    document.body.appendChild(this.contextBody);
+                    this.contextBody.classList.add("left-top-force");
+                    var ctxBodyBoundsAfter = this.contextBody.getBoundingClientRect();
+                    var bodyBounds = document.body.getBoundingClientRect();
+                    this.contextBody.classList.remove("left-top-force");
+                    document.body.removeChild(this.contextBody);
 
+                    if(this.offsetX + ctxBodyBoundsAfter.width > bodyBounds.width) {
+                        this.offsetX = this.offsetX - ctxBodyBoundsAfter.width;
+                    }
+
+                    if(this.offsetY + ctxBodyBoundsAfter.height > bodyBounds.height) {
+                        this.offsetY = bodyBounds.height - ctxBodyBoundsAfter.height;
+                    }
+                },
+                _recalculate: function () {
                     this.contextBody.style.left = this.offsetX + "px";
                     this.contextBody.style.top = this.offsetY + "px";
 
@@ -267,12 +271,39 @@
                         if(this.isSubmenu && !this.isExpand) {
                             this.smActive = true;
                             this.isExpand = true;
-                            var itemBodyBounds = this.itemBody.getBoundingClientRect();
-                            this.smX = itemBodyBounds.x + itemBodyBounds.width;
-                            this.smY = itemBodyBounds.y;
+                            this._actualOffsets();
                         }
 
                         this.$emit("over");
+                    },
+                    _actualOffsets: function () {
+                        document.body.appendChild(this.$refs.submenu.contextBody);
+                        this.$refs.submenu.contextBody.classList.add("left-top-force");
+                        var ctxBodyBoundsAfter = this.$refs.submenu.contextBody.getBoundingClientRect();
+                        var bodyBounds = document.body.getBoundingClientRect();
+                        this.$refs.submenu.contextBody.classList.remove("left-top-force");
+                        document.body.removeChild(this.$refs.submenu.contextBody);
+
+                        var itemBodyBounds = this.itemBody.getBoundingClientRect();
+                        var smX = itemBodyBounds.x + itemBodyBounds.width;
+                        var smY = itemBodyBounds.y;
+
+                        if(smX + ctxBodyBoundsAfter.width > bodyBounds.width) {
+                            smX = itemBodyBounds.x - ctxBodyBoundsAfter.width;
+                        }
+
+                        if(smY + ctxBodyBoundsAfter.height > bodyBounds.height) {
+                            smY = itemBodyBounds.y + itemBodyBounds.height - ctxBodyBoundsAfter.height;
+                        }
+
+
+                        this.smX = smX;
+                        this.smY = smY;
+
+                        //
+                        // if(this.offsetY + ctxBodyBoundsAfter.height > bodyBounds.height) {
+                        //     this.offsetY = bodyBounds.height - ctxBodyBoundsAfter.height;
+                        // }
                     },
                     collapse: function () {
                         if(this.isSubmenu && this.isExpand) {
