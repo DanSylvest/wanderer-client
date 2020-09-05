@@ -357,7 +357,8 @@
 
                 this.updateLink(mid, {
                     massStatus: 0,
-                    timeStatus: 1,
+                    timeStatus: 0,
+                    shipSizeType: 1
                 })
                 this._forceLinks = this.forceLinks();
                 this._sfForce.call();
