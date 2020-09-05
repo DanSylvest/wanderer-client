@@ -67,7 +67,7 @@
             },
             template: template,
             mounted: function () {
-                this.currentSystemData = {}
+                this.currentSystemData = Object.create(null);
                 this._rtid = -1;
                 this.mapId = null;
                 this.systemId = null;
@@ -82,7 +82,7 @@
                 this._so.destructor();
                 this._so = null;
                 this.enabled = false;
-                this.currentSystemData = null;
+                this.currentSystemData = Object.create(null);
                 this.panelTitle = "";
                 window.focus();
             },
@@ -116,8 +116,15 @@
                     this.enabled = false;
                     window.focus();
                 },
+                reload: function (_data) {
+                    this.currentSystemData = _data;
+                    this.__update();
+                },
                 update: function (_data) {
                     this.currentSystemData = extend(this.currentSystemData, _data);
+                    this.__update();
+                },
+                __update: function () {
                     this.showPopup = true;
                     this.panelTitle = printf("%s", this.currentSystemData.name);
 

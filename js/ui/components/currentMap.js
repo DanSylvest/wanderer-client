@@ -400,7 +400,7 @@
                     this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
 
                     this.$nextTick(function () {
-                        this.$refs.systemPanel.update(_event);
+                        this.$refs.systemPanel.reload(_event);
                     }.bind(this));
                 },
                 _onDragStarted: function () {
