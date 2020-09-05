@@ -1,7 +1,5 @@
 (function () {
-    var modulePath = "conf/main";
-
-    define(modulePath, [], function () {
+    define([], function () {
         var config = {
             app: {
                 title: "Wanderer the mapper"
