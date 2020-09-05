@@ -67,8 +67,22 @@
         <c-system-panel ref="systemPanel" />
         
         <c-context-menu :c-activated.sync="linkCMActive" :c-offset-x="linkCMOffsetX" :c-offset-y="linkCMOffsetY" @c-closed="onClosedLinkContext">
-            <c-context-menu-item c-title="Edit connection" c-icon="edit" @click="onLinkContextMenuEdit" />
-            <c-context-menu-item c-title="Disconnect connection" c-icon="delete" @click="onLinkContextMenuRemove" />
+            <c-context-menu-item c-title="Edit chain" c-icon="edit" @click="onLinkContextMenuEdit" />
+            <c-context-menu-item c-title="Time state" c-icon="access_time" :c-is-submenu="true" >
+                <c-context-menu-item c-title="Not yet begun" c-icon="done_all" @click="onTimeStateChange(0)"/>
+                <c-context-menu-item c-title="End of life" c-icon="error_outline" @click="onTimeStateChange(1)"/>                
+            </c-context-menu-item>
+            <c-context-menu-item c-title="Mass state" c-icon="slow_motion_video" :c-is-submenu="true">
+                <c-context-menu-item c-title="Whole" c-icon="done" @click="onMassStateChange(0)" />           
+                <c-context-menu-item c-title="Less than half" c-icon="trending_down" @click="onMassStateChange(1)" />           
+                <c-context-menu-item c-title="Verge of collapse" c-icon="error_outline" @click="onMassStateChange(2)" />           
+            </c-context-menu-item>
+            <c-context-menu-item c-title="Ship size" c-icon="slow_motion_video" :c-is-submenu="true">
+                <c-context-menu-item c-title="Frigate (S)" c-icon="done" @click="onShipSizeTypeChange(0)" />           
+                <c-context-menu-item c-title="Normal (M/L)" c-icon="trending_down" @click="onShipSizeTypeChange(1)" />           
+                <c-context-menu-item c-title="Capital (XL)" c-icon="error_outline" @click="onShipSizeTypeChange(2)" />           
+            </c-context-menu-item>
+            <c-context-menu-item c-title="Disconnect chain" c-icon="delete" @click="onLinkContextMenuRemove" />
         </c-context-menu>
         
         <c-context-menu :c-activated.sync="systemsCMActive" :c-offset-x="systemsCMOffsetX" :c-offset-y="systemsCMOffsetY" @c-closed="onClosedSystemsContext">
@@ -158,7 +172,6 @@
                 refresh: function () {
                     this.mapController && this.mapController.map.refresh();
                 },
-
                 initialize: function () {
                     var pr = new CustomPromise();
 
@@ -195,6 +208,10 @@
                     return pr.native;
                 },
 
+                // API
+
+                // HANDLERS
+
                 onSelectionCompleted: function (_event) {
                     this.mapController.setSelection(_event.leftTop, _event.rightBottom);
                 },
@@ -225,123 +242,46 @@
                         tag: ""
                     });
                 },
-
                 onMapSelected: function(_mapId) {
                     this.selectedMap = _mapId;
                     this._destroyMap();
                     this._initMap(_mapId);
                 },
-
                 onAAClick: function () {
                     this.isAutoAlignment = !this.isAutoAlignment;
 
                     this.mapController.map.enableForce(this.isAutoAlignment);
                 },
-
                 onSaveClick: function () {
                     var positions = this.mapController.map.collectPositions();
                     api.eve.map.updateSystemsPosition(this.selectedMap, positions);
                 },
-
+                onTimeStateChange: function (_state) {
+                    api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                        timeStatus: _state
+                    });
+                },
                 /**
-                 * Will remove current map if it initialized
-                 * @private
+                 * 0 - whole
+                 * 1 - half
+                 * 2 - verge
+                 * @param {number} _state
                  */
-                _destroyMap: function () {
-                    if(this.mapController) {
-                        var map = this.mapController.map;
-                        this.mapController && this.mapController.deinit();
-                        map && map.destructor();
-                        this.mapController = null
-                    }
+                onMassStateChange: function (_state) {
+                    api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                        massStatus: _state
+                    });
                 },
-
-                _initMap: function (_mapId) {
-                    var bounds = this.$el.getBoundingClientRect();
-
-                    this.mapController = new MapController(new Map({
-                        container: document.querySelector("#mapContainer"),
-                        width: bounds.width,
-                        height: bounds.height
-                    }), _mapId);
-
-                    this.mapController.init();
-
-                    this.mapController.on("linkContextMenu", this._onLinkContextMenu.bind(this));
-                    this.mapController.on("systemContextMenu", this._onSystemContextMenu.bind(this));
-                    this.mapController.on("systemsContextMenu", this._onSystemsContextMenu.bind(this));
-                    this.mapController.on("systemOpenInfo", this._onSystemOpenInfo.bind(this));
-                    this.mapController.on("systemChange", this._onSystemChange.bind(this));
-                    this.mapController.on("dragStarted", this._onDragStarted.bind(this));
-                    this.mapController.on("mapClicked", this._onMapClicked.bind(this));
-                },
-                _offContexts: function () {
-                    this.systemsCMActive = false;
-                    this.systemCMActive = false;
-                    this.linkCMActive = false;
-                },
-
-                _onLinkContextMenu: function (_linkId, _event) {
-                    this._offContexts();
-
-                    this._currentContextLink = _linkId;
-                    this.linkCMActive = true;
-                    this.linkCMOffsetX = _event.x + 10;
-                    this.linkCMOffsetY = _event.y + 10;
-                },
-                _onSystemContextMenu: function (_systemId, _event) {
-                    this._offContexts();
-
-                    this._currentContextSystem = _systemId;
-                    this.systemCMActive = true;
-                    var systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                    this.systemContextMenuLockedItem = systemInfo.isLocked;
-                    this.systemCMOffsetX = _event.x + 10;
-                    this.systemCMOffsetY = _event.y + 10;
-                },
-                _onSystemsContextMenu: function (_systemIds, _event) {
-                    this._offContexts();
-
-                    this._currentSelectedSystems = _systemIds;
-                    this.systemsCMActive = true;
-                    this.systemsCMOffsetX = _event.x + 10;
-                    this.systemsCMOffsetY = _event.y + 10;
-                },
-                onClosedSystemsContext: function ( ){
-                    this._currentSelectedSystems = [];
-                },
-                onSystemsContextMenuRemove: function () {
-                    api.eve.map.systemsRemove(this.selectedMap, this._currentSelectedSystems);
-                },
-                onClosedSystemContext: function () {
-                    this._currentContextSystem = null;
-                },
-                onClosedLinkContext: function () {
-                    this._currentContextLink = null;
-                },
-                onSystemInfoPanelClosed: function () {
-                    this._currentOpenSystem = null;
-                },
-                _onSystemOpenInfo: function (_systemId, _event) {
-                    this._offContexts();
-                    this.mapController.map.deselectAll();
-
-                    if(this._currentOpenSystem === _systemId)
-                        return;
-
-                    this._currentOpenSystem = _systemId;
-                    this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
-
-                    this.$nextTick(function () {
-                        this.$refs.systemPanel.update(_event);
-                    }.bind(this));
-                },
-                _onDragStarted: function () {
-                    this._offContexts();
-                },
-                _onMapClicked: function () {
-                    this.mapController.map.deselectAll();
-                    this._offContexts();
+                /**
+                 * 0 - frig
+                 * 1 - M/L
+                 * 2 - Capital
+                 * @param {number} _state
+                 */
+                onShipSizeTypeChange: function (_state) {
+                    api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                        shipSizeType: _state
+                    });
                 },
                 onMapContainerContext: function (_event) {
                     _event.preventDefault();
@@ -369,7 +309,107 @@
                         isLocked: false
                     });
                 },
+                onClosedSystemsContext: function ( ){
+                    this._currentSelectedSystems = [];
+                },
+                onSystemsContextMenuRemove: function () {
+                    api.eve.map.systemsRemove(this.selectedMap, this._currentSelectedSystems);
+                },
+                onClosedSystemContext: function () {
+                    this._currentContextSystem = null;
+                },
+                onClosedLinkContext: function () {
+                    this._currentContextLink = null;
+                },
+                // HANDLERS
 
+
+                /**
+                 * Will remove current map if it initialized
+                 * @private
+                 */
+                _destroyMap: function () {
+                    if(this.mapController) {
+                        var map = this.mapController.map;
+                        this.mapController && this.mapController.deinit();
+                        map && map.destructor();
+                        this.mapController = null
+                    }
+                },
+                _initMap: function (_mapId) {
+                    var bounds = this.$el.getBoundingClientRect();
+
+                    this.mapController = new MapController(new Map({
+                        container: document.querySelector("#mapContainer"),
+                        width: bounds.width,
+                        height: bounds.height
+                    }), _mapId);
+
+                    this.mapController.init();
+
+                    this.mapController.on("linkContextMenu", this._onLinkContextMenu.bind(this));
+                    this.mapController.on("systemContextMenu", this._onSystemContextMenu.bind(this));
+                    this.mapController.on("systemsContextMenu", this._onSystemsContextMenu.bind(this));
+                    this.mapController.on("systemOpenInfo", this._onSystemOpenInfo.bind(this));
+                    this.mapController.on("systemChange", this._onSystemChange.bind(this));
+                    this.mapController.on("dragStarted", this._onDragStarted.bind(this));
+                    this.mapController.on("mapClicked", this._onMapClicked.bind(this));
+                },
+                _offContexts: function () {
+                    this.systemsCMActive = false;
+                    this.systemCMActive = false;
+                    this.linkCMActive = false;
+                },
+                _onLinkContextMenu: function (_linkId, _event) {
+                    this._offContexts();
+
+                    this._currentContextLink = _linkId;
+                    this.linkCMActive = true;
+                    this.linkCMOffsetX = _event.x + 10;
+                    this.linkCMOffsetY = _event.y + 10;
+                },
+                _onSystemContextMenu: function (_systemId, _event) {
+                    this._offContexts();
+
+                    this._currentContextSystem = _systemId;
+                    this.systemCMActive = true;
+                    var systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                    this.systemContextMenuLockedItem = systemInfo.isLocked;
+                    this.systemCMOffsetX = _event.x + 10;
+                    this.systemCMOffsetY = _event.y + 10;
+                },
+                _onSystemsContextMenu: function (_systemIds, _event) {
+                    this._offContexts();
+
+                    this._currentSelectedSystems = _systemIds;
+                    this.systemsCMActive = true;
+                    this.systemsCMOffsetX = _event.x + 10;
+                    this.systemsCMOffsetY = _event.y + 10;
+                },
+                onSystemInfoPanelClosed: function () {
+                    this._currentOpenSystem = null;
+                },
+                _onSystemOpenInfo: function (_systemId, _event) {
+                    this._offContexts();
+                    this.mapController.map.deselectAll();
+
+                    if(this._currentOpenSystem === _systemId)
+                        return;
+
+                    this._currentOpenSystem = _systemId;
+                    this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
+
+                    this.$nextTick(function () {
+                        this.$refs.systemPanel.update(_event);
+                    }.bind(this));
+                },
+                _onDragStarted: function () {
+                    this._offContexts();
+                },
+                _onMapClicked: function () {
+                    this.mapController.map.deselectAll();
+                    this._offContexts();
+                },
                 _onSystemChange: function (_data) {
                     switch (_data.type) {
                         case "removed":

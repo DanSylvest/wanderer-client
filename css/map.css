@@ -20,9 +20,10 @@
     height: 35px;
     padding: 2px;
 
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     border-radius: 9px;
-    border: 1px solid #e4e0e0;
+    border: 1px solid #ababab;
     background-color: #ffffff;
 }
 
@@ -45,7 +46,7 @@
 }
 
 .eve-marker-body:hover {
-    background-color: #f1f1f1;
+    background-color: #dadada;
 }
 
 .eve-marker-first-row {

@@ -29,6 +29,7 @@
                 var sourceMarkerId = this.controller.systems[this.info.solarSystemSource].markerId;
                 var targetMarkerId = this.controller.systems[this.info.solarSystemTarget].markerId;
                 this.uiLinkId = this.map.createLink(this.linkId, sourceMarkerId, targetMarkerId);
+                this.map.updateLink(this.uiLinkId, this.info);
             },
             deinit: function () {
                 if(exist(this.uiLinkId)) {
@@ -43,6 +44,7 @@
             },
             updateInfo: function (_info) {
                 this.info = extend(this.info, _info);
+                this._inited && this.map.updateLink(this.uiLinkId, _info);
             }
         });
 

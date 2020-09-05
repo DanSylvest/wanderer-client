@@ -177,6 +177,11 @@
                             delete this.links[_data.linkId];
                         }
                         break;
+                    case "linkUpdated":
+                        if(this.links[_data.linkId]) {
+                            this.links[_data.linkId].updateInfo(_data.data);
+                        }
+                        break;
                 }
             },
             _onLinkContextMenu: function (_linkId, _event) {

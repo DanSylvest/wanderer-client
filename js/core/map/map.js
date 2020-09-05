@@ -331,33 +331,95 @@
             createLink: function (_customId, _source, _target) {
                 var mid = counter++;
 
-                var element = new _ui("line").attr({class: "map-link off-events"});
-                var element2 = new _ui("line").attr({class: "map-link-under"});
+                var element = new _ui("line").attr({class: "map-link link-top"});
+                var element2 = new _ui("line").attr({class: "map-link link-middle"});
+                var element3 = new _ui("line").attr({class: "map-link link-bottom"});
 
+                this.linksLayer.append(element3);
                 this.linksLayer.append(element2);
                 this.linksLayer.append(element);
 
-                element2.el.addEventListener("click", this._onLinkClick.bind(this, mid));
-                element2.el.addEventListener("contextmenu", this._onLinkContext.bind(this, mid));
+                element3.el.addEventListener("click", this._onLinkClick.bind(this, mid));
+                element3.el.addEventListener("contextmenu", this._onLinkContext.bind(this, mid));
 
                 this._links[mid] = {
+                    data: {
+                        // massStatus: 0,
+                        // timeStatus: 1,
+                    },
                     customId: _customId,
                     element: element,
                     element2: element2,
+                    element3: element3,
                     source: _source,
                     target: _target,
                 };
 
+                this.updateLink(mid, {
+                    massStatus: 0,
+                    timeStatus: 1,
+                })
                 this._forceLinks = this.forceLinks();
                 this._sfForce.call();
 
                 return mid;
+            },
+            updateLink: function (_linkId, _data) {
+                var link = this._links[_linkId];
+
+                if (exist(_data.massStatus) && _data.massStatus !== link.data.massStatus) {
+                    link.element.el.classList.remove("mass-state-0");
+                    link.element.el.classList.remove("mass-state-1");
+                    link.element.el.classList.remove("mass-state-2");
+                    link.element2.el.classList.remove("mass-state-0");
+                    link.element2.el.classList.remove("mass-state-1");
+                    link.element2.el.classList.remove("mass-state-2");
+                    link.element3.el.classList.remove("mass-state-0");
+                    link.element3.el.classList.remove("mass-state-1");
+                    link.element3.el.classList.remove("mass-state-2");
+
+                    link.element.el.classList.add("mass-state-" + _data.massStatus);
+                    link.element2.el.classList.add("mass-state-" + _data.massStatus);
+                    link.element3.el.classList.add("mass-state-" + _data.massStatus);
+                }
+
+                if (exist(_data.timeStatus) && _data.timeStatus !== link.data.timeStatus) {
+                    link.element.el.classList.remove("time-state-0");
+                    link.element.el.classList.remove("time-state-1");
+                    link.element2.el.classList.remove("time-state-0");
+                    link.element2.el.classList.remove("time-state-1");
+                    link.element3.el.classList.remove("time-state-0");
+                    link.element3.el.classList.remove("time-state-1");
+
+                    link.element.el.classList.add("time-state-" + _data.timeStatus);
+                    link.element2.el.classList.add("time-state-" + _data.timeStatus);
+                    link.element3.el.classList.add("time-state-" + _data.timeStatus);
+                }
+
+                if (exist(_data.shipSizeType) && _data.shipSizeType !== link.data.shipSizeType) {
+                    link.element.el.classList.remove("ship-size-0");
+                    link.element.el.classList.remove("ship-size-1");
+                    link.element.el.classList.remove("ship-size-2");
+                    link.element2.el.classList.remove("ship-size-0");
+                    link.element2.el.classList.remove("ship-size-1");
+                    link.element2.el.classList.remove("ship-size-2");
+                    link.element3.el.classList.remove("ship-size-0");
+                    link.element3.el.classList.remove("ship-size-1");
+                    link.element3.el.classList.remove("ship-size-2");
+
+                    link.element.el.classList.add("ship-size-" + _data.shipSizeType);
+                    link.element2.el.classList.add("ship-size-" + _data.shipSizeType);
+                    link.element3.el.classList.add("ship-size-" + _data.shipSizeType);
+                }
+
+                extend(link.data, _data);
             },
             removeLink: function (_linkId) {
                 var linkData = this._links[_linkId];
 
                 this.linksLayer.remove(linkData.element);
                 this.linksLayer.remove(linkData.element2);
+                this.linksLayer.remove(linkData.element3);
 
                 delete this._links[_linkId];
 
@@ -510,6 +572,14 @@
                     // Render source point
 
                     linkData.element2.attr({
+                        // d: print_f("M100,250 C100,100 351,211 306,273 Z"),
+                        x1: source.x,
+                        y1: source.y,
+                        x2: target.x,
+                        y2: target.y,
+                    });
+
+                    linkData.element3.attr({
                         // d: print_f("M100,250 C100,100 351,211 306,273 Z"),
                         x1: source.x,
                         y1: source.y,
