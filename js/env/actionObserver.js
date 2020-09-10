@@ -35,10 +35,13 @@
 
                 this._createHandlers();
                 this.options.container.addEventListener("mousedown", this._h.mousedown);
+                this.options.container.addEventListener("touchstart", this._h.mousedown);
+                
             },
             destructor: function () {
                 this.options.container.removeEventListener("mousedown", this._h.mousedown);
-
+                this.options.container.removeEventListener("touchstart", this._h.mousedown);
+                
                 this._state = "initial";
                 this.subject = null;
 
@@ -65,19 +68,28 @@
                     this.options.container.addEventListener("mouseup", this._h.mouseup);
                     this.options.container.addEventListener("mousemove", this._h.mousemove);
                     this.options.container.addEventListener("mouseout", this._h.mouseout);
+                    
+                    this.options.container.addEventListener("touchend", this._h.mouseup);
+                    this.options.container.addEventListener("touchmove", this._h.mousemove);
                 } else {
                     window.addEventListener("mouseup", this._h.mouseup);
                     window.addEventListener("mousemove", this._h.mousemove);
+                    window.addEventListener("touchend", this._h.mouseup);
+                    window.addEventListener("touchmove", this._h.mousemove);
                 }
             },
-            _unbindEvents: function () {
+            _unbindEvents: function () 
                 if(this.options.offOnOut) {
                     this.options.container.removeEventListener("mouseup", this._h.mouseup);
                     this.options.container.removeEventListener("mousemove", this._h.mousemove);
                     this.options.container.removeEventListener("mouseout", this._h.mouseout);
+                    this.options.container.removeEventListener("touchend", this._h.mouseup);
+                    this.options.container.removeEventListener("touchmove", this._h.mousemove);
                 } else {
                     window.removeEventListener("mouseup", this._h.mouseup);
                     window.removeEventListener("mousemove", this._h.mousemove);
+                    window.removeEventListener("touchend", this._h.mouseup);
+                    window.removeEventListener("touchmove", this._h.mousemove);
                 }
             },
             _onMouseDown: function (_event) {
