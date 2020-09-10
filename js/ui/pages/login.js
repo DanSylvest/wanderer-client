@@ -31,7 +31,7 @@ require(["env/cookie", "env/query"], function () {
                         </div>
                         
                         <div class="md-layout md-alignment-center-center relative" style="top: 12px; background: #fff; margin: 0px 172px;">
-                            OR
+                            OR manual
                         </div>
                         <md-divider style="margin-bottom: 15px"></md-divider>   
                     
