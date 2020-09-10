@@ -17,7 +17,7 @@ require(["env/cookie", "env/query"], function () {
           :md-title="dialogLoginTitle"
           :md-content="dialogLoginDescription" />
 
-    <div class="">
+    
         <md-card style=" width: 450px" class="md-elevation-6">          
         
             <md-card-content>
@@ -95,7 +95,7 @@ require(["env/cookie", "env/query"], function () {
         </md-card>
         
          
-    </div>
+    
 </div>
 `;
 
