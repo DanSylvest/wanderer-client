@@ -93,12 +93,13 @@
                         }
                     },
                     _onMouseDown: function(_event) {
-                        if (_event.which && _event.which !== 1) {
+                        if (_event.which !== undefined && _event.which !== 1) {
                             return;
                         }
 
                         var currentMouse = this.getCurrentMouseOffset(_event.touches !== undefined ? _event.touches[0]: _event);
 
+alert(JSON.stringify(currentMouse,true,3))
                         this.subject = this.options.mdCondition({ mouse: currentMouse.copy(), originalEvent: _event });
                         if (!!this.subject) {
                             _event.stopPropagation();
