@@ -78,7 +78,7 @@
                                 window.addEventListener("touchmove", this._h.mousemove);
                             }
                         },
-                        _unbindEvents: function()
+                    _unbindEvents: function()
                         if (this.options.offOnOut) {
                             this.options.container.removeEventListener("mouseup", this._h.mouseup);
                             this.options.container.removeEventListener("mousemove", this._h.mousemove);
