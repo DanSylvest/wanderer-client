@@ -93,6 +93,7 @@
                         }
                     },
                     _onMouseDown: function(_event) {
+                        alert("kek")
                         if (_event.which !== undefined && _event.which !== 1) {
                             return;
                         }
