@@ -93,7 +93,7 @@
                         }
                     },
                     _onMouseDown: function(_event) {
-                        if (_event.which !== 1) {
+                        if (_event.which && _event.which !== 1) {
                             return;
                         }
 
