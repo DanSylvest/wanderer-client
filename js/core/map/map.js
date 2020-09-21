@@ -118,7 +118,7 @@
 
             },
             _createActionObservers: function () {
-                try {
+                // try {
                 this._ao2 = new ActionObserver({
                     offOnOut: false,
                     container: this.svg.el,
@@ -126,7 +126,7 @@
                         return !_event.originalEvent.ctrlKey && !this.findMarker(_event.mouse);
                     }.bind(this)
                 });
-} catch(e) {alert(JSON.stringify(e))}
+// } catch(e) {alert(JSON.stringify(e))}
                 var rlStarted = null;
                 var savedAxis = null;
 
