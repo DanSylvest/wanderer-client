@@ -19,66 +19,66 @@
                 var extend = require("env/tools/extend");
 
                 var ActionObserver = classCreator("ActionObserver", Emitter, {
-                        constructor: function(_options) {
-                            Emitter.prototype.constructor.call(this);
+                    constructor: function(_options) {
+                        Emitter.prototype.constructor.call(this);
 
-                            this.options = extend({
-                                offOnOut: true,
-                                container: null,
-                                isDraggable: true,
-                                isClickable: true,
-                                mdCondition: function() { return true }
-                            }, _options);
+                        this.options = extend({
+                            offOnOut: true,
+                            container: null,
+                            isDraggable: true,
+                            isClickable: true,
+                            mdCondition: function() { return true }
+                        }, _options);
 
-                            this._state = "initial";
-                            this.subject = null;
+                        this._state = "initial";
+                        this.subject = null;
 
-                            this._createHandlers();
-                            this.options.container.addEventListener("mousedown", this._h.mousedown);
-                            this.options.container.addEventListener("touchstart", this._h.mousedown);
+                        this._createHandlers();
+                        this.options.container.addEventListener("mousedown", this._h.mousedown);
+                        this.options.container.addEventListener("touchstart", this._h.mousedown);
 
-                        },
-                        destructor: function() {
-                            this.options.container.removeEventListener("mousedown", this._h.mousedown);
-                            this.options.container.removeEventListener("touchstart", this._h.mousedown);
+                    },
+                    destructor: function() {
+                        this.options.container.removeEventListener("mousedown", this._h.mousedown);
+                        this.options.container.removeEventListener("touchstart", this._h.mousedown);
 
-                            this._state = "initial";
-                            this.subject = null;
+                        this._state = "initial";
+                        this.subject = null;
 
-                            this.options = {
-                                offOnOut: true,
-                                container: null,
-                                isDraggable: true,
-                                isClickable: true,
-                                mdCondition: null
-                            };
+                        this.options = {
+                            offOnOut: true,
+                            container: null,
+                            isDraggable: true,
+                            isClickable: true,
+                            mdCondition: null
+                        };
 
-                            Emitter.prototype.destructor.call(this);
-                        },
-                        _createHandlers: function() {
-                            this._h = {
-                                mousedown: this._onMouseDown.bind(this),
-                                mousemove: this._onMouseMove.bind(this),
-                                mouseup: this._onMouseUp.bind(this),
-                                mouseout: this._onMouseOut.bind(this),
-                            }
-                        },
-                        _bindEvents: function() {
-                            if (this.options.offOnOut) {
-                                this.options.container.addEventListener("mouseup", this._h.mouseup);
-                                this.options.container.addEventListener("mousemove", this._h.mousemove);
-                                this.options.container.addEventListener("mouseout", this._h.mouseout);
+                        Emitter.prototype.destructor.call(this);
+                    },
+                    _createHandlers: function() {
+                        this._h = {
+                            mousedown: this._onMouseDown.bind(this),
+                            mousemove: this._onMouseMove.bind(this),
+                            mouseup: this._onMouseUp.bind(this),
+                            mouseout: this._onMouseOut.bind(this),
+                        }
+                    },
+                    _bindEvents: function() {
+                        if (this.options.offOnOut) {
+                            this.options.container.addEventListener("mouseup", this._h.mouseup);
+                            this.options.container.addEventListener("mousemove", this._h.mousemove);
+                            this.options.container.addEventListener("mouseout", this._h.mouseout);
 
-                                this.options.container.addEventListener("touchend", this._h.mouseup);
-                                this.options.container.addEventListener("touchmove", this._h.mousemove);
-                            } else {
-                                window.addEventListener("mouseup", this._h.mouseup);
-                                window.addEventListener("mousemove", this._h.mousemove);
-                                window.addEventListener("touchend", this._h.mouseup);
-                                window.addEventListener("touchmove", this._h.mousemove);
-                            }
-                        },
-                    _unbindEvents: function()
+                            this.options.container.addEventListener("touchend", this._h.mouseup);
+                            this.options.container.addEventListener("touchmove", this._h.mousemove);
+                        } else {
+                            window.addEventListener("mouseup", this._h.mouseup);
+                            window.addEventListener("mousemove", this._h.mousemove);
+                            window.addEventListener("touchend", this._h.mouseup);
+                            window.addEventListener("touchmove", this._h.mousemove);
+                        }
+                    },
+                    _unbindEvents: function() {
                         if (this.options.offOnOut) {
                             this.options.container.removeEventListener("mouseup", this._h.mouseup);
                             this.options.container.removeEventListener("mousemove", this._h.mousemove);
@@ -100,7 +100,7 @@
 
                         var currentMouse = this.getCurrentMouseOffset(_event.touches !== undefined ? _event.touches[0]: _event);
 
-alert(JSON.stringify(currentMouse,true,3))
+// alert(JSON.stringify(currentMouse,true,3))
                         this.subject = this.options.mdCondition({ mouse: currentMouse.copy(), originalEvent: _event });
                         if (!!this.subject) {
                             _event.stopPropagation();
