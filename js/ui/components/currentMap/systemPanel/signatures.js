@@ -7,6 +7,7 @@
         "env/promise",
         "env/sizeObserver",
         "env/tabObserver",
+        "ui/components/cTimeLeft",
     ];
 
     define(componentId, deps, function () {
