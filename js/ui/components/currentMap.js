@@ -90,10 +90,6 @@
         </c-context-menu> 
                   
         <c-context-menu :c-activated.sync="systemCMActive" :c-offset-x="systemCMOffsetX" :c-offset-y="systemCMOffsetY" @c-closed="onClosedSystemContext">
-            <c-context-menu-item c-title="Edit system" c-icon="edit" @click="onSystemContextMenuEdit" />
-            <c-context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
-            <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
-            <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
             <c-context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">
                 <c-context-menu-item c-title="Clear" c-icon="block" @click="onClearTag"/>
                 <c-context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
@@ -103,6 +99,10 @@
                     <c-context-menu-item :c-title="item.toString()" v-for="item in digits" @click="onDigitClick(item)" />
                 </c-context-menu-item>
             </c-context-menu-item>
+            <c-context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
+            <c-context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
+            <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
+            <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
         </c-context-menu>
     </div>
     
@@ -211,6 +211,12 @@
                 // API
 
                 // HANDLERS
+
+                onSystemCopyName: function () {
+                    var systemName = this.mapController.systems[this._currentContextSystem].info.name;
+                    navigator.clipboard.writeText(systemName);
+                    // debugger;
+                },
 
                 onSelectionCompleted: function (_event) {
                     this.mapController.setSelection(_event.leftTop, _event.rightBottom);
