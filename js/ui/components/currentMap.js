@@ -214,8 +214,7 @@
 
                 onSystemCopyName: function () {
                     var systemName = this.mapController.systems[this._currentContextSystem].info.name;
-                    navigator.clipboard.writeText(systemName);
-                    // debugger;
+                    copyToClipboard(systemName);
                 },
 
                 onSelectionCompleted: function (_event) {
@@ -435,6 +434,16 @@
                 }
             }
         });
+
+
+        const copyToClipboard = str => {
+            const el = document.createElement('textarea');
+            el.value = str;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        };
     });
 })(window);
 
