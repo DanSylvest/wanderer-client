@@ -96,9 +96,17 @@
                 this._to.on("in", this._onTabIn.bind(this));
 
                 this._hiddenInput = this.$el.querySelector(".c-hidden-input");
-                this._hiddenInput.addEventListener("paste", this.onPaste.bind(this));
+
+                // this._focusHandler = this.focus.bind(this);
+                this._pasteHandler = this.onPaste.bind(this);
+
+                this._hiddenInput.addEventListener("paste", this._pasteHandler);
+                // window.addEventListener("mousedown", this._focusHandler);
             },
             beforeDestroy: function () {
+                // window.removeEventListener("mousedown", this._focusHandler);
+                this._hiddenInput.removeEventListener("paste", this._pasteHandler);
+
                 this._rtid !== -1 && clearTimeout(this._rtid);
                 this._rtid = -1;
                 this.mapId = null;
@@ -194,20 +202,24 @@
                         this.currentWaitSaveData = result;
                     } else {
                         api.eve.map.updateSystem(this.mapId, this.systemId, {
-                            signatures: result.updatedSignatures.concat(result.newSignatures)
+                            signatures: result.updatedSignatures.concat(result.newSignatures).concat(result.oldSignatures)
                         });
                     }
                 },
                 _processSignatures: function (_signatures) {
+                    var kinds = ["Cosmic Signature", "Cosmic Anomaly"];
+                    var names = ["Unstable Wormhole", "Gas Site", "Relic Site", "Data Site"]
+
                     var nonExistingSignatures = [];
 
                     for (var a = 0; a < this.signatures.length; a++) {
                         var oldSignature = this.signatures[a];
 
-                        if(!_signatures.searchByObjectKey("id", oldSignature.id))
+                        if (!_signatures.searchByObjectKey("id", oldSignature.id))
                             nonExistingSignatures.push(oldSignature.id);
                     }
 
+                    var oldSignatures = [];
                     var updatedSignatures = [];
                     var newSignatures = [];
 
@@ -216,15 +228,24 @@
 
                         var oldSig = this.signatures.searchByObjectKey("id", signature.id);
 
-                        if(oldSig) {
-                            updatedSignatures.push({
-                                id: oldSig.id,
-                                kind: signature.kind,
-                                type: signature.type,
-                                name: signature.name,
-                                description: signature.description,
-                                created: oldSig.created
-                            })
+                        if (oldSig) {
+                            if (kinds.in(oldSig.kind)) {
+                                if (
+                                    oldSig.name === "" && signature.name !== ""
+                                    && oldSig.name !== "" && names.in(oldSig.name) && !names.in(signature.name)
+                                ) {
+                                    updatedSignatures.push({
+                                        id: oldSig.id,
+                                        kind: signature.kind,
+                                        type: signature.type,
+                                        name: signature.name,
+                                        description: signature.description,
+                                        created: oldSig.created
+                                    })
+                                } else {
+                                    oldSignatures.push(oldSig)
+                                }
+                            }
                         } else {
                             newSignatures.push(signature);
                         }
@@ -234,6 +255,7 @@
                         nonExistingSignatures: nonExistingSignatures,
                         updatedSignatures: updatedSignatures,
                         newSignatures: newSignatures,
+                        oldSignatures: oldSignatures,
                     }
                 }
             }
@@ -266,33 +288,65 @@
             }
         }
 
-        var rx = /([A-Z]{3}-[0-9]{3})\s(\w+\s\w+)\s(|\w+\s\w+)\s(|[A-Za-z\s]+)\s/gm;
+        //`		`
+        // char 9
+        // var rx = /([A-Z]{3}-[0-9]{3})\s(\w+\s\w+)\s(|\w+\s\w+)\s(|[A-Za-z\s]+)\s/gm;
         var signaturesParser = function (_value) {
             var outArr = [];
-            var itr = _value.matchAll(rx);
+            var rows = _value.split('\n');
 
-            var result = itr.next();
-            while(!result.done) {
+            for (var a = 0; a < rows.length; a++) {
+                var row = rows[a];
 
-                var type = result.value[3];
+                var sigArrInfo = row.split("	");
 
-                var kind = result.value[2];
-                if(kind === "Unstable Wormhole") {
-                    kind = "Wormhole"
+                if(sigArrInfo.length === 0) {
+                    continue;
+                }
+
+                if(!sigArrInfo[1] || sigArrInfo[1] !== "Cosmic Signature") {
+                    continue;
                 }
 
                 outArr.push({
-                    id: result.value[1],
-                    kind: kind,
-                    type: type ? type.split(" ")[0] : "Signature",
-                    name: result.value[4],
+                    id: sigArrInfo[0],
+                    kind: sigArrInfo[1],
+                    type: sigArrInfo[2],
+                    name: sigArrInfo[3],
                     description: "",
                     created: new Date().toUTCString()
-                });
-                result = itr.next();
+                })
+
+                // debugger;
             }
 
             return outArr;
+
+
+            // var itr = _value.matchAll(rx);
+            //
+            // var result = itr.next();
+            // while(!result.done) {
+            //
+            //     var type = result.value[3];
+            //
+            //     var kind = result.value[2];
+            //     if(kind === "Unstable Wormhole") {
+            //         kind = "Wormhole"
+            //     }
+            //
+            //     outArr.push({
+            //         id: result.value[1],
+            //         kind: kind,
+            //         type: type ? type.split(" ")[0] : "Signature",
+            //         name: result.value[4],
+            //         description: "",
+            //         created: new Date().toUTCString()
+            //     });
+            //     result = itr.next();
+            // }
+            //
+            // return outArr;
         }
     });
 })(window);

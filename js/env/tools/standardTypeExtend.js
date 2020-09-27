@@ -53,3 +53,7 @@ var exist = function (_var) {
     var cond3 = _var === _var;
     return cond1 && cond0 && cond3;
 };
+
+Array.prototype.in = function (_key) {
+    return this.indexOf(_key) !== -1;
+}
