@@ -27,6 +27,7 @@
            <label><md-icon>search</md-icon>Search characters</label>
             
            <template slot="md-autocomplete-item" slot-scope="{ item, term }">
+               <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" style="margin-right: 10px;"/>
                <md-highlight-text :md-fuzzy-search="false" :md-term="term">{{ item.name }}</md-highlight-text>
            </template>
            

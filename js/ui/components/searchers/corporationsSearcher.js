@@ -27,6 +27,7 @@
            <label><md-icon>search</md-icon>Search corporations</label>
             
            <template slot="md-autocomplete-item" slot-scope="{ item, term }">
+               <img class="md-icon" :src="'https://images.evetech.net/corporations/' + item.id + '/logo'" style="margin-right: 10px;"/>
                <md-highlight-text :md-fuzzy-search="false" :md-term="term">{{ item.name }}</md-highlight-text>
            </template>
            
