@@ -425,6 +425,8 @@
 
                 delete this._links[_linkId];
 
+                this._forceLinks = this.forceLinks();
+
                 this._sfForce.call();
             },
             enableForce: function (_bool) {
