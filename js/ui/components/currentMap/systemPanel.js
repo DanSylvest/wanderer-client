@@ -107,6 +107,11 @@
 
                     this.mapId = _mapId;
                     this.systemId = _systemId;
+
+                    if(this.$refs.signatures) {
+                        this.$refs.signatures.load(this.mapId, this.systemId);
+                    }
+
                     this.focus();
                 },
                 hide: function () {
@@ -126,7 +131,7 @@
                 },
                 __update: function () {
                     this.showPopup = true;
-                    this.panelTitle = printf("%s", this.currentSystemData.name);
+                    this.panelTitle = printf("%s - (%s)", this.currentSystemData.name, this.systemId);
 
                     switch (this.currentTab) {
                         case "tab-overview":

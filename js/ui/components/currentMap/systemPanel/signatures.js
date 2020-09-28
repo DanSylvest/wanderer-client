@@ -99,7 +99,6 @@
 
                 // this._focusHandler = this.focus.bind(this);
                 this._pasteHandler = this.onPaste.bind(this);
-
                 this._hiddenInput.addEventListener("paste", this._pasteHandler);
                 // window.addEventListener("mousedown", this._focusHandler);
             },
@@ -115,6 +114,14 @@
                 this._to.destructor();
             },
             methods: {
+                updateHiddenInput: function () {
+                    this._hiddenInput.removeEventListener("paste", this._pasteHandler);
+
+                    this.$nextTick(function () {
+                        this._hiddenInput = this.$el.querySelector(".c-hidden-input");
+                        this._hiddenInput.addEventListener("paste", this._pasteHandler);
+                    }.bind(this));
+                },
                 refresh: function () {
                     this._rtid !== -1 && clearTimeout(this._rtid);
                     this._rtid = setTimeout(innerRefresh.bind(this), 10);
@@ -126,6 +133,7 @@
                 },
                 _onTabIn: function () {
                     this.enable = true;
+                    this.updateHiddenInput();
                 },
                 onSelect (items) {
                     this.selected = items
