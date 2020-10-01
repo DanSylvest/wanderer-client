@@ -13,7 +13,7 @@
     define(moduleName, deps, function () {
         var CustomPromise = require("env/promise");
 
-        var groupInfo = function (_mapId) {
+        var request = function (_mapId) {
             var p = new CustomPromise();
 
             var id = this.add(function (_e) {
@@ -28,6 +28,6 @@
             return p.native;
         };
 
-        return groupInfo;
+        return request;
     })
 })();

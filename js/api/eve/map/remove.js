@@ -20,7 +20,7 @@
          * @param {string} _mapId
          * @returns {*}
          */
-        var eveMapRemove = function (_mapId) {
+        var request = function (_mapId) {
             var p = new promise();
 
             var id = this.add(function (_e) {
@@ -35,6 +35,6 @@
             return p.native;
         };
 
-        return eveMapRemove;
+        return request;
     })
 })();

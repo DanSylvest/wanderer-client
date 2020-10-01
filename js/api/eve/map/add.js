@@ -23,7 +23,7 @@
          * @param {Boolean} _options.isPrivate
          * @returns {*}
          */
-        var eveMapAdd = function (_options) {
+        var request = function (_options) {
             var p = new promise();
 
             var id = this.add(function (_e) {
@@ -41,6 +41,6 @@
             return p.native;
         };
 
-        return eveMapAdd;
+        return request;
     })
 })();

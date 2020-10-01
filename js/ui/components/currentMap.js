@@ -69,7 +69,6 @@
         <c-system-panel ref="systemPanel" />
         
         <c-context-menu :c-activated.sync="linkCMActive" :c-offset-x="linkCMOffsetX" :c-offset-y="linkCMOffsetY" @c-closed="onClosedLinkContext">
-            <c-context-menu-item c-title="Edit chain" c-icon="edit" @click="onLinkContextMenuEdit" />
             <c-context-menu-item c-title="Time state" c-icon="access_time" :c-is-submenu="true" >
                 <c-context-menu-item c-title="Not yet begun" c-icon="done_all" @click="onTimeStateChange(0)"/>
                 <c-context-menu-item c-title="End of life" c-icon="error_outline" @click="onTimeStateChange(1)"/>                
@@ -102,6 +101,13 @@
                 </c-context-menu-item>
             </c-context-menu-item>
             <c-context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
+            <c-context-menu-item c-title="Waypoints" c-icon="call_split" :c-is-submenu="true" v-show="isSystemInKSpace">
+                <c-context-menu-item :c-title="item.name" :c-is-submenu="true" v-for="item in characters">
+                    <c-context-menu-item c-title="Set Destination" c-icon="near_me" @click="onSetDestination(item.id)"/>
+                    <c-context-menu-item c-title="Add Waypoint Front" c-icon="call_missed" @click="onAddWaypointFront(item.id)" />
+                    <c-context-menu-item c-title="Add Waypoint Back" c-icon="call_missed_outgoing" @click="onAddWaypointBack(item.id)" />
+                </c-context-menu-item>
+            </c-context-menu-item>
             <c-context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
             <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
             <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
@@ -132,6 +138,7 @@
                     isLoaded: false,
                     systemContextMenuLockedItem: false,
                     isAutoAlignment: false,
+                    characters: [],
 
                     linkCMOffsetX: 0,
                     linkCMOffsetY: 0,
@@ -140,6 +147,7 @@
                     systemCMOffsetX: 0,
                     systemCMOffsetY: 0,
                     systemCMActive: false,
+                    isSystemInKSpace: false,
 
                     systemsCMActive: false,
                     systemsCMOffsetX: 0,
@@ -178,7 +186,11 @@
                     var pr = new CustomPromise();
 
                     var mapIds = [];
-                    api.eve.map.allowedMaps().then(function (_mapIds) {
+                    api.eve.character.list().then(function(_characters){
+                        this.characters = _characters;
+
+                        return api.eve.map.allowedMaps();
+                    }.bind(this)).then(function (_mapIds) {
                         mapIds = _mapIds;
                         var prarr = [];
 
@@ -187,8 +199,6 @@
                         }
 
                         return Promise.all(prarr);
-                    }.bind(this), function (_err) {
-                        pr.reject(_err);
                     }.bind(this)).then(function (_arr) {
                         for (var a = 0; a < _arr.length; a++) {
                             _arr[a].id = mapIds[a];
@@ -203,9 +213,9 @@
                             this.selectedMap = _arr[0].id;
                         }
                         pr.resolve();
-                    }.bind(this), function (_err) {
+                    }.bind(this)).catch(function (_err) {
                         pr.reject(_err);
-                    }.bind(this))
+                    });
 
                     return pr.native;
                 },
@@ -328,6 +338,15 @@
                 onClosedLinkContext: function () {
                     this._currentContextLink = null;
                 },
+                onSetDestination: function (_characterId) {
+                    api.eve.map.waypoint(_characterId, 0, this._currentContextSystem);
+                },
+                onAddWaypointFront: function (_characterId) {
+                    api.eve.map.waypoint(_characterId, 1, this._currentContextSystem);
+                },
+                onAddWaypointBack: function (_characterId) {
+                    api.eve.map.waypoint(_characterId, 2, this._currentContextSystem);
+                },
                 // HANDLERS
 
 
@@ -391,6 +410,16 @@
                     this.systemContextMenuLockedItem = systemInfo.isLocked;
                     this.systemCMOffsetX = _event.x + 10;
                     this.systemCMOffsetY = _event.y + 10;
+
+                    switch (systemInfo.systemType) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            this.isSystemInKSpace = true;
+                            break;
+                        default:
+                            this.isSystemInKSpace = false;
+                    }
                 },
                 _onSystemsContextMenu: function (_systemIds, _event) {
                     this._offContexts();

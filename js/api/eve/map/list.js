@@ -15,7 +15,7 @@
     define(moduleName, deps, function () {
         var promise = require("env/promise");
 
-        var eveMapList = function () {
+        var request = function () {
             var p = new promise();
 
             var id = this.add(function (_e) {
@@ -28,6 +28,6 @@
             return p.native;
         };
 
-        return eveMapList;
+        return request;
     })
 })();
