@@ -5,6 +5,7 @@
         "core/map/map",
         "env/promise",
         "ui/components/currentMap/controller/mapController",
+        "env/cookie",
 
         "ui/components/cContextMenu",
         "ui/components/cAreaSelection",
@@ -15,6 +16,7 @@
         var Map           = require("core/map/map");
         var CustomPromise = require("env/promise");
         var MapController = require("ui/components/currentMap/controller/mapController");
+        var cookie        = require("env/cookie");
 
         var template = `
 
@@ -359,6 +361,13 @@
                     this.mapController.on("systemChange", this._onSystemChange.bind(this));
                     this.mapController.on("dragStarted", this._onDragStarted.bind(this));
                     this.mapController.on("mapClicked", this._onMapClicked.bind(this));
+                    this.mapController.on("offsetChanged", this._onMapOffsetChanged.bind(this));
+
+                    var offset = cookie.get(`offset_${_mapId}`);
+                    if(offset) {
+                        var pointArr = offset.split(",");
+                        this.mapController.setOffset(parseFloat(pointArr[0]), parseFloat(pointArr[1]));
+                    }
                 },
                 _offContexts: function () {
                     this.systemsCMActive = false;
@@ -414,6 +423,9 @@
                 _onMapClicked: function () {
                     this.mapController.map.deselectAll();
                     this._offContexts();
+                },
+                _onMapOffsetChanged: function (_offset) {
+                    cookie.set(`offset_${this.mapController.mapId}`, `${_offset.x},${_offset.y}`, {expires: 60 * 60 * 24 * 365 * 1000});
                 },
                 _onSystemChange: function (_data) {
                     switch (_data.type) {

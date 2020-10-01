@@ -40,6 +40,7 @@
                 this.map.on("markerClicked", this.onMarkerClicked.bind(this));
                 this.map.on("dragStarted", this.emit.bind(this, "dragStarted"));
                 this.map.on("mapClicked", this.emit.bind(this, "mapClicked"));
+                this.map.on("offsetChanged", this.emit.bind(this, "offsetChanged"));
                 this.map.clear();
 
                 this._systemsSubscription.subscribe().then(function () {
@@ -73,6 +74,9 @@
                 for (var a = 0; a < result.length; a++) {
                     this.map.setSelectMarker(result[a], true);
                 }
+            },
+            setOffset: function (x,y) {
+                this.map.setOffset(x,y);
             },
             _onSystemSubscriptionChange: function (_data) {
                 var onlineCharacters;

@@ -117,6 +117,11 @@
             clear: function () {
 
             },
+            setOffset: function (x,y) {
+                this.magnifier.hAxis.min = x;
+                this.magnifier.vAxis.min = y;
+                this.render();
+            },
             _createActionObservers: function () {
                 // try {
                 this._ao2 = new ActionObserver({
@@ -151,6 +156,7 @@
                     this.magnifier.hAxis.min = savedAxis.x - v.x;
                     this.magnifier.vAxis.min = savedAxis.y - v.y;
 
+                    this.emit("offsetChanged", new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
                     this.render();
                 }.bind(this));
 
