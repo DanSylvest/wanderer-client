@@ -2,11 +2,13 @@
     var moduleName = "ui/components/cContextMenu";
 
     var deps = [
-        "env/mouseObserver"
+        "env/mouseObserver",
+        "env/spamFilter"
     ];
 
     define(moduleName, deps, function () {
         var MouseObserver = require("env/mouseObserver");
+        var SpamFilter    = require("env/spamFilter");
 
         var getContextContainer = function () {
             var arr = document.getElementsByClassName("c-contexts-container");
@@ -246,21 +248,42 @@
                     this.isEnable = true;
                     this.itemBody = this.$el;
 
+
                     this.mouseObserver = new MouseObserver(this.itemBody);
                     this.mouseObserver.on("mouseIn", this._onMouseIn.bind(this));
                     this.mouseObserver.on("mouseOut", this._onMouseOut.bind(this));
 
-                    if(this.isSubmenu) {
-                        for (var a = 0; a < this.$refs.submenu.$children.length; a++) {
-                            var child = this.$refs.submenu.$children[a];
-                            child.$on("over", this.onSmChildrenOver.bind(this, child));
-                        }
-                    }
+                    this.spamFilter = new SpamFilter(this._updateHandlers, 10);
+                    this._handlers = [];
+                },
+                updated: function () {
+                    this.spamFilter.call();
                 },
                 beforeDestroy: function () {
                     this.mouseObserver.destructor();
+                    this.spamFilter.destructor();
                 },
                 methods: {
+                    _updateHandlers: function () {
+                        if(this.isSubmenu) {
+                            this.destroyHandlers();
+                            this.createHandlers();
+                        }
+                    },
+                    createHandlers: function () {
+                        for (var a = 0; a < this.$refs.submenu.$children.length; a++) {
+                            var child = this.$refs.submenu.$children[a];
+                            var handler = this.onSmChildrenOver.bind(this, child);
+                            this._handlers.push([child, "over", handler]);
+                            child.$on("over", handler);
+                        }
+                    },
+                    destroyHandlers: function () {
+                        for (var a = 0; a < this._handlers.length; a++) {
+                            this._handlers[a][0].$off(this._handlers[a][1], this._handlers[a][2]);
+                        }
+                        this._handlers = [];
+                    },
                     onClick: function (_event) {
                         this.$emit("click", _event);
                     },
@@ -299,11 +322,6 @@
 
                         this.smX = smX;
                         this.smY = smY;
-
-                        //
-                        // if(this.offsetY + ctxBodyBoundsAfter.height > bodyBounds.height) {
-                        //     this.offsetY = bodyBounds.height - ctxBodyBoundsAfter.height;
-                        // }
                     },
                     collapse: function () {
                         if(this.isSubmenu && this.isExpand) {
