@@ -41,6 +41,8 @@
                 this.map.on("dragStarted", this.emit.bind(this, "dragStarted"));
                 this.map.on("mapClicked", this.emit.bind(this, "mapClicked"));
                 this.map.on("offsetChanged", this.emit.bind(this, "offsetChanged"));
+                this.map.on("markerIn", this.emit.bind(this, "markerIn"));
+                this.map.on("markerOut", this.emit.bind(this, "markerOut"));
                 this.map.clear();
 
                 this._systemsSubscription.subscribe().then(function () {

@@ -142,3 +142,76 @@
 .eve-zInd-top {
     z-index: 1;
 }
+
+.eve-system-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    min-width: 100px;
+    /*min-height: 80px;*/
+}
+
+.eve-card-header {
+    display: flex;
+    justify-content: flex-start;
+    white-space: nowrap;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.eve-card-header > div:not(:last-child) {
+    margin-right: 5px;
+}
+
+.eve-card-header > div {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.eve-card-solar-security {
+    color: #aaaaaa;
+    font-weight: bold;
+}
+.eve-card-solar-system-name {
+    color: #848484;
+    font-weight: bold;
+}
+.eve-card-constellation-name {
+    color: #aaaaaa;
+}
+.eve-card-region-name {
+    color: #aaaaaa;
+}
+
+.eve-card-content {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    box-sizing: border-box;
+}
+
+.eve-card-content > div {
+    line-height: 14px;
+    /*font-weight: bold;*/
+    font-family: sans-serif;
+    color: #848484;
+    font-size: 11px;
+}
+
+.eve-card-local {
+
+}
+.eve-card-local-character {
+
+}
+.eve-card-local-name {
+    font-weight: bold;
+    color: #006890;
+}
+.eve-card-local-name.eve-card-local-name-own {
+    color: #ca7900;
+}
+.eve-card-local-ship {
+    font-weight: bold;
+}

@@ -319,7 +319,6 @@
                             smY = itemBodyBounds.y + itemBodyBounds.height - ctxBodyBoundsAfter.height;
                         }
 
-
                         this.smX = smX;
                         this.smY = smY;
                     },

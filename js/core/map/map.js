@@ -206,6 +206,8 @@
 
                 marker.on("mousedown", this._onMarkerDown.bind(this, mid));
                 marker.on("contextmenu", this._onMarkerContext.bind(this, mid));
+                marker.on("mousein", this._onMarkerMouseIn.bind(this, mid));
+                marker.on("mouseout", this._onMarkerMouseOut.bind(this, mid));
 
                 this._markers[mid] = marker;
 
@@ -269,6 +271,9 @@
                         return;
                     }
 
+                    this._onMarkerMouseOut(_markerId, _event);
+                    this._isDragging = true;
+
                     this._markers[_event.subject.id].wrapper.el.classList.add("eve-zInd-top");
 
                     this.simulation.alphaTarget(0.3).restart();
@@ -300,6 +305,8 @@
                 }.bind(this));
 
                 this._ao.on("dragEnd", function (_event) {
+                    this._isDragging = false;
+
                     if(this._markers[_event.subject.id].data.isLocked) {
                         return;
                     }
@@ -453,6 +460,8 @@
                 return out;
             },
             _onMarkerClick: function (_markerId, _event) {
+                this._onMarkerMouseOut(_markerId, _event)
+
                 var marker = this._markers[_markerId];
                 this.emit("markerClicked", marker.data.customId, _event);
             },
@@ -462,6 +471,16 @@
 
                 var marker = this._markers[_markerId];
                 this.emit("systemContextMenu", marker.data.customId, _event);
+            },
+            _onMarkerMouseIn: function (_markerId, _event){
+                if(!this._isDragging) {
+                    var marker = this._markers[_markerId];
+                    this.emit("markerIn", marker.data.customId, _event);
+                }
+            },
+            _onMarkerMouseOut: function (_markerId, _event){
+                var marker = this._markers[_markerId];
+                this.emit("markerOut", marker.data.customId, _event);
             },
             _onLinkClick: function (_linkId) {
                 var linkData = this._links[_linkId];

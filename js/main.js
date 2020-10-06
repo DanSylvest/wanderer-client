@@ -12,7 +12,7 @@ var deps = [
     "core/pageController",
     "core/pageLoader",
     "defaultLayout",
-    "env/tabKeeper"
+    // "env/tabKeeper"
 ];
 require(deps, function() {
     var mainConf       = require("conf/main");

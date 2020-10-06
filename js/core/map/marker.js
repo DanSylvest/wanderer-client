@@ -12,7 +12,8 @@
         "env/tools/print_f",
         "env/tools/emitter",
         "env/ui",
-        "core/map/environment"
+        "core/map/environment",
+        "env/mouseObserver"
     ];
 
     define(moduleName, deps, function () {
@@ -23,6 +24,7 @@
         var Emitter         = require("env/tools/emitter");
         var _ui             = require("env/ui");
         var environment     = require("core/map/environment");
+        var MouseObserver   = require("env/mouseObserver");
 
         var Marker = classCreator("Marker", Emitter, {
             constructor: function (_options) {
@@ -34,8 +36,14 @@
 
                 this.markerDownHandler = this._onMarkerDown.bind(this);
                 this.markerContextHandler = this._onMarkerContext.bind(this);
-
                 this.createMarker();
+                this.createMouseObserver();
+            },
+            destructor: function () {
+                this.mo.destructor();
+                this.mo = null;
+
+                Emitter.prototype.destructor.call(this);
             },
             createMarker: function () {
                 this.wrapper = _ui.fromText(`
@@ -62,6 +70,11 @@
 
                 this.wrapper.el.addEventListener("mousedown", this.markerDownHandler);
                 this.wrapper.el.addEventListener("contextmenu", this.markerContextHandler);
+            },
+            createMouseObserver: function () {
+                this.mo = new MouseObserver(this.wrapper.el);
+                this.mo.on("mouseIn", this._onMouseIn.bind(this));
+                this.mo.on("mouseOut", this._onMouseOut.bind(this));
             },
             update: function (_data) {
                 var markerData = this.data;
@@ -152,6 +165,12 @@
             },
             _onMarkerContext: function (_event) {
                 this.emit("contextmenu", _event);
+            },
+            _onMouseIn: function (_event){
+                this.emit("mousein", _event);
+            },
+            _onMouseOut: function (_event){
+                this.emit("mouseout", _event);
             },
         });
 

@@ -9,7 +9,9 @@
 
         "ui/components/cContextMenu",
         "ui/components/cAreaSelection",
+        "ui/components/cTooltip",
         "ui/components/currentMap/systemPanel",
+        "ui/components/currentMap/systemCard",
     ];
 
     define(componentId, deps, function () {
@@ -112,6 +114,16 @@
             <c-context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
             <c-context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
         </c-context-menu>
+        
+        <c-tooltip 
+            :c-offset-x="item.x" 
+            :c-offset-y="item.y" 
+            :c-activated="true"
+            :key="item.systemId"
+            v-for="item in systemsTooltipDisplayed"
+        >
+            <c-system-card :c-solar-system-id="item.systemId" :c-map-id="item.mapId" />
+        </c-tooltip>
     </div>
     
     <c-area-selection v-on:c-selection-completed="onSelectionCompleted" @c-selection-started="onSelectionStarted" />
@@ -152,6 +164,8 @@
                     systemsCMActive: false,
                     systemsCMOffsetX: 0,
                     systemsCMOffsetY: 0,
+
+                    systemsTooltipDisplayed: []
                 }
             },
             template: template,
@@ -381,6 +395,8 @@
                     this.mapController.on("dragStarted", this._onDragStarted.bind(this));
                     this.mapController.on("mapClicked", this._onMapClicked.bind(this));
                     this.mapController.on("offsetChanged", this._onMapOffsetChanged.bind(this));
+                    this.mapController.on("markerIn", this._onMapMarkerIn.bind(this));
+                    this.mapController.on("markerOut", this._onMapMarkerOut.bind(this));
 
                     var offset = cookie.get(`offset_${_mapId}`);
                     if(offset) {
@@ -455,6 +471,12 @@
                 },
                 _onMapOffsetChanged: function (_offset) {
                     cookie.set(`offset_${this.mapController.mapId}`, `${_offset.x},${_offset.y}`, {expires: 60 * 60 * 24 * 365 * 1000});
+                },
+                _onMapMarkerIn: function (_systemId, _event) {
+                    this.systemsTooltipDisplayed.push({mapId: this.selectedMap, systemId: _systemId, x: _event.clientX, y: _event.clientY});
+                },
+                _onMapMarkerOut: function (_systemId, _event) {
+                    this.systemsTooltipDisplayed.eraseByObjectKey("systemId", _systemId);
                 },
                 _onSystemChange: function (_data) {
                     switch (_data.type) {
