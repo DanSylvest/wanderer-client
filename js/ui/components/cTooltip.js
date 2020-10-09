@@ -28,7 +28,7 @@
         }
 
         var template = `
-            <div class="c-context-main c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
+            <div class="с-tooltip c-context-main c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
                 <slot></slot>
             </div>
         `;

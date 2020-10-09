@@ -55,6 +55,11 @@
     }
 }
 
+.с-tooltip {
+    pointer-events: none;
+    user-select: none;
+}
+
 .c-hidden-input {
     outline: none;
     appearance: none;
