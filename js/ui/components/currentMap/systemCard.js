@@ -33,7 +33,8 @@
             <div class="eve-card-constellation-name">{{constellationName}}</div>
             <div class="eve-card-region-name">{{regionName}}</div>
         </div>
-        <div class="eve-card-content">
+        <div class="eve-card-divider" v-show="characters.length > 0"></div>
+        <div class="eve-card-content" v-show="characters.length > 0">
             <div class="eve-card-local">
                 <div class="eve-card-local-character" v-for="item in characters" :key="item.name">
                     <span :class="{'eve-card-local-name':true, 'eve-card-local-name-own': item.isOwn}">{{item.name}}</span>

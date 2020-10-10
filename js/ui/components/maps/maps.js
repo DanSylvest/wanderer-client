@@ -27,7 +27,7 @@
                 <md-table-head>Description</md-table-head>
             </md-table-row>
             
-            <md-table-row @contextmenu="onContextMenu(map.id, $event)" @click="onMapRowClick(map.id, $event)" class="cursor-pointer" v-for="map in maps">            
+            <md-table-row @contextmenu="onContextMenu(map.id, $event)" @click="onMapRowClick(map.id, $event)" class="cursor-pointer" v-for="map in maps" :key="map.id">            
                 <md-table-cell>
                     <md-icon>{{!Boolean.fromString(map.private) ? "lock_open" : "lock"}}</md-icon>
                 </md-table-cell>

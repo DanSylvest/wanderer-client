@@ -18,7 +18,7 @@
             <md-table-head>Description</md-table-head>
         </md-table-row>
         
-        <md-table-row @click="onRowClick(item.id, $event)" class="cursor-pointer" v-for="item in groups">
+        <md-table-row @click="onRowClick(item.id, $event)" class="cursor-pointer" v-for="item in groups" :key="item.id">
             <md-table-cell>{{item.name}}</md-table-cell>
             <md-table-cell>{{item.owner}}</md-table-cell>
             <md-table-cell>{{item.description}}</md-table-cell>

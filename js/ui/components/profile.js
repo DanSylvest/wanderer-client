@@ -23,9 +23,6 @@
 
             },
             methods: {
-                close: function () {
-
-                },
                 refresh: function () {
 
                 },

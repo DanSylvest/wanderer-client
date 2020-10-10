@@ -24,7 +24,7 @@
             <md-table-head>Description</md-table-head>
         </md-table-row>
         
-        <md-table-row @contextmenu="onContextMenu(item.id, $event)" @click="onRowClick(item.id, $event)" class="cursor-pointer" v-for="item in groups">
+        <md-table-row @contextmenu="onContextMenu(item.id, $event)" @click="onRowClick(item.id, $event)" class="cursor-pointer" v-for="item in groups" :key="item.id">
             <md-table-cell>{{item.name}}</md-table-cell>
             <md-table-cell>{{item.owner}}</md-table-cell>
             <md-table-cell>{{item.description}}</md-table-cell>

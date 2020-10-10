@@ -33,7 +33,7 @@
                 <md-field>
                     <label for="selectedMap">Select a map...</label>
                     <md-select v-model="selectedMap" name="selectedMap" id="selectedMap" md-dense @md-selected="onMapSelected($event)">
-                        <md-option v-for="item in allowedMaps" :value="item.id">{{item.name}}</md-option>
+                        <md-option v-for="item in allowedMaps" :value="item.id" :key="item.id">{{item.name}}</md-option>
                     </md-select>
                 </md-field>
             </div>
@@ -96,15 +96,15 @@
             <c-context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">
                 <c-context-menu-item c-title="Clear" c-icon="block" @click="onClearTag"/>
                 <c-context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
-                    <c-context-menu-item :c-title="item.toString()" v-for="item in letters" @click="onLetterClick(item)" />
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in letters" :key="item" @click="onLetterClick(item)" />
                 </c-context-menu-item>
                 <c-context-menu-item c-title="Digit" c-icon="edit" :c-is-submenu="true">
-                    <c-context-menu-item :c-title="item.toString()" v-for="item in digits" @click="onDigitClick(item)" />
+                    <c-context-menu-item :c-title="item.toString()" v-for="item in digits" :key="item" @click="onDigitClick(item)" />
                 </c-context-menu-item>
             </c-context-menu-item>
             <c-context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
             <c-context-menu-item c-title="Waypoints" c-icon="call_split" :c-is-submenu="true" v-show="isSystemInKSpace">
-                <c-context-menu-item :c-title="item.name" :c-is-submenu="true" v-for="item in characters">
+                <c-context-menu-item :c-title="item.name" :c-is-submenu="true" v-for="item in characters" :key="item.id">
                     <c-context-menu-item c-title="Set Destination" c-icon="near_me" @click="onSetDestination(item.id)"/>
                     <c-context-menu-item c-title="Add Waypoint Front" c-icon="call_missed" @click="onAddWaypointFront(item.id)" />
                     <c-context-menu-item c-title="Add Waypoint Back" c-icon="call_missed_outgoing" @click="onAddWaypointBack(item.id)" />
@@ -182,17 +182,16 @@
                     debugger;
                 }.bind(this));
             },
+            beforeDestroy: function ( ){
+                if(this.mapController) {
+                    var map = this.mapController.map;
+                    this.mapController && this.mapController.deinit();
+                    map && map.destructor();
+                    this.mapController = null
+                }
+                this.$refs.systemPanel.hide();
+            },
             methods: {
-                // API
-                close: function () {
-                    if(this.mapController) {
-                        var map = this.mapController.map;
-                        this.mapController && this.mapController.deinit();
-                        map && map.destructor();
-                        this.mapController = null
-                    }
-                    this.$refs.systemPanel.hide();
-                },
                 refresh: function () {
                     this.mapController && this.mapController.map.refresh();
                 },
@@ -473,7 +472,7 @@
                     cookie.set(`offset_${this.mapController.mapId}`, `${_offset.x},${_offset.y}`, {expires: 60 * 60 * 24 * 365 * 1000});
                 },
                 _onMapMarkerIn: function (_systemId, _event) {
-                    this.systemsTooltipDisplayed.push({mapId: this.selectedMap, systemId: _systemId, x: _event.clientX, y: _event.clientY});
+                    this.systemsTooltipDisplayed.push({mapId: this.selectedMap, systemId: _systemId, x: _event.x, y: _event.y});
                 },
                 _onMapMarkerOut: function (_systemId, _event) {
                     this.systemsTooltipDisplayed.eraseByObjectKey("systemId", _systemId);

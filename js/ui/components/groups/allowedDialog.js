@@ -21,7 +21,7 @@
                     <md-table-head style="width: 150px">Track</md-table-head>
                 </md-table-row>
                 
-                <md-table-row v-for="item in characters">
+                <md-table-row v-for="item in characters" :key="item.id">
                     <md-table-cell>{{item.name}}</md-table-cell>
                     <md-table-cell>
                         <md-switch v-model="item.track" class="md-primary"></md-switch>

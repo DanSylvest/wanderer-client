@@ -72,7 +72,7 @@
                 this.wrapper.el.addEventListener("contextmenu", this.markerContextHandler);
             },
             createMouseObserver: function () {
-                this.mo = new MouseObserver(this.wrapper.el);
+                this.mo = new MouseObserver(this.wrapper.el, 300);
                 this.mo.on("mouseIn", this._onMouseIn.bind(this));
                 this.mo.on("mouseOut", this._onMouseOut.bind(this));
             },
@@ -167,7 +167,13 @@
                 this.emit("contextmenu", _event);
             },
             _onMouseIn: function (_event){
-                this.emit("mousein", _event);
+                var bounds = this.wrapper.el.getBoundingClientRect();
+
+                this.emit("mousein", {
+                    x: bounds.x,
+                    y: bounds.y + bounds.height,
+                    originalEvent: _event
+                });
             },
             _onMouseOut: function (_event){
                 this.emit("mouseout", _event);

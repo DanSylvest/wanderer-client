@@ -13,7 +13,7 @@
 
 <div class="ms-cst-chars-layout">
 
-    <md-card class="md-elevation-4" v-for="(character, index) in characters" md-with-hover>
+    <md-card class="md-elevation-4" v-for="(character, index) in characters" :key="character.id" md-with-hover>
         <md-ripple>
             <md-card-media-cover md-text-scrim>
                 <md-card-media md-ratio="1:1" :style='"background-image: url(" + character.images.px512x512 + ")"'>
@@ -85,6 +85,13 @@
                     debugger;
                 }.bind(this))
             },
+            beforeDestroy: function () {
+                for (var characterId in this._subscribers) {
+                    this._subscribers[characterId].unsubscribe();
+                }
+
+                this._subscribers = Object.create(null);
+            },
             methods: {
                 onAddClick: function (_event) {
                     ssoAuthRequest(query.toString({
@@ -100,13 +107,6 @@
                         this._subscribers[character.id].subscribe();
                         this._subscribers[character.id].on("change", _onOnlineChange.bind(this, character.id));
                     }
-                },
-                close: function () {
-                    for (var characterId in this._subscribers) {
-                        this._subscribers[characterId].unsubscribe();
-                    }
-
-                    this._subscribers = Object.create(null);
                 },
                 refresh: function () {
 
