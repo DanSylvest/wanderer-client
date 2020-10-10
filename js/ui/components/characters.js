@@ -32,7 +32,9 @@
                 <md-card-area>
                     <md-card-header>
                         <span class="md-title">{{character.name}}</span>
-                        <span class="md-subhead">{{character.corporation + " [" + character.alliance + "]"}}</span>
+                        <span class="md-subhead">
+                            <span>{{character.corporation}}</span>
+                            <span v-show="!!character.alliance">[{{character.alliance}}]</span>
                     </md-card-header>
                     
                     <md-card-actions>
