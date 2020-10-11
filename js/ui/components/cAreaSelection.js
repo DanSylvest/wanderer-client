@@ -1,5 +1,5 @@
 (function () {
-    var moduleName = "ui/vue/components/cAreaSelection";
+    var moduleName = "ui/components/cAreaSelection";
 
     var deps = [
         "env/actionObserver",
@@ -20,21 +20,16 @@ var template = `
 
         Vue.component("cAreaSelection", {
             props: {
-                // cForeground: {
-                //     type: String,
-                //     default: "#fff"
-                // }
+
             },
             data: function () {
                 return {
-                    // date: this.cDate
                 }
             },
             template: template,
             mounted: function () {
                 this.parent = this.$el.parentElement;
                 this._createActionObserver();
-                // debugger;
             },
             beforeDestroy: function () {
 
@@ -78,9 +73,6 @@ var template = `
                         } else {
                             this.$el.style.height = delta.y + "px";
                         }
-
-                        // this.$el.style.width = delta.x + "px";
-                        // this.$el.style.height = delta.y + "px";
                     }.bind(this));
 
                     this.ao.on("dragEnd", function (_event) {
@@ -106,14 +98,9 @@ var template = `
                 },
             },
             watch: {
-                // cDate: function(_val, _oldVal) {
-                //     this.date = _val;
-                //     this.update()
-                // }
+
             }
         });
-
-
 
     });
 })(window);

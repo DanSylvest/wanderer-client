@@ -104,3 +104,49 @@
     background-color: rgba(233, 255, 249, 0.36);
     border-radius: 5px;
 }
+
+.md-icon.md-theme-default.md-icon-font.md-custom-primary {
+    color: #969696;
+}
+
+
+.md-icon.md-theme-default.md-icon-font.md-custom-secondary {
+    color: #494949;
+}
+
+.md-custom-size-1 {
+    font-size: 18px !important;
+}
+
+.md-custom-icon {
+    width: 18px;
+    min-width: 18px;
+    height: 18px;
+}
+
+.md-custom-small {
+    width: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    height: 14px;
+    font-size: 14px !important;
+}
+
+.c-context-item-content {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.c-context-item-content > *:not(:last-child) {
+    margin-right: 5px;
+}
+
+.c-context-item {
+    align-items: center;
+}
+
+.c-context-item.c-small-padding {
+    padding: 5px 5px !important;
+    padding-right: 10px !important;
+}

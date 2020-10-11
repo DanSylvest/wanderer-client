@@ -1,20 +1,37 @@
 .map-link {
-    stroke-width: 2px;
+    cursor: pointer;
     stroke: #ffffff;
-    cursor: pointer;
-
 }
 
-.map-link-under {
-    stroke-width: 4px;
-    stroke: #bbbbbb;
-    cursor: pointer;
-}
+.map-link.link-top { pointer-events: none; }
+.map-link.link-top.ship-size-0  { stroke-width: 4px; }                                                                       /* frig */
+.map-link.link-top.ship-size-1  {stroke-width: 4px; }                                                                       /* M\L */
+.map-link.link-top.ship-size-2  {stroke-width: 7px; }                                                                       /* Capital */
+.map-link.link-top.mass-state-0 { stroke: #fff; }                                                                                         /* normal */
+.map-link.link-top.mass-state-1 { stroke: #ffcdac; }                                                                                         /* less than half */
+.map-link.link-top.mass-state-2 { stroke: #ff7979; }                                                                                         /* verge */
+.map-link.link-top.time-state-0 {  }                                                                                         /* normal */
+.map-link.link-top.time-state-1 {  }                                                                                         /* end of life */
 
-.map-link-under:hover {
-    transition: stroke 200ms;
-    stroke: #666666;
-}
+.map-link.link-middle { pointer-events: none; }
+.map-link.link-middle.ship-size-0 { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7;}
+.map-link.link-middle.ship-size-1 {stroke-width: 7px;}
+.map-link.link-middle.ship-size-2 {stroke-width: 11px;}
+.map-link.link-middle.mass-state-0 { stroke: #aaa; }
+.map-link.link-middle.mass-state-1 { stroke: #aaa; }
+.map-link.link-middle.mass-state-2 { stroke: #aaa; }
+.map-link.link-middle.time-state-0 { stroke: #aaa; }
+.map-link.link-middle.time-state-1 { stroke: #ff00cd; }
+
+.map-link.link-bottom { }
+.map-link.link-bottom.ship-size-0  { stroke-width: 5px; }
+.map-link.link-bottom.ship-size-1  { stroke-width: 8px; }
+.map-link.link-bottom.ship-size-2  { stroke-width: 11px; }
+.map-link.link-bottom.mass-state-0 { }
+.map-link.link-bottom.mass-state-1 { }
+.map-link.link-bottom.mass-state-2 { }
+.map-link.link-bottom.time-state-0 {  }
+.map-link.link-bottom.time-state-1 {  }
 
 .marker-text {
     fill: rgb(66, 66, 66);

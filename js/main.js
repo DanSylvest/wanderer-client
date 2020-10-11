@@ -6,52 +6,54 @@
 var deps = [
     "env/tools/standardTypeExtend",
     "conf/main",
-    "conf/custom",
     "api",
     "handlers",
     "env/tools/extend",
     "core/pageController",
-    "core/pageExecutor",
-    "core/componentController",
+    "core/pageLoader",
     "defaultLayout",
-    "env/tabKeeper",
-    "ui/vue/components/cAreaSelection",
+    // "env/tabKeeper"
 ];
 require(deps, function() {
     var mainConf       = require("conf/main");
-    var customConf     = require("conf/custom");
     var API            = require("api");
     var handlers       = require("handlers");
     var extend         = require("env/tools/extend");
     var PageController = require("core/pageController");
-    var PageExecutor   = require("core/pageExecutor");
-    var ComponentController   = require("core/componentController");
+    var PageLoader     = require("core/pageLoader");
 
-    window.config = extend(mainConf, customConf);
-
-    window.api = new API({
-        protocol: config.connection.socket.proto,
-        host: config.connection.socket.host,
-        port: config.connection.socket.port,
-        handlers: handlers
+    require(["conf/custom"], function (customConf) {
+        extend(mainConf, customConf);
+        initialize();
+    }, function () {
+        initialize();
     });
 
-    api.init();
+    var initialize = function () {
+        window.config = mainConf;
 
-    api.on("ready", function () {
-        window.pageExecutor = new PageExecutor();
-        window.componentController = new ComponentController();
-
-        window.pageController = new PageController({
-            query: location.search
+        window.api = new API({
+            protocol: config.connection.socket.proto,
+            host: config.connection.socket.host,
+            port: config.connection.socket.port,
+            handlers: handlers
         });
-        window.pageController.run().then(function(_data) {
 
-            window.pageExecutor.execute(_data.page);
-        }.bind(this));
+        api.init();
 
-    });
+        api.on("ready", function () {
+            pageExecutor = new PageLoader();
 
-    document.title = config.app.title;
+            pageController = new PageController({
+                query: location.search
+            });
+            pageController.run().then(function(_data) {
+                pageExecutor.load(_data.page);
+            }.bind(this));
+
+        });
+
+        document.title = config.app.title;
+    };
 });
 

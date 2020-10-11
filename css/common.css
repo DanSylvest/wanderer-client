@@ -50,6 +50,12 @@
 .tac {
     text-align: center;
 }
+
+.left-top-force {
+    left: 0 !important;
+    top: 0 !important;
+}
+
 .nowrap {
     white-space: nowrap;
 }

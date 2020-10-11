@@ -55,6 +55,11 @@
     }
 }
 
+.с-tooltip {
+    pointer-events: none;
+    user-select: none;
+}
+
 .c-hidden-input {
     outline: none;
     appearance: none;
@@ -69,6 +74,7 @@
     overflow: hidden;
     border-radius: 3px;
     box-sizing: border-box;
+    min-width: 30px;
 }
 
 .c-contexts-container  {
@@ -108,7 +114,7 @@
 
 .c-context-animate {
     opacity: 0;
-    transform: scale(1, 0) translateX(-30px);
+    transform: scale(1, 0) translateY(-30px);
     animation-duration: 250ms;
     animation-name: c-context-animation-body;
 }
@@ -116,18 +122,18 @@
 @keyframes c-context-animation-body {
     from {
         opacity: 0;
-        transform: translateX(-30px);
+        transform: translateY(-30px);
     }
 
     to {
         opacity: 100%;
-        transform: translateX(0px);
+        transform: translateY(0px);
     }
 }
 
 .c-context-animate-fade {
     opacity: 100%;
-    transform: translateX(0px);
+    transform: translateY(0px);
     animation-duration: 250ms;
     animation-name: c-context-animation-body-fade;
 }
@@ -135,11 +141,11 @@
 @keyframes c-context-animation-body-fade {
     from {
         opacity: 100%;
-        transform: translateX(0px);
+        transform: translateY(0px);
     }
 
     to {
         opacity: 0%;
-        transform: translateX(30px);
+        transform: translateY(30px);
     }
 }

@@ -25,7 +25,7 @@
          * @param {Array<String>} _options.groups
          * @returns {*}
          */
-        var eveMapEdit = function (_mapId, _options) {
+        var request = function (_mapId, _options) {
             var p = new promise();
 
             var id = this.add(function (_e) {
@@ -44,6 +44,6 @@
             return p.native;
         };
 
-        return eveMapEdit;
+        return request;
     })
 })();

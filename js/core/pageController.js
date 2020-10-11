@@ -5,23 +5,23 @@
     var deps = [
         "env/tools/class",
         "env/tools/extend",
-        "utils/log",
         "env/tools/emitter",
         "env/cookie",
         "env/tools/exist",
         "env/promise",
         "env/query",
+        "conf/pages",
     ];
 
     define(moduleName, deps, function () {
         var classCreator = require("env/tools/class");
         var extend       = require("env/tools/extend");
-        var log          = require("utils/log");
         var Emitter      = require("env/tools/emitter");
         var cookie       = require("env/cookie");
         var exist        = require("env/tools/exist");
         var promise      = require("env/promise");
         var locQuery     = require("env/query");
+        var pages        = require("conf/pages");
 
         var PageController = classCreator("PageController", Emitter, {
             constructor: function connector(_options) {
@@ -100,38 +100,19 @@
             },
             _checkFirstTime: function () {
                 this._nextState(ST_CHECK_PROTECT_PAGE);
-                /*var isFirstTime = cookie.get("isFirstTime");
-                if(exist(isFirstTime)) {
-                    if(isFirstTime === "true" || isFirstTime === "false") {
-                        if(isFirstTime === "true") { // this case means that someone already was on site
-                            this._nextState(ST_CHECK_PROTECT_PAGE);
-                        } else {                     // this case say us that user first time on site
-                            this._nextState(ST_GO_TO_LOGIN_PAGE)
-                        }
-                    } else {
-                        throw "Exception: 'this is some shit' - somebody set invalid value inside 'isFirstTime' cookie";
-                    }
-                } else {
-                    // вот точно первый раз
-                    this._nextState(ST_GO_TO_LOGIN_PAGE);
-                }*/
             },
             checkProtectPage: function () {
                 var query = locQuery.parse(location.search.substring(1, location.search.length));
                 if(exist(query.page)) {
-                    window.api.page.isProtect(query.page).then(function(_isProtect) {
-                        if(_isProtect) {
-                            if(this.isLogged) {
-                                this._nextState(ST_GO_TO_PAGE, query.page);
-                            } else {
-                                this._nextState(ST_GO_TO_LOGIN_PAGE);
-                            }
-                        } else {
+                    if(pages[query.page].isProtected){
+                        if(this.isLogged) {
                             this._nextState(ST_GO_TO_PAGE, query.page);
+                        } else {
+                            this._nextState(ST_GO_TO_LOGIN_PAGE);
                         }
-                    }.bind(this), function() {
-                        this._nextState(ST_GO_TO_ERROR_PAGE);
-                    }.bind(this));
+                    } else {
+                        this._nextState(ST_GO_TO_PAGE, query.page);
+                    }
                 } else {
                     this._nextState(this.isLogged ? ST_GO_TO_HOME_PAGE : ST_GO_TO_LOGIN_PAGE);
                 }

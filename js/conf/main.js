@@ -1,7 +1,5 @@
 (function () {
-    var modulePath = "conf/main";
-
-    define(modulePath, [], function () {
+    define([], function () {
         var config = {
             app: {
                 title: "Wanderer the mapper"
@@ -26,7 +24,8 @@
                         scope: [
                             "esi-location.read_location.v1",
                             "esi-location.read_ship_type.v1",
-                            "esi-location.read_online.v1"
+                            "esi-location.read_online.v1",
+                            "esi-ui.write_waypoint.v1"
                         ]
                     },
                     server:  {

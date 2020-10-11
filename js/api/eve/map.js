@@ -21,6 +21,8 @@
         "api/eve/map/systemsRemove",
         "api/eve/map/updateSystemsPosition",
         "api/eve/map/updateSystem",
+        "api/eve/map/updateLink",
+        "api/eve/map/waypoint",
     ];
 
     define(moduleName, deps, function () {
@@ -40,6 +42,8 @@
             systemsRemove         : require("api/eve/map/systemsRemove"),
             updateSystemsPosition : require("api/eve/map/updateSystemsPosition"),
             updateSystem          : require("api/eve/map/updateSystem"),
+            updateLink            : require("api/eve/map/updateLink"),
+            waypoint              : require("api/eve/map/waypoint"),
         }
     });
 })();
