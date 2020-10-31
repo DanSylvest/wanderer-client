@@ -1,0 +1,162 @@
+<template>
+    <md-content class="c-context-item c-small-padding md-hover" @click="onClick">
+        <div class="c-context-item-content">
+            <md-icon v-show="icon.length > 0" class="md-custom-icon md-custom-primary md-custom-size-1">{{icon}}</md-icon>
+            <span>{{title}}</span>
+        </div>
+
+        <md-icon v-if="isSubmenu" class="md-custom-icon md-custom-secondary md-custom-small">play_arrow</md-icon>
+
+        <context-menu ref="submenu" :c-activated.sync="smActive" :c-offset-x="smX" :c-offset-y="smY" @c-closed="onSmClosed">
+            <slot></slot>
+        </context-menu>
+    </md-content>
+</template>
+
+<script>
+    import ContextMenu from "./ContextMenu";
+    import MouseObserver from "../../../js/env/mouseObserver";
+    import SpamFilter from "../../../js/env/spamFilter";
+
+    export default {
+        name: "ContextMenuItem",
+        components: {
+            ContextMenu
+        },
+        props: {
+            cTitle: {
+                type: String,
+                default: ""
+            },
+            cIcon: {
+                type: String,
+                default: ""
+            },
+            cIsSubmenu: {
+                type: Boolean,
+                default: false
+            }
+        },
+        data: function () {
+            return {
+                smActive: false,
+                smX: 0,
+                smY: 0,
+
+                title: this.cTitle,
+                icon: this.cIcon,
+                isSubmenu: this.cIsSubmenu,
+            }
+        },
+        mounted: function () {
+            this.isExpand = false;
+            this.isEnable = true;
+            this.itemBody = this.$el;
+
+
+            this.mouseObserver = new MouseObserver(this.itemBody);
+            this.mouseObserver.on("mouseIn", this._onMouseIn.bind(this));
+            this.mouseObserver.on("mouseOut", this._onMouseOut.bind(this));
+
+            this.spamFilter = new SpamFilter(this._updateHandlers, 10);
+            this._handlers = [];
+        },
+        updated: function () {
+            this.spamFilter.call();
+        },
+        beforeDestroy: function () {
+            this.mouseObserver.destructor();
+            this.spamFilter.destructor();
+        },
+        methods: {
+            _updateHandlers: function () {
+                if(this.isSubmenu) {
+                    this.destroyHandlers();
+                    this.createHandlers();
+                }
+            },
+            createHandlers: function () {
+                for (let a = 0; a < this.$refs.submenu.$children.length; a++) {
+                    let child = this.$refs.submenu.$children[a];
+                    let handler = this.onSmChildrenOver.bind(this, child);
+                    this._handlers.push([child, "over", handler]);
+                    child.$on("over", handler);
+                }
+            },
+            destroyHandlers: function () {
+                for (let a = 0; a < this._handlers.length; a++) {
+                    this._handlers[a][0].$off(this._handlers[a][1], this._handlers[a][2]);
+                }
+                this._handlers = [];
+            },
+            onClick: function (_event) {
+                this.$emit("click", _event);
+            },
+            _onMouseIn: function () {
+                if(!this.isEnable)
+                    return;
+
+                if(this.isSubmenu && !this.isExpand) {
+                    this.smActive = true;
+                    this.isExpand = true;
+                    this._actualOffsets();
+                }
+
+                this.$emit("over");
+            },
+            _actualOffsets: function () {
+                document.body.appendChild(this.$refs.submenu.contextBody);
+                this.$refs.submenu.contextBody.classList.add("left-top-force");
+                let ctxBodyBoundsAfter = this.$refs.submenu.contextBody.getBoundingClientRect();
+                let bodyBounds = document.body.getBoundingClientRect();
+                this.$refs.submenu.contextBody.classList.remove("left-top-force");
+                document.body.removeChild(this.$refs.submenu.contextBody);
+
+                let itemBodyBounds = this.itemBody.getBoundingClientRect();
+                let smX = itemBodyBounds.x + itemBodyBounds.width;
+                let smY = itemBodyBounds.y;
+
+                if(smX + ctxBodyBoundsAfter.width > bodyBounds.width) {
+                    smX = itemBodyBounds.x - ctxBodyBoundsAfter.width;
+                }
+
+                if(smY + ctxBodyBoundsAfter.height > bodyBounds.height) {
+                    smY = itemBodyBounds.y + itemBodyBounds.height - ctxBodyBoundsAfter.height;
+                }
+
+                this.smX = smX;
+                this.smY = smY;
+            },
+            collapse: function () {
+                if(this.isSubmenu && this.isExpand) {
+                    this.isExpand = false;
+                    this.smActive = false;
+                }
+            },
+            enable: function () {
+                this.isEnable = true;
+            },
+            disable: function () {
+                this.isEnable = false;
+                this.collapse();
+            },
+            _onMouseOut: function () {
+
+            },
+            onSmClosed: function () {
+
+            },
+            onSmChildrenOver: function (child) {
+                for (let a = 0; a < this.$refs.submenu.$children.length; a++) {
+                    if(child !== this.$refs.submenu.$children[a]) {
+                        this.$refs.submenu.$children[a].collapse();
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    
+</style>

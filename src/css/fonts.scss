@@ -1,0 +1,10 @@
+@font-face {
+    font-family: "Triglavian";
+    src: url("./../fonts/Triglavian-Regular.ttf") format("truetype");
+}
+
+.wd {
+    &.font-triglavian {
+        font-family: Triglavian;
+    }
+}
