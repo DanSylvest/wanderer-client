@@ -5,27 +5,7 @@
 </template>
 
 <script>
-
-    const getContextContainer = function () {
-        let arr = document.getElementsByClassName("c-contexts-container");
-        let element;
-
-        if (arr.length === 0) {
-            element = document.createElement("div");
-            document.body.appendChild(element);
-
-            element.setAttribute("class", "c-contexts-container absolute top left");
-            element.style.width = "100%";
-            element.style.height = "0px";
-        } else {
-            element = arr[0];
-        }
-
-        return element;
-    }
-
-
-    const ContextMenu = {
+    export default {
         name: "ContextMenu",
         props: {
             cActivated: {
@@ -191,7 +171,24 @@
         }
     }
 
-    export default ContextMenu;
+    const getContextContainer = function () {
+        let arr = document.getElementsByClassName("c-contexts-container");
+        let element;
+
+        if (arr.length === 0) {
+            element = document.createElement("div");
+            document.body.appendChild(element);
+
+            element.setAttribute("class", "c-contexts-container absolute top left");
+            element.style.width = "100%";
+            element.style.height = "0px";
+        } else {
+            element = arr[0];
+        }
+
+        return element;
+    }
+
 </script>
 
 <style>

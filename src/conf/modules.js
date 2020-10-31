@@ -32,6 +32,24 @@ const modules = {
         isComponent: true,
         componentName: "Characters",
         path: "common/Characters"
+    },
+    profile: {
+        isProtected: true,
+        isComponent: true,
+        componentName: "Profile",
+        path: "common/Profile"
+    },
+    maps: {
+        isProtected: true,
+        isComponent: true,
+        componentName: "Maps",
+        path: "common/Maps"
+    },
+    groups: {
+        isProtected: true,
+        isComponent: true,
+        componentName: "Groups",
+        path: "common/Groups"
     }
 }
 

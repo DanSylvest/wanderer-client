@@ -6,7 +6,6 @@ import CustomPromise from "../../../env/promise";
 
 /**
  *
- * @param {string} _mapId
  * @param {Object} _options
  * @param {String} _options.name
  * @param {String} _options.description
