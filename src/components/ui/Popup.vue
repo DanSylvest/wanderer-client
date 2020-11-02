@@ -1,13 +1,13 @@
 <template>
     <div>
-        <div class="c-popup-body md-elevation-10 absolute flex flex-vertical flex-justify" >
+        <div class="c-popup-body md-elevation-10 wd absolute flex flex-column" >
             <div class="c-popup-head" style="height: 26px;">
                 <div class="c-popup-title" style="float: left;">{{cTitle}}</div>
                 <div class="c-button" style="float: right;" @click="onCloseClick" >
                     <md-icon>close</md-icon>
                 </div>
             </div>
-            <div class="c-popup-content fh">
+            <div class="c-popup-content wd f-height">
                 <slot></slot>
             </div>
         </div>
@@ -99,7 +99,7 @@
                     element = document.createElement("div");
                     document.body.appendChild(element);
 
-                    element.setAttribute("class", "c-popups-container absolute top left");
+                    element.setAttribute("class", "wd c-popups-container absolute top left");
                     element.style.width = "100%";
                     element.style.height = "0px";
                 } else {

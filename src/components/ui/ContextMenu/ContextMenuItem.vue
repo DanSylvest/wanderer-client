@@ -1,11 +1,11 @@
 <template>
-    <md-content class="c-context-item c-small-padding md-hover" @click="onClick">
-        <div class="c-context-item-content">
-            <md-icon v-show="icon.length > 0" class="md-custom-icon md-custom-primary md-custom-size-1">{{icon}}</md-icon>
+    <md-content class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center" @click="onClick">
+        <div class="wd-context-item-content wd nowrap flex flex-align-center">
+            <md-icon v-show="icon.length > 0" class="wd-context-expand-icon wd font-size-large">{{icon}}</md-icon>
             <span>{{title}}</span>
         </div>
 
-        <md-icon v-if="isSubmenu" class="md-custom-icon md-custom-secondary md-custom-small">play_arrow</md-icon>
+        <md-icon v-if="isSubmenu" class="wd-arrow wd font-size-medium">play_arrow</md-icon>
 
         <context-menu ref="submenu" :c-activated.sync="smActive" :c-offset-x="smX" :c-offset-y="smY" @c-closed="onSmClosed">
             <slot></slot>
@@ -157,6 +157,56 @@
     }
 </script>
 
-<style>
-    
+<style lang="scss">
+    @import "./src/css/variables";
+    @import "./src/components/ui/Popup.scss";
+
+    .wd-context {
+        & > .wd-context-item {
+            transition: background-color 250ms;
+            background-color: rgba(0, 0, 0, 0);
+            padding: 5px 5px !important;
+            padding-right: 10px !important;
+
+            &:hover {
+                background-color: rgba(130, 130, 130, 0.15);
+            }
+
+            &:active {
+                background-color: rgba(120, 120, 120, 0.25);
+            }
+
+            & > span {
+                vertical-align: middle;
+                justify-content: center;
+                flex-direction: column;
+                display: flex;
+            }
+
+            & > i {
+                margin: initial;
+                margin-left: 10px;
+            }
+
+            .wd-context-item-content {
+                & > .wd-context-expand-icon {
+                    width: 18px;
+                    min-width: 18px;
+                    height: 18px;
+                }
+
+                & > *:not(:last-child) {
+                    margin-right: 5px;
+                }
+            }
+
+            .wd-arrow {
+                color: $fg-primary-1;
+                width: 14px;
+                min-width: 14px;
+                min-height: 14px;
+                height: 14px;
+            }
+        }
+    }
 </style>

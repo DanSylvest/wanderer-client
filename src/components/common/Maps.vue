@@ -1,14 +1,14 @@
 <template>
-    <div>
-        <div style="border-bottom: 1px solid #ccc;padding-bottom: 10px;padding-top: 5px;">
+    <div class="wd-maps">
+        <div class="maps-toolbar" v-show="maps.length > 0">
             <md-button class="md-dense md-primary md-raised" @click="add">
                 <md-icon>add</md-icon>
                 <span style="vertical-align: middle">Add map</span>
             </md-button>
         </div>
 
-        <div class="" >
-            <md-table class="c-custom-table">
+        <div class="maps-content">
+            <md-table v-show="loaded && maps.length > 0" class="maps-table">
                 <md-table-row>
                     <md-table-head style="width: 30px" class="tac">Public</md-table-head>
                     <md-table-head style="width: 150px">Name</md-table-head>
@@ -25,6 +25,17 @@
                     <md-table-cell>{{map.description}}</md-table-cell>
                 </md-table-row>
             </md-table>
+
+            <md-empty-state
+                    v-show="loaded && maps.length === 0"
+                    md-icon="layers"
+                    md-label="Create your map!"
+                    md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
+            >
+                <md-button class="md-dense md-primary md-raised" @click="add">
+                    <span style="vertical-align: middle">Create</span>
+                </md-button>
+            </md-empty-state>
         </div>
 
         <MapsEditDialog ref="mapsEditDialogRef"></MapsEditDialog>
@@ -39,7 +50,7 @@
 
 <script>
     import ContextMenu from "../ui/ContextMenu/ContextMenu";
-    import ContextMenuItem from "../ui/ContextMenu/ContextMenu";
+    import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
     import MapsEditDialog from "./maps/MapsEditDialog";
 
     import api from "../../js/api";
@@ -55,6 +66,7 @@
                 maps: [],
                 groups: [],
 
+                loaded: false,
                 mapContextMenuEnable: false,
                 contextOffsetX: 0,
                 contextOffsetY: 0,
@@ -77,6 +89,7 @@
                 prarr.push(api.eve.map.list());
 
                 Promise.all(prarr).then(function(_arr){
+                    this.loaded = true;
                     this.groups = _arr[0];
                     this.maps = _arr[1];
                     // eslint-disable-next-line no-unused-vars
@@ -149,3 +162,24 @@
     }
 </script>
 
+
+<style lang="scss">
+    @import "src/css/variables";
+
+    .wd-maps {
+        & > .maps-toolbar {
+            padding-bottom: 10px;
+            padding-top: 5px;
+        }
+
+        & > .maps-content {
+            .maps-table {
+                &.md-card.md-table,
+                &.md-table.md-theme-default .md-table-content,
+                &.md-table.md-theme-default .md-table-alternate-header {
+                    background-color: $bg-primary;
+                }
+            }
+        }
+    }
+</style>

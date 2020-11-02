@@ -12,6 +12,10 @@ body {
         display: flex;
     }
 
+    &.flex-justify-sb {
+        justify-content: space-between;
+    }
+
     &.flex-justify-center {
         justify-content: center;
     }
@@ -20,7 +24,7 @@ body {
         justify-content: flex-end;
     }
 
-    &.flex-h-center {
+    &.flex-align-center {
         align-items: center;
     }
 
@@ -77,4 +81,26 @@ body {
     &.top {
         top: 0;
     }
+
+    &.left {
+        left: 0;
+    }
+
+    &.right {
+        right: 0;
+    }
+
+    &.cursor-pointer {
+        cursor: pointer;
+    }
+
+    &.nowrap {
+        white-space: nowrap;
+    }
+}
+
+.left-top-force {
+    position: absolute;
+    left: 0 !important;
+    top: 0 !important;
 }

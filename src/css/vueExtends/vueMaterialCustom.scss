@@ -1,0 +1,23 @@
+@import "src/css/variables";
+
+.md-content.md-tabs-content,
+.md-dialog-container.md-theme-default {
+    background-color: $bg-secondary;
+}
+
+.md-content.md-tabs-content {
+    min-width: 731px;
+}
+
+.md-dialog.wd-medium-dialog .md-dialog-container {
+    max-width: 768px;
+}
+
+.md-table-row.cursor-pointer,
+.md-list-item {
+    cursor: pointer;
+}
+
+.md-tabs.md-alignment-left .md-tabs-navigation.wd.flex-justify-center {
+    justify-content: center;
+}

@@ -1,15 +1,16 @@
 <template>
-    <div>
-        <md-tabs @md-changed="onTabChange">
-            <md-tab id="tab-own" md-label="Own groups" exact>
-                <OwnGroups ref="ownGroupsRef" ></OwnGroups>
-            </md-tab>
+    <div class="wd-groups">
+        <md-card>
+            <md-tabs @md-changed="onTabChange" md-dynamic-height>
+                <md-tab id="tab-own" md-label="Own groups" exact>
+                    <OwnGroups ref="ownGroupsRef" ></OwnGroups>
+                </md-tab>
 
-            <md-tab id="tab-allowed" md-label="Allowed groups">
-                <AllowedGroups ref="allowedGroupsRef"></AllowedGroups>
-            </md-tab>
-
-        </md-tabs>
+                <md-tab id="tab-allowed" md-label="Allowed groups">
+                    <AllowedGroups ref="allowedGroupsRef"></AllowedGroups>
+                </md-tab>
+            </md-tabs>
+        </md-card>
     </div>
 </template>
 
@@ -66,3 +67,17 @@
     }
 </script>
 
+<style lang="scss">
+    .wd-groups {
+        & > .md-card {
+            max-width: 900px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .md-tabs.md-alignment-left .md-tabs-navigation {
+            display: flex;
+            justify-content: center;
+        }
+    }
+</style>

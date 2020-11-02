@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="md-content relative md-home-maps-search-content" style="padding-right: 65px">
+    <div class="wd-corporations-search">
+        <div class="wd relative flex flex-align-center box-sizing padding-vertical-primary">
             <md-autocomplete
                     v-model="currentValue"
                     :md-options="searchList"
@@ -24,7 +24,7 @@
             </md-autocomplete>
 
             <md-button
-                    class="md-raised md-mini md-fab absolute top right"
+                    class="md-raised md-accent"
                     :disabled="buttonDisabled"
                     @click="onElementAddButtonClicked"
             >
@@ -32,7 +32,7 @@
             </md-button>
         </div>
 
-        <md-table class="c-custom-table" style="height: 400px" md-card @md-selected="onRowsSelected" v-model="elements">
+        <md-table v-show="elements.length > 0" class="wd-corporations-search-table" md-card @md-selected="onRowsSelected" v-model="elements">
             <md-table-toolbar>
                 <h1 class="md-title">Corporations is allowed to see the map</h1>
             </md-table-toolbar>
@@ -47,10 +47,18 @@
                 </div>
             </md-table-toolbar>
 
-            <md-table-row slot-scope="{ item }" class="cursor-pointer" md-auto-select md-selectable="multiple" slot="md-table-row">
+            <md-table-row slot-scope="{ item }" class="wd cursor-pointer" md-auto-select md-selectable="multiple" slot="md-table-row">
                 <md-table-cell md-label="Name">{{item.name}}</md-table-cell>
             </md-table-row>
         </md-table>
+
+        <md-empty-state
+                v-show="elements.length === 0"
+                md-icon="groups"
+                md-label="Add corporations"
+                md-description="In this group is not added any corporations. Here you can search corporations and attach them to group."
+        >
+        </md-empty-state>
     </div>
 </template>
 
@@ -135,3 +143,23 @@
         }
     }
 </script>
+
+<style lang="scss">
+    @import "./src/css/variables";
+
+    .wd-corporations-search {
+        .md-autocomplete.md-field {
+            margin: 0;
+        }
+
+        .wd-corporations-search-table {
+            height: 400px;
+
+            &.md-card.md-table,
+            &.md-table.md-theme-default .md-table-content,
+            &.md-table.md-theme-default .md-table-alternate-header {
+                background-color: $bg-secondary;
+            }
+        }
+    }
+</style>

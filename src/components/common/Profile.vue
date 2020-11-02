@@ -1,6 +1,11 @@
 <template>
     <div class="">
-        Coming soon...
+        <md-empty-state
+            md-icon="biotech"
+            md-label="Unfortunately its not work!"
+            md-description="Coming soon..."
+        >
+        </md-empty-state>
     </div>
 </template>
 

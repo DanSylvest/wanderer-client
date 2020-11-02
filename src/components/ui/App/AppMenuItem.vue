@@ -1,10 +1,10 @@
 <template>
     <div
-        class="wd-app-menu-item wd flex flex-column flex-h-center off-user-select"
+        class="wd-app-menu-item wd flex flex-column flex-align-center off-user-select"
     >
         <md-ripple>
             <div
-                class="wd-app-menu-item-content wd flex flex-column flex-h-center box-sizing"
+                class="wd-app-menu-item-content wd flex flex-column flex-align-center box-sizing"
                 :class="{
                     'expanding': $parent.expandAnimation,
                     'collapsing': $parent.collapseAnimation,

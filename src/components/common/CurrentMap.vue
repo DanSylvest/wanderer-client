@@ -1,6 +1,6 @@
 <template>
 
-    <div class="wd fs relative box-sizing padding-primary" style="height: calc(100% - 7px)">
+    <div class="wd fs relative box-sizing" style="height: calc(100% - 7px)">
         <div v-if="isLoaded" class="wd fs relative">
             <div v-if="!showMapEmpty" class="wd fs relative">
                 <div id="mapContainer" class="wd fs relative" @contextmenu="onMapContainerContext">

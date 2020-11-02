@@ -1,13 +1,12 @@
 <template>
     <div>
-
-        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="c-medium-dialog">
+        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
             <md-dialog-title>{{header}}</md-dialog-title>
 
-            <div style="padding: 20px; height: 70%" class="bs">
+            <div class="wd box-sizing wd-dialog-content">
                 <md-tabs md-dynamic-height>
                     <md-tab id="tab-preferences" md-label="Preferences">
-                        <div style="padding: 20px;" class="fs bs">
+                        <div class="wd fs box-sizing">
 
                             <md-field md-clearable>
                                 <label>Name</label>
@@ -28,9 +27,8 @@
                     </md-tab>
 
                     <md-tab id="tab-groups" md-label="Groups">
-                        <div style="padding: 20px; height: 500px " class="fs bs">
-
-                            <div class="md-content relative md-home-maps-search-content" style="padding-right: 65px">
+                        <div class="groups-tab wd box-sizing ">
+                            <div class="wd relative flex flex-align-center box-sizing padding-vertical-primary">
                                 <md-autocomplete
                                         v-model="searchDefaultGroupValue"
                                         :md-options="groups"
@@ -53,7 +51,7 @@
                                 </md-autocomplete>
 
                                 <md-button
-                                        class="md-raised md-mini md-fab absolute top right"
+                                        class="md-raised md-accent"
                                         :disabled="searchAddButtonDisabled"
                                         @click="onSearchAddButtonClick"
                                 >
@@ -61,28 +59,37 @@
                                 </md-button>
                             </div>
 
-                            <md-table class="c-custom-table" style="height: 400px" md-card @md-selected="onRowsSelected" v-model="searchAttachedGroups">
-                                <md-table-toolbar>
-                                    <h1 class="md-title">Groups attached to map</h1>
-                                </md-table-toolbar>
+                            <div>
+                                <md-table v-show="searchAttachedGroups.length > 0" class="groups-table" md-card @md-selected="onRowsSelected" v-model="searchAttachedGroups">
+                                    <md-table-toolbar>
+                                        <h1 class="md-title">Groups attached to map</h1>
+                                    </md-table-toolbar>
 
-                                <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
-                                    <div class="md-toolbar-section-start">Groups selected - {{count}}</div>
+                                    <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
+                                        <div class="md-toolbar-section-start">Groups selected - {{count}}</div>
 
-                                    <div class="md-toolbar-section-end">
-                                        <md-button class="md-icon-button" @click="onDeleteRows">
-                                            <md-icon>delete</md-icon>
-                                        </md-button>
-                                    </div>
-                                </md-table-toolbar>
+                                        <div class="md-toolbar-section-end">
+                                            <md-button class="md-icon-button" @click="onDeleteRows">
+                                                <md-icon>delete</md-icon>
+                                            </md-button>
+                                        </div>
+                                    </md-table-toolbar>
 
-                                <md-table-row slot-scope="{ item }" class="cursor-pointer" md-auto-select md-selectable="multiple" slot="md-table-row">
-                                    <md-table-cell md-label="Name">{{item.name}}</md-table-cell>
-                                    <md-table-cell md-label="Owner">{{item.owner}}</md-table-cell>
-                                    <md-table-cell md-label="Description">{{item.description}}</md-table-cell>
-                                </md-table-row>
-                            </md-table>
+                                    <md-table-row slot-scope="{ item }" class="wd cursor-pointer" md-auto-select md-selectable="multiple" slot="md-table-row">
+                                        <md-table-cell md-label="Name">{{item.name}}</md-table-cell>
+                                        <md-table-cell md-label="Owner">{{item.owner}}</md-table-cell>
+                                        <md-table-cell md-label="Description">{{item.description}}</md-table-cell>
+                                    </md-table-row>
+                                </md-table>
 
+                                <md-empty-state
+                                        v-show="searchAttachedGroups.length === 0"
+                                        md-icon="group_add"
+                                        md-label="Add groups to map"
+                                        md-description="Groups allow you attach to map some users, corporations, alliances."
+                                >
+                                </md-empty-state>
+                            </div>
                         </div>
                     </md-tab>
                 </md-tabs>
@@ -326,3 +333,34 @@
         return !!_nickname.match(/[A-Za-z_][A-Za-z_\- ]*?/m);
     };
 </script>
+
+<style lang="scss">
+    @import "./src/css/variables";
+
+    .wd-dialog-content {
+        height: 70%;
+
+        & .md-tab {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .groups-tab {
+            height: 500px;
+        }
+
+        .md-autocomplete.md-field {
+            margin: 0;
+        }
+
+        .groups-table {
+            height: 400px;
+
+            &.md-card.md-table,
+            &.md-table.md-theme-default .md-table-content,
+            &.md-table.md-theme-default .md-table-alternate-header {
+                background-color: $bg-secondary;
+            }
+        }
+    }
+</style>

@@ -135,7 +135,7 @@
 <style lang="scss">
     .wd-characters-layout {
         box-sizing: border-box;
-        padding: 10px;
+        /*padding: 10px;*/
 
         .md-card {
 

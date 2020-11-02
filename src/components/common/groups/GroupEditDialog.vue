@@ -1,12 +1,17 @@
 <template>
     <div>
-        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="c-medium-dialog">
+        <md-dialog
+            :md-active.sync="showEditDialog"
+            @md-opened="onEditDialogOpened"
+            @md-closed="onDialogClosed"
+            class="wd-groups-edit-dialog wd-medium-dialog"
+        >
             <md-dialog-title>{{header}}</md-dialog-title>
 
-            <div style="padding: 20px; height: 70%" class="bs">
+            <div class="wd-edc-content wd box-sizing">
                 <md-tabs md-dynamic-height>
                     <md-tab id="tab-preferences" md-label="Preferences">
-                        <div style="padding: 20px;" class="fs bs">
+                        <div class="wd-tab wd-tab-preferences wd fs box-sizing">
 
                             <md-field md-clearable>
                                 <label>Name</label>
@@ -26,23 +31,22 @@
                     </md-tab>
 
                     <md-tab id="tab-characters" md-label="Characters">
-                        <div style="padding: 20px; height: 500px " class="fs bs">
+                        <div class="wd-tab wd-tab-characters wd fs box-sizing">
                             <CharactersSearcher ref="charactersSearcherRef" ></CharactersSearcher>
                         </div>
                     </md-tab>
 
                     <md-tab id="tab-corporations" md-label="Corporations">
-                        <div style="padding: 20px; height: 500px " class="fs bs">
+                        <div class="wd-tab wd-tab-corporations wd fs box-sizing">
                             <CorporationsSearcher ref="corporationsSearcherRef" ></CorporationsSearcher>
                         </div>
                     </md-tab>
 
                     <md-tab id="tab-alliances" md-label="Alliances">
-                        <div style="padding: 20px; height: 500px " class="fs bs">
+                        <div class="wd-tab wd-tab-alliances wd fs box-sizing">
                             <AlliancesSearcher ref="alliancesSearcherRef" ></AlliancesSearcher>
                         </div>
                     </md-tab>
-
 
                 </md-tabs>
             </div>
@@ -308,3 +312,23 @@
         return !!_nickname.match(/[A-Za-z_][A-Za-z_\- ]*?/m);
     };
 </script>
+
+<style lang="scss">
+    .wd-groups-edit-dialog {
+        & > .wd-edc-content {
+            height: 70%
+        }
+
+        .wd-tab {
+            padding: 0 20px;
+
+            &.wd-tab-preferences {}
+
+            &.wd-tab-corporations,
+            &.wd-tab-alliances,
+            &.wd-tab-characters {
+                height: 500px
+            }
+        }
+    }
+</style>

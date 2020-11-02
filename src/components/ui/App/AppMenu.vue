@@ -1,6 +1,6 @@
 <template>
     <div
-        class="wd-app-menu wd f-height padding-top flex flex-column flex-h-center"
+        class="wd-app-menu wd f-height padding-top flex flex-column flex-align-center"
         :class="{'expanding': expandAnimation, 'collapsing': collapseAnimation, 'expanded': expanded}"
     >
         <div class="wd f-width flex flex-justify-center" :class="{'flex-justify-end': expandAnimation || expanded}">
@@ -12,7 +12,7 @@
             </md-button>
         </div>
 
-        <div class="wd-app-menu-list wd fs flex flex-column flex-h-center">
+        <div class="wd-app-menu-list wd fs flex flex-column flex-align-center">
             <slot></slot>
         </div>
     </div>

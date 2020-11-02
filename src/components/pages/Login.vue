@@ -19,7 +19,7 @@
                 <div class="wd flex c-modules">
 
                     <!-- Login -->
-                    <div class="c-module c-login-module wd flex-column flex-h-center">
+                    <div class="c-module c-login-module wd flex-column flex-align-center">
                         <div class="wd fs fms md-layout md-alignment-center-center flex-column" style="min-height: 250px;">
                             <div class="c-module-header">
                                 <a class="c-link" title="What it is?" style="margin-right: 5px;" target="_blank" href="http://community.eveonline.com/news/dev-blogs/eve-online-sso-and-what-you-need-to-know" >Authorize</a>
@@ -31,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="c-module wd flex flex-column flex-h-center">
+                    <div class="c-module wd flex flex-column flex-align-center">
                         <div class="c-module-header">Read the guide</div>
                         <div class="c-module-content">
                             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
@@ -42,12 +42,12 @@
                         </div>
                     </div>
 
-                    <div class="c-module wd flex flex-column flex-h-center">
+                    <div class="c-module wd flex flex-column flex-align-center">
                         <div class="c-module-header">About wanderer</div>
                         <div class="c-module-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
                     </div>
 
-                    <div class="c-module wd flex flex-column flex-h-center">
+                    <div class="c-module wd flex flex-column flex-align-center">
                         <div class="c-module-header">Read the announcements</div>
                         <div class="c-module-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
                     </div>
@@ -65,7 +65,7 @@
     import cookie from "../../js/env/cookie";
     import query from "../../js/env/query";
     import api from "../../js/api";
-    import ssoAuth from "../../js/api/ssoAuth";
+    import authRequest from "../../js/api/ssoAuth";
 
     export default {
         name: "Login",
@@ -180,7 +180,7 @@
                 this[_type + _field + "Icon"] = _valid ? "done": "warning";
             },
             onEveSSOLogin: function () {
-                ssoAuth(query.toString({
+                authRequest(query.toString({
                     page: "ssoAuthResponseForLogin"
                 }));
             }

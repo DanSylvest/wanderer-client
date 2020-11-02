@@ -1,5 +1,5 @@
 <template>
-    <div class="с-tooltip c-context-main c-context-body md-elevation-2 absolute flex flex-vertical flex-justify" >
+    <div class="с-tooltip c-context-main c-context-body md-elevation-2 wd absolute flex flex-column flex-justify-center" >
         <slot></slot>
     </div>
 </template>
@@ -91,6 +91,8 @@
 
                 // this._addMouseObserver();
 
+                this._actualOffsets(true);
+
             },
             hide: function () {
                 this.contextBody.classList.add("c-context-animate-fade");
@@ -133,16 +135,22 @@
                     this._recalculate()
                 }.bind(this), 0);
             },
-            _actualOffsets: function () {
-                document.body.appendChild(this.contextBody);
-                this.contextBody.classList.add("left-top-force");
+            _actualOffsets: function (_notCalc) {
+                if(!_notCalc) {
+                    document.body.appendChild(this.contextBody);
+                    this.contextBody.classList.add("left-top-force");
+                }
+
                 let ctxBodyBoundsAfter = this.contextBody.getBoundingClientRect();
                 let bodyBounds = document.body.getBoundingClientRect();
-                this.contextBody.classList.remove("left-top-force");
-                document.body.removeChild(this.contextBody);
+
+                if(!_notCalc) {
+                    this.contextBody.classList.remove("left-top-force");
+                    document.body.removeChild(this.contextBody);
+                }
 
                 if(this.offsetX + ctxBodyBoundsAfter.width > bodyBounds.width) {
-                    this.offsetX = this.offsetX - ctxBodyBoundsAfter.width;
+                    this.offsetX = bodyBounds.width - ctxBodyBoundsAfter.width;
                 }
 
                 if(this.offsetY + ctxBodyBoundsAfter.height > bodyBounds.height) {

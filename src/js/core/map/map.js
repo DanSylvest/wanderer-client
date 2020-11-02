@@ -630,7 +630,7 @@ class Map extends Emitter {
         return out;
     }
     refresh () {
-        let bounds = this.container.parentElement.getBoundingClientRect();
+        let bounds = this.container/*.parentElement.parentElement.parentElement.*/.getBoundingClientRect();
         this.setSize(bounds.width, bounds.height);
     }
     setSize (_w, _h) {
