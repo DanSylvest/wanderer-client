@@ -9,7 +9,9 @@ import CustomPromise from "../../../env/promise";
  * @param {Object} _options
  * @param {String} _options.name
  * @param {String} _options.description
- * @param {Boolean} _options.isPrivate
+ * @param {Boolean} _options.shareForCorporation
+ * @param {Boolean} _options.shareForAlliance
+ * @param {Number} _options.characterId
  * @returns {*}
  */
 export default function (_options) {
@@ -17,14 +19,15 @@ export default function (_options) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve({mapId: _e.mapId, userId: _e.userId}) : p.reject(_e.message);
+        _e.success ? p.resolve(_e.mapData) : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "map", "add"], {
+    this.send(id, ["api", "eve", "map", "addFast"], {
         name: _options.name,
         description: _options.description,
-        isPrivate: _options.isPrivate,
-        groups: _options.groups,
+        shareForCorporation: _options.shareForCorporation,
+        shareForAlliance: _options.shareForAlliance,
+        characterId: _options.characterId,
     });
 
     return p.native;

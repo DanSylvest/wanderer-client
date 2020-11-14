@@ -1,0 +1,112 @@
+@import "/src/css/variables";
+@import "~vue-material/dist/theme/engine";
+
+$button-closed-color: md-get-palette-color(orange, 200);
+
+.wd-popup {
+    border: 1px solid $border-color-primary-4;
+    background: $bg-3;
+    overflow: hidden;
+    border-radius: 3px;
+    box-sizing: border-box;
+    min-width: 30px;
+
+    & {
+        &__content {
+            padding: 0 5px;
+        }
+
+        &__head {
+            //height: 26px;
+
+            .wd-popup-button {
+                cursor: pointer;
+                border-radius: 3px;
+
+                .md-icon.md-theme-default.md-icon-font {
+                    transition: color 250ms;
+                    color: $fg-secondary;
+                }
+                .md-icon.md-theme-default.md-icon-font:hover {
+                    color: $button-closed-color;
+                }
+            }
+
+            .wd-popup-title {
+                padding: 2px 5px;
+                color: #939393;
+            }
+        }
+    }
+
+    &.wd-popup-animate {
+        opacity: 0;
+        transform: scale(1, 0) translateY(-30px);
+        animation-duration: 250ms;
+        animation-name: wd-popup-animation-body;
+    }
+
+    &.wd-popup-animate-fade {
+        opacity: 100%;
+        transform: translateY(0px);
+        animation-duration: 250ms;
+        animation-name: wd-popup-animation-body-fade;
+    }
+
+    @keyframes wd-popup-animation-body {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 100%;
+            transform: translateY(0px);
+        }
+    }
+
+    @keyframes wd-popup-animation-body-fade {
+        from {
+            opacity: 100%;
+            transform: translateY(0px);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    }
+}
+.c-contexts-container  {
+    z-index: 2;
+}
+
+
+.c-popups-container {
+    z-index: 1;
+}
+
+.c-popup-title {
+    padding: 2px 5px;
+    /*font-weight: bold;*/
+    color: #939393;
+}
+
+.c-popup-animate {
+    opacity: 0;
+    transform: translate(-30px, 0);
+    animation-duration: 250ms;
+    animation-name: c-popup-animation-body;
+}
+
+@keyframes c-popup-animation-body {
+    from {
+        opacity: 0;
+        transform: translate(-30px, 0);
+    }
+
+    to {
+        opacity: 100%;
+        transform: translate(0px, 0);
+    }
+}

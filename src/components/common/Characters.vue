@@ -3,21 +3,21 @@
 
         <md-card class="md-elevation-4" v-for="item in characters" :key="item.id" md-with-hover>
             <md-ripple>
-                <md-card-media-cover md-text-scrim>
+                <md-card-media-cover class="wd-character-cover">
                     <md-card-media md-ratio="1:1" :style='"background-image: url(" + item.images.px512x512 + ")"'>
 
                         <div class="wd fs absolute top">
                             <md-icon
-                                    class="wd absolute"
-                                    :id="'character_icon_' + btoa(item.id)"
-                                    :style="'right: 5px; top: 5px; color: #7c7c6f'">
+                                class="wd absolute wd-character-online-state"
+                                :id="'character_icon_' + item.id"
+                            >
                                 public
                             </md-icon>
                         </div>
 
                     </md-card-media>
 
-                    <md-card-area>
+                    <md-card-area class="wd-card-area">
                         <md-card-header>
                             <span class="md-title">{{item.name}}</span>
                             <span class="md-subhead"></span>
@@ -58,6 +58,7 @@
     import query from "../../js/env/query";
     import api from "../../js/api";
     import authRequest from "../../js/api/ssoAuth";
+    import cookie from "../../js/env/cookie";
 
     export default {
         name: "Characters",
@@ -90,9 +91,13 @@
         },
         methods: {
             onAddClick: function (/*_event*/) {
-                authRequest(query.toString({
-                    page: "ssoAuthResponse"
-                }));
+                api.user.getAuthToken("attach").then(function(_token){
+                    cookie.set("authToken", _token);
+
+                    authRequest(query.toString({
+                        page: "ssoAuth"
+                    }));
+                }.bind(this));
             },
             _initSubscribes: function () {
                 this._subscribers = Object.create(null);
@@ -118,14 +123,14 @@
     }
 
     var _onOnlineChange = function (_characterId, _isOnline) {
-        let iconId  = "character_icon_" + btoa(_characterId);
+        let iconId  = "character_icon_" + _characterId;
         let iconDiv = document.getElementById(iconId);
 
         if(iconDiv) {
             if (!_isOnline) {
-                iconDiv.style.color = "#7c7c6f";
+                iconDiv.classList.remove("is-online");
             } else {
-                iconDiv.style.color = "#00cb04";
+                iconDiv.classList.add("is-online");
             }
         }
     };
@@ -133,9 +138,36 @@
 
 
 <style lang="scss">
+    @import "/src/css/variables";
+    @import "~vue-material/dist/theme/engine";
+    $font-color: md-get-palette-color(orange, A100);
+
+    .wd-characters-layout {
+        .wd-character-cover.md-card-media-cover {
+            color: $font-color;
+
+            .wd-card-area.md-card-area {
+                /*color: #2bff72;*/
+                background: linear-gradient(#40404000, #000000)
+            }
+        }
+
+        .wd-character-online-state {
+            right: 5px;
+            top: 5px;
+
+            &:not(.is-online){
+                color: #7c7c6f;
+            }
+
+            &.is-online {
+                color: #00cb04;
+            }
+        }
+    }
+
     .wd-characters-layout {
         box-sizing: border-box;
-        /*padding: 10px;*/
 
         .md-card {
 

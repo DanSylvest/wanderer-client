@@ -47,7 +47,7 @@ class Dispatcher extends Emitter {
             if (info) {
                 info.callback(_event);
             } else {
-                log(log.WARN, "Default event handler (%s)", _event.route.join("."));
+                log(log.WARN, "Default event handler (%s)", _event.eventType);
             }
         }
     }

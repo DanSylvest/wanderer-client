@@ -2,6 +2,7 @@ import Emitter from "../../../../js/env/tools/emitter";
 import api from "../../../../js/api";
 import Link from "./link";
 import System from "./system";
+import exists from "../../../../js/env/tools/exists";
 
 class MapController extends Emitter {
     constructor (_map, _mapId) {
@@ -57,7 +58,6 @@ class MapController extends Emitter {
         this.links = Object.create(null);
     }
     setSelection (_leftTop, _rightBottom) {
-        this.map.deselectAll();
         let lt = this.map.getVirtualBy(_leftTop);
         let rb = this.map.getVirtualBy(_rightBottom);
 
@@ -200,8 +200,26 @@ class MapController extends Emitter {
         }
 
     }
-    onMarkerClicked (_systemId/*, _event*/) {
-        this.emit("systemOpenInfo", _systemId, this.systems[_systemId].info);
+    onMarkerClicked (_systemId, _event) {
+        if(_event.ctrlKey) {
+            let markerId = this.systems[_systemId].markerId;
+            this.map.setSelectMarker(markerId, !this.map.isMarkerSelected(markerId));
+        } else {
+            this.emit("systemOpenInfo", _systemId, this.systems[_systemId].info);
+        }
+    }
+    setSystemActive (systemId) {
+        if(this.systems[systemId]) {
+            this.offSystemActive();
+            this.map.setMarkerActive(this.systems[systemId].markerId, true);
+            this._lastSystemActive = systemId;
+        }
+    }
+    offSystemActive () {
+        if(exists(this._lastSystemActive && this.systems[this._lastSystemActive])) {
+            this.map.setMarkerActive(this.systems[this._lastSystemActive].markerId, false);
+            delete this._lastSystemActive;
+        }
     }
     getSystem (_systemId) {
         return this.systems[_systemId]

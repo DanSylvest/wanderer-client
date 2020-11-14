@@ -1,12 +1,7 @@
-
 .md-drawer {
     width: 230px;
     max-width: calc(100vw - 125px);
 }
-//
-//.md-layout .md-button-content {
-//    top: 2px;
-//}
 
 .background {
     background-image: url(../images/bg2.png);
@@ -15,13 +10,6 @@
     background-size: 100%;
     background-repeat: no-repeat;
 }
-
-.md-app {
-    min-height: 350px;
-    border: 1px solid rgba(#000, .12);
-}
-
-
 
 .md-list-item[active="true"] {
     background-color: var(--md-theme-default-accent);
@@ -35,8 +23,6 @@
 .md-list-item[active="true"] .md-list-item-text {
     color: var(--mp-foreground-active)
 }
-
-
 
 .leaflet-div-icon {
     border: initial !important;
@@ -53,18 +39,9 @@
     border-radius: 100%;
 }
 
-
-
-
-
-
 .off-events {
     pointer-events: none;
 }
-//
-//.flex {
-//    display: flex;
-//}
 
 .flex-vertical {
     flex-direction: column;
@@ -76,18 +53,6 @@
 
 .fh {
     height: 100%;
-}
-
-.half-w {
-    width: 50%;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-color-secondary {
-    color: #6f6f6f;
 }
 
 
@@ -176,16 +141,4 @@
 .c-small-table-cell .md-table-cell {
     height: initial;
 }
-
-.c-area-selection {
-    border: 1px dashed #bdbcbc;
-    background-color: rgba(233, 255, 249, 0.36);
-    border-radius: 5px;
-}
-
-
-
-
-
-
 

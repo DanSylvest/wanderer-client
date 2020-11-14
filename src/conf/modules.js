@@ -5,21 +5,16 @@ const modules = {
         componentName: "Home",
         path: "pages/Home"
     },
-    ssoAuthResponse: {
-        isProtected: true,
-        isComponent: false,
-        path: "scripts/ssoAuthResponse"
-    },
     login: {
         isProtected: false,
         isComponent: true,
         componentName: "Login",
         path: "pages/Login"
     },
-    ssoAuthResponseForLogin: {
+    ssoAuth: {
         isProtected: false,
         isComponent: false,
-        path: "scripts/ssoAuthResponseForLogin"
+        path: "scripts/ssoAuth"
     },
     currentMap: {
         isProtected: true,

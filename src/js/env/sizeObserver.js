@@ -2,13 +2,20 @@
  * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 2/12/20.
  */
 
+import exists from "./tools/exists";
+
 class SizeObserver {
-    constructor (_handler) {
+    constructor (_element, _handler) {
+        if(!exists(_element)) _element = window;
+
         this._handler = _handler;
-        window.addEventListener("resize", this._handler);
+        this._element = _element;
+        this._element.addEventListener("resize", this._handler);
     }
     destructor () {
-        window.removeEventListener("resize", this._handler);
+        this._element.removeEventListener("resize", this._handler);
+        delete this._element;
+        delete this._handler;
     }
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="с-tooltip c-context-main c-context-body md-elevation-2 wd absolute flex flex-column flex-justify-center" >
+    <div class="md-elevation-2 wd-popup wd off-events absolute flex flex-column flex-justify-center" >
         <slot></slot>
     </div>
 </template>
@@ -12,7 +12,7 @@
             element = document.createElement("div");
             document.body.appendChild(element);
 
-            element.setAttribute("class", "c-contexts-container absolute top left");
+            element.setAttribute("class", "c-contexts-container wd absolute top left");
             element.style.width = "100%";
             element.style.height = "0px";
         } else {
@@ -54,7 +54,6 @@
 
             this.contextBody = this.$el;
             let parent = this.$el.parentElement;
-
             parent.removeChild(this.contextBody);
 
             this.handlers = {
@@ -86,7 +85,7 @@
                 if (this.contextBody.parentElement === null)
                     getContextContainer().appendChild(this.contextBody);
 
-                this.contextBody.classList.add("c-context-animate");
+                this.contextBody.classList.add("wd-popup-animate");
                 this.contextBody.addEventListener('animationend', this.handlers.onShowAnimationEnd);
 
                 // this._addMouseObserver();
@@ -95,7 +94,7 @@
 
             },
             hide: function () {
-                this.contextBody.classList.add("c-context-animate-fade");
+                this.contextBody.classList.add("wd-popup-animate-fade");
                 this.contextBody.addEventListener('animationend', this.handlers.onHideAnimationEnd);
 
                 // this._delMouseObserver();
@@ -109,11 +108,11 @@
             //     this.mouseObserver && this.mouseObserver.destructor();
             // },
             _onShowAnimationEnd: function () {
-                this.contextBody.classList.remove("c-context-animate");
+                this.contextBody.classList.remove("wd-popup-animate");
                 this.contextBody.removeEventListener('animationend', this.handlers.onShowAnimationEnd);
             },
             _onHideAnimationEnd: function () {
-                this.contextBody.classList.remove("c-context-animate-fade");
+                this.contextBody.classList.remove("wd-popup-animate-fade");
                 this.contextBody.removeEventListener('animationend', this.handlers.onHideAnimationEnd);
 
                 if (this.contextBody.parentElement !== null)
@@ -123,8 +122,8 @@
             update: function () {
                 this.contextBody.removeEventListener('animationend', this.handlers.onShowAnimationEnd);
                 this.contextBody.removeEventListener('animationend', this.handlers.onHideAnimationEnd);
-                this.contextBody.classList.remove("c-context-animate");
-                this.contextBody.classList.remove("c-context-animate-fade");
+                this.contextBody.classList.remove("wd-popup-animate");
+                this.contextBody.classList.remove("wd-popup-animate-fade");
 
                 this._actualOffsets();
 

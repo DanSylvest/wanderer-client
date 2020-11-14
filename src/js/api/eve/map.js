@@ -3,6 +3,7 @@
  */
 
 import add from "./map/add";
+import addFast from "./map/addFast";
 import edit from "./map/edit";
 import list from "./map/list";
 import remove from "./map/remove";
@@ -19,9 +20,11 @@ import updateSystemsPosition from "./map/updateSystemsPosition";
 import updateSystem from "./map/updateSystem";
 import updateLink from "./map/updateLink";
 import waypoint from "./map/waypoint";
+import userWatchMapStatus from "./map/userWatchMapStatus";
 
 export default {
     add: add,
+    addFast: addFast,
     edit: edit,
     list: list,
     remove: remove,
@@ -37,5 +40,6 @@ export default {
     updateSystemsPosition: updateSystemsPosition,
     updateSystem: updateSystem,
     updateLink: updateLink,
-    waypoint: waypoint
+    waypoint: waypoint,
+    userWatchMapStatus: userWatchMapStatus
 }

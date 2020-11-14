@@ -1,5 +1,5 @@
 <template>
-    <div class="c-area-selection absolute top left hidden">
+    <div class="c-area-selection wd absolute top left hidden">
 
     </div>
 </template>
@@ -92,3 +92,13 @@
         }
     }
 </script>
+
+<style lang="scss">
+    @import "/src/css/variables";
+
+    .c-area-selection {
+        border: 1px dashed $border-color-primary-3;
+        background-color: transparentize($bg-3-major, 0.8);
+        border-radius: 5px;
+    }
+</style>

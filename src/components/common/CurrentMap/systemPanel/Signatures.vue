@@ -1,8 +1,8 @@
 <template>
     <div>
         <div v-if="enable === true">
-            <md-content class="kek c-small-table-cell">
-                <div v-if="signatures.length > 0">
+            <md-content v-if="signatures.length > 0" class="kek c-small-table-cell">
+                <div>
                     <md-table ref="signaturesTable" v-model="signatures" md-sort="email" md-sort-order="asc" md-card md-fixed-header md-height="600px" @md-selected="onSelect" >
                         <md-table-row ref="tableRows" slot="md-table-row" slot-scope="{ item }" md-auto-select md-selectable="multiple">
                             <md-table-cell md-label="id" md-sort-by="id" width="40" style="white-space: nowrap">{{ item.id }}</md-table-cell>
@@ -14,15 +14,6 @@
                         </md-table-row>
                     </md-table>
                 </div>
-
-                <md-content v-if="signatures.length === 0" class="md-card" style="padding: 10px 0">
-                    <md-empty-state
-                            md-rounded
-                            md-icon="announcement"
-                            md-label="No signatures"
-                            md-description="Just paste (ctrl + v) for update signatures.">
-                    </md-empty-state>
-                </md-content>
 
                 <transition name="c-fade">
                     <md-toolbar v-if="selected.length > 0" md-elevation="0" class="c-table-toolbar" style="padding: 0 10px;">
@@ -37,6 +28,13 @@
                 </transition>
 
             </md-content>
+
+            <md-empty-state
+                    v-if="signatures.length === 0"
+                    md-icon="announcement"
+                    md-label="No signatures"
+                    md-description="Just paste (ctrl + v) for update signatures.">
+            </md-empty-state>
 
             <div style="width: 1000px;">
                 <md-dialog :md-active.sync="saveSigsDialogActive">
@@ -80,7 +78,7 @@
         },
         mounted: function () {
             this._rtid = -1;
-            this._so = new SizeObserver(this.refresh.bind(this));
+            this._so = new SizeObserver(null, this.refresh.bind(this));
             this._to = new TabObserver();
             this._to.on("out", this._onTabOut.bind(this));
             this._to.on("in", this._onTabIn.bind(this));

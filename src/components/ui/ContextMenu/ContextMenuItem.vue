@@ -1,5 +1,5 @@
 <template>
-    <md-content class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center" @click="onClick">
+    <md-content class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb" @click="onClick">
         <div class="wd-context-item-content wd nowrap flex flex-align-center">
             <md-icon v-show="icon.length > 0" class="wd-context-expand-icon wd font-size-large">{{icon}}</md-icon>
             <span>{{title}}</span>
@@ -159,21 +159,23 @@
 
 <style lang="scss">
     @import "./src/css/variables";
-    @import "./src/components/ui/Popup.scss";
+    @import "~vue-material/dist/theme/engine";
+
+    $button-closed-color: md-get-palette-color(orange, 400);
 
     .wd-context {
         & > .wd-context-item {
-            transition: background-color 250ms;
+            transition: background-color 150ms;
             background-color: rgba(0, 0, 0, 0);
             padding: 5px 5px !important;
             padding-right: 10px !important;
 
             &:hover {
-                background-color: rgba(130, 130, 130, 0.15);
+                background-color: transparentize($button-closed-color, 0.55);
             }
 
             &:active {
-                background-color: rgba(120, 120, 120, 0.25);
+                background-color: transparentize($button-closed-color, 0.45);
             }
 
             & > span {

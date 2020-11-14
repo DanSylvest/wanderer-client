@@ -1,6 +1,6 @@
 <template>
     <div>
-        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
+        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="">
             <md-dialog-title>{{header}}</md-dialog-title>
 
             <div class="wd box-sizing wd-dialog-content">
@@ -339,6 +339,7 @@
 
     .wd-dialog-content {
         height: 70%;
+        width: 700px;
 
         & .md-tab {
             padding-left: 20px;

@@ -1,5 +1,5 @@
 <template>
-    <div class="wd-popup wd-context md-elevation-2 wd absolute flex flex-column flex-justify-center" >
+    <div class="wd-popup wd-context md-elevation-2 wd off-user-select absolute flex flex-column flex-justify-center" >
         <slot></slot>
     </div>
 </template>
@@ -192,5 +192,4 @@
 </script>
 
 <style lang="scss">
-    @import "./src/components/ui/Popup.scss";
 </style>

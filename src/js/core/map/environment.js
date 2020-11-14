@@ -29,18 +29,18 @@ export default {
     },
 
     typeClasses : {
-        "C1"      : "eve-wh-type-color-c1",
-        "C2"      : "eve-wh-type-color-c2",
-        "C3"      : "eve-wh-type-color-c3",
-        "C4"      : "eve-wh-type-color-c4",
-        "C5"      : "eve-wh-type-color-c5",
-        "C6"      : "eve-wh-type-color-c6",
-        "C13"     : "eve-wh-type-color-c13",
-        "drifter" : "eve-wh-type-color-drifter",
-        "Thera"   : "eve-wh-type-color-thera",
-        "High"    : "eve-wh-type-color-high",
-        "Low"     : "eve-wh-type-color-low",
-        "Null"    : "eve-wh-type-color-null",
+        "C1"  : "eve-wh-type-color-c1",
+        "C2"  : "eve-wh-type-color-c2",
+        "C3"  : "eve-wh-type-color-c3",
+        "C4"  : "eve-wh-type-color-c4",
+        "C5"  : "eve-wh-type-color-c5",
+        "C6"  : "eve-wh-type-color-c6",
+        "C13" : "eve-wh-type-color-c13",
+        "D"   : "eve-wh-type-color-drifter",
+        "T"   : "eve-wh-type-color-thera",
+        "H"   : "eve-wh-type-color-high",
+        "L"   : "eve-wh-type-color-low",
+        "N"   : "eve-wh-type-color-null",
     },
 
     kindClassed : {
@@ -51,5 +51,14 @@ export default {
         "4" : "eve-kind-color-thera",
         "5" : "eve-kind-color-abyss",
         "6" : "eve-kind-color-penalty",
+    },
+
+    effects : {
+        "pulsar":              "text-eve-wh-effect-color-pulsar",
+        "magnetar":            "text-eve-wh-effect-color-magnetar",
+        "wolfRayet":           "text-eve-wh-effect-color-wolfRayet",
+        "blackHole":           "text-eve-wh-effect-color-blackHole",
+        "cataclysmicVariable": "text-eve-wh-effect-color-cataclysmicVariable",
+        "redGiant":            "text-eve-wh-effect-color-redGiant",
     }
 }

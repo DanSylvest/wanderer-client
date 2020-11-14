@@ -1,9 +1,14 @@
 <template>
     <div class="wd-maps">
         <div class="maps-toolbar" v-show="maps.length > 0">
-            <md-button class="md-dense md-primary md-raised" @click="add">
+            <md-button class="md-dense md-accent md-raised" @click="addSimple">
                 <md-icon>add</md-icon>
                 <span style="vertical-align: middle">Add map</span>
+            </md-button>
+
+            <md-button class="md-dense md-primary md-raised" @click="add">
+                <md-icon>add</md-icon>
+                <span style="vertical-align: middle">Add map (advanced)</span>
             </md-button>
         </div>
 
@@ -32,13 +37,14 @@
                     md-label="Create your map!"
                     md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
             >
-                <md-button class="md-dense md-primary md-raised" @click="add">
+                <md-button class="md-dense md-primary md-raised" @click="addSimple">
                     <span style="vertical-align: middle">Create</span>
                 </md-button>
             </md-empty-state>
         </div>
 
         <MapsEditDialog ref="mapsEditDialogRef"></MapsEditDialog>
+        <MapsEditDialogSimple ref="mapsEditDialogSimpleRef"></MapsEditDialogSimple>
 
         <ContextMenu :c-activated.sync="mapContextMenuEnable" :c-offset-x="contextOffsetX" :c-offset-y="contextOffsetY">
             <ContextMenuItem c-title="Edit" c-icon="edit" @click="onMapContextMenuEdit" />
@@ -52,13 +58,14 @@
     import ContextMenu from "../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
     import MapsEditDialog from "./maps/MapsEditDialog";
+    import MapsEditDialogSimple from "./maps/MapsEditDialogSimple";
 
     import api from "../../js/api";
 
     export default {
         name: "Maps",
         components: {
-            ContextMenu, ContextMenuItem, MapsEditDialog
+            ContextMenu, ContextMenuItem, MapsEditDialog, MapsEditDialogSimple
         },
         props: [],
         data: function () {
@@ -119,6 +126,20 @@
             },
             add: function () {
                 this.$refs.mapsEditDialogRef.show().then(function(_options){
+                    this.maps.push({
+                        id          : _options.id,
+                        name        : _options.name,
+                        owner       : _options.owner,
+                        description : _options.description,
+                        private     : _options.isPrivate,
+                        groups      : _options.groups,
+                    });
+                }.bind(this), function(){
+                    // do nothing
+                }.bind(this));
+            },
+            addSimple: function () {
+                this.$refs.mapsEditDialogSimpleRef.show().then(function(_options){
                     this.maps.push({
                         id          : _options.id,
                         name        : _options.name,

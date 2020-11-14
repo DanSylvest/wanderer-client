@@ -176,6 +176,8 @@ class Map extends Emitter {
         marker.on("contextmenu", this._onMarkerContext.bind(this, mid));
         marker.on("mousein", this._onMarkerMouseIn.bind(this, mid));
         marker.on("mouseout", this._onMarkerMouseOut.bind(this, mid));
+        marker.on("mouseinLazy", this._onMarkerMouseInLazy.bind(this, mid));
+        marker.on("mouseoutLazy", this._onMarkerMouseOutLazy.bind(this, mid));
 
         this._markers[mid] = marker;
 
@@ -218,6 +220,12 @@ class Map extends Emitter {
         this._sfForce.call();
     }
     _onMarkerDown (_markerId, _event) {
+        // var marker = this.findMarker(_event.mouse);
+        if(_event.ctrlKey) {
+            this._onMarkerClick(_markerId, _event);
+            return;
+        }
+
         this._ao = new ActionObserver({
             container: this.svg.el,
             offOnOut: false,
@@ -313,9 +321,9 @@ class Map extends Emitter {
     createLink (_customId, _source, _target) {
         let mid = counter++;
 
-        let element = new _ui("line").attr({class: "map-link link-top"});
-        let element2 = new _ui("line").attr({class: "map-link link-middle"});
-        let element3 = new _ui("line").attr({class: "map-link link-bottom"});
+        let element = new _ui("line").attr({class: "wd cursor-pointer map-link link-top"});
+        let element2 = new _ui("line").attr({class: "wd cursor-pointer map-link link-middle"});
+        let element3 = new _ui("line").attr({class: "wd cursor-pointer map-link link-bottom"});
 
         this.linksLayer.append(element3);
         this.linksLayer.append(element2);
@@ -440,15 +448,31 @@ class Map extends Emitter {
         let marker = this._markers[_markerId];
         this.emit("systemContextMenu", marker.data.customId, _event);
     }
-    _onMarkerMouseIn (_markerId, _event){
-        if(!this._isDragging) {
+    _onMarkerMouseIn (_markerId, _event) {
+
+
+        if (!this._isDragging) {
             let marker = this._markers[_markerId];
             this.emit("markerIn", marker.data.customId, _event);
         }
     }
     _onMarkerMouseOut (_markerId, _event){
+        this.shadeAll(false);
+
         let marker = this._markers[_markerId];
         this.emit("markerOut", marker.data.customId, _event);
+    }
+    _onMarkerMouseInLazy (_markerId) {
+        this.shadeAll(true);
+
+        let result = this.getChainsAndSystemsBySystem(_markerId);
+
+        this.shadeMarker(_markerId, false);
+        result.linkedSystems.map(x => this.shadeMarker(x, false));
+        result.links.map(x => this.shadeLink(x, false));
+    }
+    _onMarkerMouseOutLazy () {
+        this.shadeAll(false);
     }
     _onLinkClick (/*_linkId*/) {
         // let linkData = this._links[_linkId];
@@ -621,6 +645,12 @@ class Map extends Emitter {
     setSelectMarker (_markerId, _isSelect) {
         this._markers[_markerId].select(_isSelect);
     }
+    isMarkerSelected (_markerId) {
+        return this._markers[_markerId].isMarkerSelected();
+    }
+    setMarkerActive (_markerId, isActive) {
+        this._markers[_markerId].setActive(isActive);
+    }
     selected () {
         let out = [];
         for (let markerId in this._markers) {
@@ -641,6 +671,63 @@ class Map extends Emitter {
         this.magnifier.setSize(this.width, this.height);
         this.render();
     }
+
+    shadeAll (_bool) {
+        for(let markerId in this._markers) {
+            this._markers[markerId].enableShade(_bool);
+        }
+
+        for(let linkId in this._links) {
+            let linkInfo = this._links[linkId];
+            if(_bool) {
+                linkInfo.element.el.classList.add("shaded");
+                linkInfo.element2.el.classList.add("shaded");
+                linkInfo.element3.el.classList.add("shaded");
+            } else {
+                linkInfo.element.el.classList.remove("shaded");
+                linkInfo.element2.el.classList.remove("shaded");
+                linkInfo.element3.el.classList.remove("shaded");
+            }
+        }
+    }
+
+    shadeMarker (_markerId, _bool) {
+        this._markers[_markerId].enableShade(_bool);
+    }
+
+    shadeLink (_linkId, _bool) {
+        let linkInfo = this._links[_linkId];
+        if(_bool) {
+            linkInfo.element.el.classList.add("shaded");
+            linkInfo.element2.el.classList.add("shaded");
+            linkInfo.element3.el.classList.add("shaded");
+        } else {
+            linkInfo.element.el.classList.remove("shaded");
+            linkInfo.element2.el.classList.remove("shaded");
+            linkInfo.element3.el.classList.remove("shaded");
+        }
+    }
+
+    getChainsAndSystemsBySystem (_markerId) {
+        let links = [];
+        let linkedSystems = [];
+        for(let linkId in this._links) {
+            let linkInfo = this._links[linkId];
+
+            if(_markerId === linkInfo.target) {
+                links.push(linkId);
+                linkedSystems.push(linkInfo.source);
+            } else if(_markerId === linkInfo.source) {
+                links.push(linkId);
+                linkedSystems.push(linkInfo.target);
+            }
+
+        }
+
+        return {links: links, linkedSystems: linkedSystems}
+    }
+
+
 }
 
 export default Map;

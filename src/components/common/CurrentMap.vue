@@ -94,11 +94,12 @@
             </context-menu>
 
             <tooltip
-                    :c-offset-x="item.x"
-                    :c-offset-y="item.y"
-                    :c-activated="true"
-                    :key="item.systemId"
-                    v-for="item in systemsTooltipDisplayed"
+                :c-offset-x="item.x"
+                :c-offset-y="item.y"
+                :c-activated="true"
+                :key="item.systemId"
+                v-for="item in systemsTooltipDisplayed"
+                class="wd-layout-secondary"
             >
                 <system-card :c-solar-system-id="item.systemId" :c-map-id="item.mapId" />
             </tooltip>
@@ -111,16 +112,18 @@
 <script>
     import CustomPromise from "../../js/env/promise";
     import cookie from "../../js/env/cookie";
+    import query from "../../js/env/query";
     import api from "../../js/api";
     import MapController from "./CurrentMap/controller/mapController";
     import Map from "../../js/core/map/map";
+    import exists from "../../js/env/tools/exists";
 
     import ContextMenu from "../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
     import Tooltip from "../ui/Tooltip";
     import AreaSelection from "../ui/AreaSelection";
-    import SystemPanel from "./CurrentMap/systemPanel"
-    import SystemCard from "./CurrentMap/systemCard"
+    import SystemPanel from "./CurrentMap/SystemPanel"
+    import SystemCard from "./CurrentMap/SystemCard"
 
     export default {
         name: "CurrentMap",
@@ -173,20 +176,17 @@
             this._currentOpenSystem = null;
 
             this.initialize().then(function() {
-                if(this.selectedMap !== null) {
-                    this.__tid = setTimeout(() => {
-                        delete this.__tid;
-                        this.onMapSelected(this.selectedMap);
-                    }, 250);
-                }
+                // if(this.selectedMap !== null) {
+                this.__tid = setTimeout(() => {
+                    delete this.__tid;
+                    this.selectMapOnStart();
+                }, 250);
+                // }
             }.bind(this),function() {
                 // eslint-disable-next-line no-debugger
                 debugger;
             }.bind(this));
         },
-        // updated() {
-        //
-        // },
         beforeDestroy: function ( ){
             if(this.__tid) {
                 clearTimeout(this.__tid);
@@ -204,6 +204,21 @@
         methods: {
             refresh: function () {
                 this.mapController && this.mapController.map.refresh();
+            },
+            selectMapOnStart: function () {
+                let currentMapId = null;
+                let queryMapId = query.searchObject().mapId;
+                let cookieMapId = cookie.get("selectedMap");
+
+                if(exists(queryMapId)) {
+                    currentMapId = queryMapId;
+                } else if(exists(cookieMapId)) {
+                    currentMapId = cookieMapId;
+                } else if(!this.showMapEmpty) {
+                    currentMapId = this.allowedMaps[0].id;
+                }
+
+                this.onMapSelected(currentMapId);
             },
             initialize: function () {
                 let pr = new CustomPromise();
@@ -232,9 +247,6 @@
                     this.isLoaded = true;
                     this.showMapEmpty = _arr.length === 0;
 
-                    if(!this.showMapEmpty) {
-                        this.selectedMap = _arr[0].id;
-                    }
                     pr.resolve();
                 }.bind(this)).catch(function (_err) {
                     pr.reject(_err);
@@ -283,6 +295,7 @@
                 });
             },
             onMapSelected: function(_mapId) {
+                cookie.set("selectedMap", _mapId);
                 this.selectedMap = _mapId;
                 this._destroyMap();
                 this._initMap(_mapId);
@@ -456,20 +469,39 @@
             },
             onSystemInfoPanelClosed: function () {
                 this._currentOpenSystem = null;
+                this.mapController.offSystemActive();
             },
             _onSystemOpenInfo: function (_systemId, _event) {
                 this._offContexts();
                 this.mapController.map.deselectAll();
+                this.mapController.offSystemActive();
+                this.mapController.setSystemActive(_systemId);
 
                 if(this._currentOpenSystem === _systemId)
                     return;
 
-                this._currentOpenSystem = _systemId;
-                this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
+                // todo
+                // Я полагаю что надо не закрывтаь, а потом открывать, а показывать загрузчик
+                // а потом перезагружать... Но только после того как разберус, какого хрена ничего не обновляется...
+                if(this._currentOpenSystem !== null) {
+                    this.$refs.systemPanel.hide();
+                    this.$nextTick(function () {
+                        this._currentOpenSystem = _systemId;
+                        this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
 
-                this.$nextTick(function () {
-                    this.$refs.systemPanel.reload(_event);
-                }.bind(this));
+                        this.$nextTick(function () {
+                            this.$refs.systemPanel.reload(_event);
+                        }.bind(this));
+                    }.bind(this))
+                } else {
+                    this._currentOpenSystem = _systemId;
+                    this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
+
+                    this.$nextTick(function () {
+                        this.$refs.systemPanel.reload(_event);
+                    }.bind(this));
+                }
+
             },
             _onDragStarted: function () {
                 this._offContexts();

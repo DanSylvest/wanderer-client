@@ -1,0 +1,31 @@
+@import "variables";
+
+.wd {
+    &.fg-primary {
+        color: $fg-primary;
+    }
+
+    &.fg-secondary {
+        color: $fg-secondary;
+    }
+
+    &.fg-contrast {
+        color: $fg-contrast;
+    }
+
+    &-layout-primary {
+        color: $fg-primary;
+        background-color: $bg-primary;
+        border-color: $border-color-primary-6;
+    }
+
+    &-layout-secondary {
+        color: $fg-primary;
+        background-color: $bg-secondary;
+        border-color: $border-color-primary-6;
+    }
+
+    &-color-primary-2 {
+        color: $fg-primary-2;
+    }
+}

@@ -14,7 +14,7 @@ class Marker extends Emitter{
         super();
 
         this.data = extend({
-
+            shade: false
         }, _options);
 
         this.markerDownHandler = this._onMarkerDown.bind(this);
@@ -58,6 +58,10 @@ class Marker extends Emitter{
         this.mo = new MouseObserver(this.wrapper.el, 300);
         this.mo.on("mouseIn", this._onMouseIn.bind(this));
         this.mo.on("mouseOut", this._onMouseOut.bind(this));
+
+        this.moLazy = new MouseObserver(this.wrapper.el, 1000);
+        this.moLazy.on("mouseIn", this._onMouseInLazy.bind(this));
+        this.moLazy.on("mouseOut", this._onMouseOutLazy.bind(this));
     }
 
     /**
@@ -117,7 +121,7 @@ class Marker extends Emitter{
 
         if (exists(_data.systemType) && _data.systemType !== markerData.systemType) {
             let systemTypeEl = _ui.fromElement(markerEl.el.querySelector(".system-type"));
-            let colorClass = printf("eve-system-color-%s", _data.systemType);
+            let colorClass = "";
             switch (_data.systemType) {
                 case 0:
                 case 1:
@@ -140,7 +144,7 @@ class Marker extends Emitter{
 
     /**
      *
-     * @param _statics {Array<{leadTo: String}>}
+     * @param _statics {Array<{type: String}>}
      * @private
      */
     _createStatics (_statics) {
@@ -148,8 +152,8 @@ class Marker extends Emitter{
 
         for (let a = 0; a < _statics.length; a++) {
             let staticData = _statics[a];
-            let colorClass = environment.typeClasses[staticData.leadTo]
-            let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${staticData.leadTo}</div>`)
+            let colorClass = environment.typeClasses[staticData.type]
+            let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${staticData.type}</div>`)
             systemTypeEl.append(staticEl);
         }
     }
@@ -162,6 +166,17 @@ class Marker extends Emitter{
             else
                 this.wrapper.el.classList.remove("selected");
         }
+    }
+    isMarkerSelected () {
+        return this.data.isSelect;
+    }
+    setActive (isActive) {
+        this.data.isActive = isActive;
+
+        if (isActive)
+            this.wrapper.el.classList.add("active");
+        else
+            this.wrapper.el.classList.remove("active");
     }
     _onMarkerDown (_event) {
         this.emit("mousedown", _event);
@@ -180,6 +195,30 @@ class Marker extends Emitter{
     }
     _onMouseOut (_event){
         this.emit("mouseout", _event);
+    }
+
+    _onMouseInLazy (_event) {
+        let bounds = this.wrapper.el.getBoundingClientRect();
+        this.emit("mouseinLazy", {
+            x: bounds.x,
+            y: bounds.y + bounds.height,
+            originalEvent: _event
+        });
+    }
+
+    _onMouseOutLazy (_event){
+        this.emit("mouseoutLazy", _event);
+    }
+
+
+    enableShade (_bool) {
+        this.data.shade = _bool;
+
+        if(_bool)
+            this.wrapper.el.classList.add("shaded");
+        else
+            this.wrapper.el.classList.remove("shaded");
+
     }
 }
 

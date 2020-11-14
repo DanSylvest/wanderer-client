@@ -1,15 +1,13 @@
 <template>
-    <div>
-        <div class="c-popup-body md-elevation-10 wd absolute flex flex-column" >
-            <div class="c-popup-head" style="height: 26px;">
-                <div class="c-popup-title" style="float: left;">{{cTitle}}</div>
-                <div class="c-button" style="float: right;" @click="onCloseClick" >
-                    <md-icon>close</md-icon>
-                </div>
+    <div :class="'wd-popup md-elevation-10 wd absolute flex flex-column padding-primary-minor ' + localClass" >
+        <div class="wd-popup__head wd flex flex-justify-sb flex-align-center padding-primary-minor">
+            <div class="wd-popup-title" >{{cTitle}}</div>
+            <div class="wd-popup-button" @click="onCloseClick" >
+                <md-icon>close</md-icon>
             </div>
-            <div class="c-popup-content wd f-height">
-                <slot></slot>
-            </div>
+        </div>
+        <div class="wd-popup__content wd f-height">
+            <slot></slot>
         </div>
     </div>
 </template>
@@ -46,6 +44,10 @@
                 type: Number,
                 default: 10,
             },
+            userClass: {
+                type: String,
+                default: ""
+            },
         },
         data: function () {
             return {
@@ -56,13 +58,18 @@
                 offsetY: this.cOffsetY,
                 horizontalAlignment: this.cHorizontalAlignment,
                 title: this.cTitle,
+                localClass: this.userClass,
             }
         },
         mounted: function () {
             this._tid = -1;
 
-            this.popupBody = this.$el.querySelector(".c-popup-body");
-            this.$el.removeChild(this.popupBody);
+            // this.popupBody = this.$el.querySelector(".wd-popup");
+            // this.$el.removeChild(this.popupBody);
+
+            this.popupBody = this.$el;
+            let parent = this.$el.parentElement;
+            parent.removeChild(this.popupBody);
 
             this.activated && this.show();
             this._recalculate();
@@ -76,6 +83,8 @@
 
             this.popupBody.addEventListener("mousedown", this._mousedownHandler);
             this.popupBody.addEventListener("mouseup", this._mouseupHandler);
+
+            this.$emit("mounted");
         },
         beforeDestroy: function () {
             this._tid !== -1 && clearTimeout(this._tid);
@@ -116,10 +125,10 @@
                 if (this.popupBody.parentElement === null)
                     this.getPopupsContainer().appendChild(this.popupBody);
 
-                this.popupBody.classList.add("c-popup-animate");
+                this.popupBody.classList.add("wd-popup-animate");
 
                 let handler = function () {
-                    this.popupBody.classList.remove("c-popup-animate");
+                    this.popupBody.classList.remove("wd-popup-animate");
                     this.popupBody.removeEventListener('animationend', handler);
                 }.bind(this);
 
@@ -168,3 +177,6 @@
         }
     }
 </script>
+
+<style>
+</style>

@@ -69,143 +69,23 @@
 
     export default {
         name: "Login",
-        props: [
-
-        ],
+        props: [],
         data: function () {
-            return {
-                dialogRegisterShow: false,
-                dialogRegisterTitle: "",
-                dialogRegisterDescription: "",
-
-                dialogLoginShow: false,
-                dialogLoginTitle: "",
-                dialogLoginDescription: "",
-
-                loginNicknameIcon: "warning",
-                loginPasswordIcon: "warning",
-                loginPasswordRepeatIcon: "warning",
-                regNicknameIcon: "warning",
-                regPasswordIcon: "warning",
-                regPasswordRepeatIcon: "warning",
-                currentTab: "",
-                nickname: "",
-                password: "",
-                regNickname: "",
-                regPassword: "",
-                regPasswordRepeat: "",
-                buttonDisabled: true
-            }
+            return {}
         },
-        mounted: function () {
-
-        },
+        mounted: function () {},
         methods: {
-            onSubmit: function () {
-                if (this.currentTab === "tab-login")
-                    this.submitLogin();
-                else
-                    this.submitRegister();
-            },
-            submitLogin: function () {
-                api.user.login(this.nickname, this.password).then(function(_token) {
-                    // this.showLoginDialog("Great with registration, " + this.regNickname, "Now you can enjoy this mapper!");
-                    // this.currentTab = "tab-login";
-                    // this.clearForm();
-                    cookie.set("token", _token);
-                    location.reload();
-                }.bind(this), function(_errMsg) {
-                    this.showLoginDialog("Error!", _errMsg);
-                }.bind(this));
-            },
-            showRegisterDialog: function (_title, _message){
-                this.dialogRegisterShow = true;
-                this.dialogRegisterTitle = _title;
-                this.dialogRegisterDescription = _message;
-            },
-            showLoginDialog: function (_title, _message){
-                this.dialogLoginShow = true;
-                this.dialogLoginTitle = _title;
-                this.dialogLoginDescription = _message;
-            },
-            clearForm: function () {
-                this.regNickname = "";
-                this.regPassword = "";
-                this.regPasswordRepeat = "";
-                this.nickname = "";
-                this.password = "";
-            },
-            submitRegister: function () {
-                api.user.register(0, {mail: this.regNickname, password: this.regPassword}).then(function() {
-                    this.showRegisterDialog("Great with registration, " + this.regNickname, "Now you can enjoy this mapper!");
-                    this.currentTab = "tab-login";
-                    this.clearForm();
-                }.bind(this), function(_errMsg) {
-                    this.showRegisterDialog("Error!", _errMsg);
-                }.bind(this));
-            },
-            onFormChange: function () {
-                if(this.currentTab === "tab-login")
-                    this.validateLoginForm();
-                else
-                    this.validateRegisterForm();
-            },
-            validateLoginForm: function ( ){
-                let isValidNickName = validateNickname(this.nickname);
-                let isValidPassword = validatePassword(this.password);
-
-                this.setFieldState("login", "Nickname", isValidNickName);
-                this.setFieldState("login", "Password", isValidPassword);
-
-                this.buttonDisabled = !(isValidNickName && isValidPassword);
-            },
-            validateRegisterForm: function ( ){
-                let isValidNickName = validateNickname(this.regNickname);
-                let isValidPassword = validatePassword(this.regPassword);
-                let isValidPasswordRepeat = validatePassword(this.regPasswordRepeat) && this.regPassword === this.regPasswordRepeat;
-
-                this.setFieldState("reg", "Nickname", isValidNickName);
-                this.setFieldState("reg", "Password", isValidPassword);
-                this.setFieldState("reg", "PasswordRepeat", isValidPasswordRepeat);
-
-                this.buttonDisabled = !(isValidNickName && isValidPassword && isValidPasswordRepeat);
-            },
-            onTabChange: function (_tabId) {
-                if(_tabId) {
-                    this.currentTab = _tabId;
-                    this.onFormChange();
-                }
-            },
-            setFieldState: function (_type, _field, _valid) {
-                this[_type + _field + "Icon"] = _valid ? "done": "warning";
-            },
             onEveSSOLogin: function () {
-                authRequest(query.toString({
-                    page: "ssoAuthResponseForLogin"
-                }));
+                api.user.getAuthToken("auth").then(function(_token){
+                    cookie.set("authToken", _token);
+
+                    authRequest(query.toString({
+                        page: "ssoAuth"
+                    }));
+                }.bind(this));
             }
         }
     }
-
-    const validateNickname = function (_nickname) {
-        if(!_nickname)
-            return false;
-
-        if(_nickname.length <= 3)
-            return false;
-
-        return !!_nickname.match(/([A-Za-z_][A-Za-z0-9]+?)@(.+)/);
-    };
-
-    const validatePassword = function (_pass) {
-        if(!_pass)
-            return false;
-
-        if(_pass.length <= 5)
-            return false;
-
-        return !!_pass.match(/[A-Z]/m) && !!_pass.match(/[a-z]/m) && !!_pass.match(/[0-9]/m);
-    };
 </script>
 
 <style>

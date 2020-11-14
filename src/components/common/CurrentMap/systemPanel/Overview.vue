@@ -1,54 +1,67 @@
 <template>
-    <div>
-        <md-card class="">
-            <md-card-header>
-                <div class="md-subhead">System information</div>
-            </md-card-header>
+    <div class="wd-system-overview wd off-user-select" :class="{'wd-show-effect': showEffect}">
+        <div class="wd-info-block wd" :class="{'margin-bottom-primary': showEffect}">
 
-            <md-card-content>
-                <div class="flex flex-justify">
-                    <div class="half-w">
-                        <div class="flex flex-justify" >
-                            <span class="text-color-secondary" >System</span>
-                            <span>{{systemName}}</span>
+            <md-card class="wd-info-block__card-info" >
+                <md-card-header>
+                    <div class="wd-system-overview__card-header wd-system-overview__header">
+                        <div :class="securityClass + ' solar-system-security'">{{security}}</div>
+                        <div class="solar-system-name">
+                            <a v-if="solarSystemLink !== ''" target="_blank" :href="solarSystemLink + systemName" >{{systemName}}</a>
+                            <span v-if="solarSystemLink === ''">{{systemName}}</span>
                         </div>
-                        <div class="flex flex-justify">
-                            <span class="text-color-secondary" >Region</span>
-                            <div>{{regionName}}</div>
-                        </div>
-                        <div class="flex flex-justify">
-                            <span class="text-color-secondary" >Constellation</span>
-                            <div>{{constellationName}}</div>
-                        </div>
-                        <div class="flex flex-justify" >
-                            <span class="text-color-secondary" >Type</span>
-                            <div>
-                                <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
+                        <div class="constellation-name">{{constellationName}}</div>
+                        <div class="region-name">{{regionName}}</div>
+                    </div>
+                </md-card-header>
+
+                <md-card-content>
+                    <div class="wd-system-overview-content wd flex flex-justify-sb">
+                        <div class="wd-system-info wd f-width">
+                            <div class="wd-system-info__system-item" >
+                                <span class="wd fg-contrast" >Type</span>
+                                <div class="wd fg-contrast" >
+                                    <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex flex-justify">
-                            <span class="text-color-secondary">Security</span>
-                            <div :class="securityClass">{{security}}</div>
-                        </div>
-                        <div class="flex flex-justify" v-if="statics.length > 0">
-                            <span class="text-color-secondary">Statics</span>
-                            <div class="text-right">
-                                <div v-for="item in statics" :key="item.id">
-                                    <span>{{item.id}}</span>
-                                    (<span :class="getStaticClassColor(item.leadTo)">{{item.leadTo}}</span>)
+                            <div class="wd-system-info__system-item" v-if="statics.length > 0">
+                                <span class="wd fg-contrast">Statics</span>
+                                <div class="text-right wd fg-contrast">
+                                    <div v-for="item in statics" :key="item.id">
+                                        <span>{{item.id}}</span>
+                                        (<span :class="getStaticClassColor(item.type)">{{item.fullName}}</span>)
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-justify" v-if="showEffect">
-                            <span class="text-color-secondary">Effect</span>
-                            <div><span :class="effectColor">{{effectName}}</span></div>
-                        </div>
                     </div>
-                    <div style="margin: 0 10px;border-left: 1px solid #efefef;border-right: 1px solid #d6d6d6;"></div>
-                    <div class="half-w">
+                </md-card-content>
+            </md-card>
 
+            <md-card class="wd-info-block__card-effect" v-if="showEffect">
+                <md-card-header>
+                    <div class="wd-system-overview__card-header">
+                        <div :class="' ' + effectColor">{{effectName}}</div>
                     </div>
+                </md-card-header>
+
+                <md-card-content>
+                    <div class="effect-bonuses-list">
+                        <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
+                    </div>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <md-card class="wd-system-overview__card-description">
+            <md-card-header>
+                <div class="wd-system-overview__card-header">
+                    <div>Description</div>
                 </div>
+            </md-card-header>
+
+            <md-card-content>
+
             </md-card-content>
         </md-card>
 
@@ -57,6 +70,8 @@
 
 <script>
     import exists from "../../../../js/env/tools/exists";
+    import environment from "../../../../js/core/map/environment";
+    // import SizeObserver from "../../../../js/env/sizeObserver";
 
     export default {
         name: "Overview",
@@ -82,20 +97,31 @@
 
                 showEffect: false,
                 effectColor: "",
-                effectName: ""
+                effectName: "",
+                effectData: [],
+                solarSystemLink: ""
             }
         },
         mounted: function () {
+            // this._so = new SizeObserver(this.$el, this._onResize.bind(this));
 
         },
         beforeDestroy: function () {
-
+            // this._so.destructor();
+            // delete this._so;
+        },
+        updated() {
+            this.$emit("cupdated")
         },
         methods: {
             getStaticClassColor: function (_staticClass) {
-                return typeClasses[_staticClass];
+                return environment.typeClasses[_staticClass];
             },
 
+            _onResize: function () {
+                // eslint-disable-next-line no-debugger
+                debugger;
+            },
             refresh: function () {
 
             },
@@ -105,40 +131,46 @@
                 this.constellationName = _data.constellationName;
                 this.security = _data.security;
                 this.statics = _data.systemData.statics || [];
-                this.securityClass = securityClasses[_data.security];
+                this.securityClass = environment.securityClasses[_data.security];
 
                 switch (_data.systemType) {
                     case 0: // high-sec
                         this.kind = "High-sec";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
+                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         this.type = null;
                         break;
                     case 1: // low-sec
                         this.kind = "Low-sec";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
+                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 2: // null-sec
                         this.kind = "Null-sec";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
+                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 3: // WH
                     case 4: // Thera
                         this.kind = "W-Space";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
-                        this.typeClass = typeClasses[_data.systemData.typeName];
+                        this.typeClass = environment.typeClasses[_data.systemData.typeName];
+                        this.solarSystemLink = "http://anoik.is/systems/";
                         break;
                     case 5: // abyss
                         this.kind = "Abyss-Space";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
+                        this.solarSystemLink = "";
                         break;
                     case 6: // penalty?
                         this.kind = "Penalty-Space";
-                        this.kindClass = kindClassed[_data.systemType];
+                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
+                        this.solarSystemLink = "";
                         break;
                 }
 
@@ -146,8 +178,14 @@
 
                 if(_data.systemType === 3 && exists(_data.systemData.effectType)) {
                     this.showEffect = true;
-                    this.effectColor = `text-eve-wh-effect-color-${_data.systemData.effectType}`;
+                    this.effectColor = environment.effects[_data.systemData.effectType];
                     this.effectName = _data.systemData.effectName;
+
+                    let sorted = _data.systemData.effectData.sort(function(x,y){
+                        return (x.positive === y.positive)? 0 : x.positive? -1 : 1;
+                    });
+
+                    this.effectData = sorted;
                 } else {
                     this.showEffect = false;
                 }
@@ -157,52 +195,197 @@
         }
     }
 
-    var securityClasses = {
-        "1.0": "eve-security-color-10",
-        "0.9": "eve-security-color-09",
-        "0.8": "eve-security-color-08",
-        "0.7": "eve-security-color-07",
-        "0.6": "eve-security-color-06",
-        "0.5": "eve-security-color-05",
-        "0.4": "eve-security-color-04",
-        "0.3": "eve-security-color-03",
-        "0.2": "eve-security-color-02",
-        "0.1": "eve-security-color-01",
-        "0.0": "eve-security-color-00",
-        "-0.1": "eve-security-color-m-01",
-        "-0.2": "eve-security-color-m-02",
-        "-0.3": "eve-security-color-m-03",
-        "-0.4": "eve-security-color-m-04",
-        "-0.5": "eve-security-color-m-05",
-        "-0.6": "eve-security-color-m-06",
-        "-0.7": "eve-security-color-m-07",
-        "-0.8": "eve-security-color-m-08",
-        "-0.9": "eve-security-color-m-09",
-        "-1.0": "eve-security-color-m-10"
-    }
-
-    var typeClasses = {
-        "C1"      : "eve-wh-type-color-c1",
-        "C2"      : "eve-wh-type-color-c2",
-        "C3"      : "eve-wh-type-color-c3",
-        "C4"      : "eve-wh-type-color-c4",
-        "C5"      : "eve-wh-type-color-c5",
-        "C6"      : "eve-wh-type-color-c6",
-        "C13"     : "eve-wh-type-color-c13",
-        "drifter" : "eve-wh-type-color-drifter",
-        "Thera"   : "eve-wh-type-color-thera",
-        "High"    : "eve-wh-type-color-high",
-        "Low"     : "eve-wh-type-color-low",
-        "Null"    : "eve-wh-type-color-null",
-    };
-
-    var kindClassed = {
-        "0" : "eve-kind-color-high",
-        "1" : "eve-kind-color-low",
-        "2" : "eve-kind-color-null",
-        "3" : "eve-kind-color-wh",
-        "4" : "eve-kind-color-thera",
-        "5" : "eve-kind-color-abyss",
-        "6" : "eve-kind-color-penalty",
-    }
 </script>
+
+<style lang="scss">
+    @import "/src/css/variables";
+
+    .wd-system-overview {
+        color: $fg-primary;
+
+        .wd-info-block {
+            display: flex;
+        }
+
+        .md-card-header {
+            padding-bottom: 5px;
+        }
+
+        & {
+            &__card-header {
+                border-bottom: 1px solid $border-color-primary-4;
+                padding-bottom: 5px;
+            }
+        }
+
+        .wd-system-overview__header {
+            display: flex;
+            justify-content: flex-start;
+            white-space: nowrap;
+
+            & > div:not(:last-child) {
+                margin-right: 5px;
+            }
+
+            & > div {
+                font-family: sans-serif;
+                font-size: 13px;
+            }
+
+            & > .solar-system-security {
+                font-weight: bold;
+            }
+
+            & > .solar-system-name {
+                /*color: #848484;*/
+                font-weight: bold;
+            }
+
+            & > .constellation-name {
+                color: #aaaaaa;
+            }
+
+            & > .region-name {
+                color: #aaaaaa;
+            }
+        }
+
+        .wd-system-overview-content {
+
+            & > .wd-system-info {
+                padding: 0;
+
+                .wd-system-info__system-item {
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
+
+            & > .wd-system-manual-info {
+
+            }
+        }
+
+        .wd-system-overview__effect-header {
+
+        }
+
+        .wd-system-overview__card-description {
+            color: $fg-contrast;
+        }
+
+        .effect-bonuses-list {
+            & > div {
+                font: $font-primary;
+                color: $fg-contrast;
+            }
+
+            & > .wd-effect-positive {
+                color: $fg-positive;
+            }
+
+            & > .wd-effect-negative {
+                color: $fg-negative;
+            }
+        }
+    }
+
+
+    .wd-system-panel-size-compact {
+        &.wd-system-overview {
+            display: flex;
+            flex-wrap: wrap;
+
+            .wd-info-block {
+                width: 100%;
+                margin-bottom: 10px;
+
+                &__card-info {
+                    width: 100%;
+                }
+            }
+
+            .wd-system-overview__card-description {
+                width: 100%;
+            }
+        }
+
+        &.wd-system-overview.wd-show-effect {
+            display: initial;
+
+            .wd-info-block {
+                flex-wrap: wrap;
+
+                & {
+                    &__card-info {
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+
+                    &__card-effect {
+                        width: 100%;
+                    }
+                }
+            }
+
+            .wd-system-overview__card-description {
+                width: initial;
+            }
+        }
+    }
+
+    .wd-system-panel-size-full {
+
+        &.wd-system-overview {
+            display: flex;
+
+            .wd-info-block {
+                flex-wrap: initial;
+                width: 400px;
+                margin-right: 10px;
+
+                & {
+                    &__card-info {
+                        width: 100%;
+                    }
+
+                    &__card-effect {
+                        width: initial;
+                    }
+                }
+            }
+
+            .wd-system-overview__card-description {
+                width: 70%;
+            }
+        }
+
+        &.wd-system-overview.wd-show-effect {
+            display: initial;
+
+            .wd-info-block {
+                width: initial;
+                margin-right: initial;
+
+                & {
+                    &__card-info {
+                        width: 400px;
+                        margin-right: 10px;
+                    }
+
+                    &__card-effect {
+                        width: 70%;
+                    }
+
+                    &__card-description {
+                        width: 100%;
+                    }
+                }
+            }
+
+            .wd-system-overview__card-description {
+                width: initial;
+            }
+        }
+    }
+</style>
