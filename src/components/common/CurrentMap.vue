@@ -176,12 +176,10 @@
             this._currentOpenSystem = null;
 
             this.initialize().then(function() {
-                // if(this.selectedMap !== null) {
                 this.__tid = setTimeout(() => {
                     delete this.__tid;
                     this.selectMapOnStart();
                 }, 250);
-                // }
             }.bind(this),function() {
                 // eslint-disable-next-line no-debugger
                 debugger;
@@ -218,7 +216,18 @@
                     currentMapId = this.allowedMaps[0].id;
                 }
 
-                this.onMapSelected(currentMapId);
+                let isSetMap = true;
+                if(!this.allowedMaps.searchByObjectKey("id", currentMapId)) {
+                    if(this.allowedMaps.length > 0) {
+                        currentMapId = this.allowedMaps[0].id;
+                    } else {
+                        isSetMap = false;
+                        cookie.remove("selectedMap");
+                    }
+                }
+
+                if(isSetMap)
+                    this.selectedMap = currentMapId;
             },
             initialize: function () {
                 let pr = new CustomPromise();
@@ -296,9 +305,15 @@
             },
             onMapSelected: function(_mapId) {
                 cookie.set("selectedMap", _mapId);
-                this.selectedMap = _mapId;
+
                 this._destroyMap();
-                this._initMap(_mapId);
+                api.eve.map.userWatchMapStatus({mapId: _mapId, status: true}).then(function(){
+                    this._initMap(_mapId);
+                    // eslint-disable-next-line no-unused-vars
+                }.bind(this), function(_err){
+                    // eslint-disable-next-line no-debugger
+                    debugger;
+                }.bind(this));
             },
             onAAClick: function () {
                 this.isAutoAlignment = !this.isAutoAlignment;
@@ -399,6 +414,8 @@
                 }
             },
             _initMap: function (_mapId) {
+                // eslint-disable-next-line no-debugger
+                // debugger
                 let bounds = this.$el.getBoundingClientRect();
 
                 this.mapController = new MapController(new Map({

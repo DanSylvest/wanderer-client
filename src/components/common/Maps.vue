@@ -32,7 +32,7 @@
             </md-table>
 
             <md-empty-state
-                    v-show="loaded && maps.length === 0"
+                    v-if="loaded && maps.length === 0"
                     md-icon="layers"
                     md-label="Create your map!"
                     md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
