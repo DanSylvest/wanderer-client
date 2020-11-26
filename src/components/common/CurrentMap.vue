@@ -191,12 +191,17 @@
                 delete this.__tid;
             }
 
-            if(this.mapController) {
-                let map = this.mapController.map;
-                this.mapController && this.mapController.deinit();
-                map && map.destructor();
-                this.mapController = null
+            if(this.selectedMap !== null)
+                api.eve.map.userWatchMapStatus({mapId: this.selectedMap, status: false});
+
+            this._destroyMap();
+
+            if(this._mapsSubscriber) {
+                this._mapsSubscriber.unsubscribe();
+                this._mapsSubscriber.destructor();
+                this._mapsSubscriber = null;
             }
+
             this.$refs.systemPanel.hide();
         },
         methods: {
@@ -204,6 +209,8 @@
                 this.mapController && this.mapController.map.refresh();
             },
             selectMapOnStart: function () {
+                this.showMapEmpty = this.allowedMaps.length === 0;
+
                 let currentMapId = null;
                 let queryMapId = query.searchObject().mapId;
                 let cookieMapId = cookie.get("selectedMap");
@@ -232,38 +239,79 @@
             initialize: function () {
                 let pr = new CustomPromise();
 
-                let mapIds = [];
-                api.eve.character.list().then(function(_characters){
-                    this.characters = _characters;
-
-                    return api.eve.map.allowedMaps();
-                }.bind(this)).then(function (_mapIds) {
-                    mapIds = _mapIds;
-                    let prarr = [];
-
-                    for (let a = 0; a < mapIds.length; a++) {
-                        prarr.push(api.eve.map.info(mapIds[a]));
-                    }
-
-                    return Promise.all(prarr);
-                }.bind(this)).then(function (_arr) {
-                    for (let a = 0; a < _arr.length; a++) {
-                        _arr[a].id = mapIds[a];
-                    }
-
-                    this.allowedMaps = _arr;
-
+                let prarr = [];
+                prarr.push(api.eve.character.list());
+                prarr.push(this.subscribeOnMaps());
+                Promise.all(prarr).then((arr) => {
+                    this.characters = arr[0];
                     this.isLoaded = true;
-                    this.showMapEmpty = _arr.length === 0;
-
+                    this.showMapEmpty = this.allowedMaps.length === 0;
                     pr.resolve();
-                }.bind(this)).catch(function (_err) {
-                    pr.reject(_err);
-                });
+                }, pr.reject);
 
                 return pr.native;
             },
 
+            subscribeOnMaps () {
+                let pr = new CustomPromise();
+                // we must subscribe on map systems and links
+                this._mapsSubscriber = api.eve.map.subscribeAllowedMaps(this.mapId);
+                this._mapsSubscriber.one("change", (data) =>  {
+                    if(data.type === "add" && data.maps.length > 0) {
+                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId))).then((arr) => {
+                            data.maps.map((mapId, index) => {
+                                arr[index].id = mapId
+                            });
+
+                            this.allowedMaps = arr;
+                            this._mapsSubscriber.on("change", this._onMapsListChanged.bind(this));
+                            pr.resolve();
+                        });
+                    } else {
+                        this.allowedMaps = [];
+                        this._mapsSubscriber.on("change", this._onMapsListChanged.bind(this));
+                        pr.resolve();
+                    }
+                });
+
+                this._mapsSubscriber.subscribe();
+
+                return pr.native;
+            },
+
+            _onMapsListChanged (data) {
+                switch (data.type) {
+                    case "added":
+                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId))).then((arr) => {
+                            data.maps.map((mapId, index) => {
+                                arr[index].id = mapId
+                            });
+
+                            let hasMapsBefore = this.allowedMaps.length > 0;
+
+                            arr.map(x => this.allowedMaps.push(x));
+
+                            if(!hasMapsBefore) {
+                                this.selectMapOnStart();
+                            }
+                        });
+                        break;
+                    case "removed":
+                        var isUpdate = false;
+                        data.maps.map(mapId => {
+                            this.allowedMaps.eraseByObjectKey("id", mapId);
+
+                            if(!isUpdate && mapId === this.selectedMap)
+                                isUpdate = true;
+                        });
+
+                        if(isUpdate) {
+                            this._destroyMap();
+                            this.selectMapOnStart();
+                        }
+                }
+
+            },
             // API
 
             // HANDLERS
@@ -307,13 +355,7 @@
                 cookie.set("selectedMap", _mapId);
 
                 this._destroyMap();
-                api.eve.map.userWatchMapStatus({mapId: _mapId, status: true}).then(function(){
-                    this._initMap(_mapId);
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function(_err){
-                    // eslint-disable-next-line no-debugger
-                    debugger;
-                }.bind(this));
+                api.eve.map.userWatchMapStatus({mapId: _mapId, status: true}).then(() => this._initMap(_mapId));
             },
             onAAClick: function () {
                 this.isAutoAlignment = !this.isAutoAlignment;
@@ -436,6 +478,7 @@
                 this.mapController.on("offsetChanged", this._onMapOffsetChanged.bind(this));
                 this.mapController.on("markerIn", this._onMapMarkerIn.bind(this));
                 this.mapController.on("markerOut", this._onMapMarkerOut.bind(this));
+                this.mapController.on("removed", this._onMapRemoved.bind(this));
 
                 let offset = cookie.get(`offset_${_mapId}`);
                 if(offset) {
@@ -535,6 +578,11 @@
             },
             _onMapMarkerOut: function (_systemId/*, _event*/) {
                 this.systemsTooltipDisplayed.eraseByObjectKey("systemId", _systemId);
+            },
+            _onMapRemoved: function () {
+                this.allowedMaps.eraseByObjectKey("id", this.selectedMap);
+                this._destroyMap();
+                this.selectMapOnStart();
             },
             _onSystemChange: function (_data) {
                 switch (_data.type) {

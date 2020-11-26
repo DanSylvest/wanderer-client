@@ -8,6 +8,11 @@ Array.prototype.removeByIndex = function removeByIndex (index) {
     this.pop();
 };
 
+Array.prototype.removeByValue = function removeByValue (value) {
+    let index = this.indexOf(value);
+    index !== -1 && this.removeByIndex();
+}
+
 Boolean.fromString = function (_val) {
     if(typeof _val === "boolean")
         return _val;

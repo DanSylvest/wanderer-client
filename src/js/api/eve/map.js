@@ -11,6 +11,8 @@ import allowedMaps from "./map/allowedMaps";
 import info from "./map/info";
 import subscribeMapSystems from "./map/subscribeMapSystems";
 import subscribeMapLinks from "./map/subscribeMapLinks";
+import subscribeMapExistence from "./map/subscribeMapExistence";
+import subscribeAllowedMaps from "./map/subscribeAllowedMaps";
 import systemInfo from "./map/systemInfo";
 import linkInfo from "./map/linkInfo";
 import linkRemove from "./map/linkRemove";
@@ -32,6 +34,8 @@ export default {
     info: info,
     subscribeMapSystems: subscribeMapSystems,
     subscribeMapLinks: subscribeMapLinks,
+    subscribeMapExistence: subscribeMapExistence,
+    subscribeAllowedMaps: subscribeAllowedMaps,
     systemInfo: systemInfo,
     linkInfo: linkInfo,
     linkRemove: linkRemove,
@@ -41,5 +45,5 @@ export default {
     updateSystem: updateSystem,
     updateLink: updateLink,
     waypoint: waypoint,
-    userWatchMapStatus: userWatchMapStatus
+    userWatchMapStatus: userWatchMapStatus,
 }

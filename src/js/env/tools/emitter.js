@@ -16,14 +16,15 @@ class Emitter {
         this._counter = 0;
     }
 
-    on(_type, _func) {
+    on(_type, _func, isOne) {
         if (!(_func instanceof Function))
             throw "_func in not a function";
 
-        var hid = this._counter++;
+        let hid = this._counter++;
         this._handlers[hid] = {
             type: _type,
-            func: _func
+            func: _func,
+            isOne: !!isOne
         };
 
         if (!this._types[_type])
@@ -34,22 +35,33 @@ class Emitter {
         return hid;
     }
 
+    one(_type, _func) {
+        return this.on(_type, _func, true);
+    }
+
     off(_hid) {
         if (this._handlers[_hid]) {
-            var info = this._handlers[_hid];
-            var index = this._types[info.type].indexOf(_hid);
+            let info = this._handlers[_hid];
+            let index = this._types[info.type].indexOf(_hid);
             this._types[info.type].splice(index, 1);
         }
     }
 
     emit() {
-        var type = arguments[0];
-        var args = Array.prototype.slice.call(arguments, 1);
+        let type = arguments[0];
+        let args = Array.prototype.slice.call(arguments, 1);
 
+        let forOff = [];
         if (this._types[type]) {
-            for (var a = 0; a < this._types[type].length; a++)
-                this._handlers[this._types[type]].func.apply(null, args);
+            let safe = this._types[type].slice(0);
+            for (let a = 0; a < safe.length; a++) {
+                let data = this._handlers[safe[a]];
+                data.isOne && forOff.push(safe[a]);
+                data.func.apply(null, args);
+            }
         }
+
+        forOff.map(x => this.off(x));
     }
 }
 

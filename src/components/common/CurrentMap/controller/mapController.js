@@ -25,6 +25,10 @@ class MapController extends Emitter {
         this._linksSubscription = api.eve.map.subscribeMapLinks(this.mapId);
         this._linksSubscription.on("change", this._onLinksSubscriptionChange.bind(this));
 
+        // we must subscribe on map systems and links
+        this._existenceSubscription = api.eve.map.subscribeMapExistence(this.mapId);
+        this._existenceSubscription.on("change", this._onExistenceSubscriptionChange.bind(this));
+
         this.map.on("linkContextMenu", this._onLinkContextMenu.bind(this));
         this.map.on("systemContextMenu", this._onSystemContextMenu.bind(this));
         this.map.on("markerClicked", this.onMarkerClicked.bind(this));
@@ -34,6 +38,8 @@ class MapController extends Emitter {
         this.map.on("markerIn", this.emit.bind(this, "markerIn"));
         this.map.on("markerOut", this.emit.bind(this, "markerOut"));
         this.map.clear();
+
+        this._existenceSubscription.subscribe();
 
         this._systemsSubscription.subscribe().then(function () {
             this._linksSubscription.subscribe();
@@ -47,6 +53,7 @@ class MapController extends Emitter {
 
         this._systemsSubscription.unsubscribe();
         this._linksSubscription.unsubscribe();
+        this._existenceSubscription.unsubscribe();
 
         for (let systemId in this.systems)
             this.systems[systemId].deinit();
@@ -68,6 +75,16 @@ class MapController extends Emitter {
     }
     setOffset (x,y) {
         this.map.setOffset(x,y);
+    }
+    // eslint-disable-next-line no-unused-vars
+    _onExistenceSubscriptionChange (data) {
+
+        if(!data) {
+            // eslint-disable-next-line no-debugger
+            // debugger;
+            this.emit("removed");
+        }
+
     }
     _onSystemSubscriptionChange (_data) {
         let onlineCharacters;
