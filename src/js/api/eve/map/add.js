@@ -9,7 +9,6 @@ import CustomPromise from "../../../env/promise";
  * @param {Object} _options
  * @param {String} _options.name
  * @param {String} _options.description
- * @param {Boolean} _options.isPrivate
  * @returns {*}
  */
 export default function (_options) {
@@ -17,13 +16,12 @@ export default function (_options) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve({mapId: _e.mapId, userId: _e.userId}) : p.reject(_e.message);
+        _e.success ? p.resolve(_e.data) : p.reject(_e.message);
     }.bind(this));
 
     this.send(id, ["api", "eve", "map", "add"], {
         name: _options.name,
         description: _options.description,
-        isPrivate: _options.isPrivate,
         groups: _options.groups,
     });
 

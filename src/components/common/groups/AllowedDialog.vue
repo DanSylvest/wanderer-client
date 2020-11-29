@@ -81,7 +81,7 @@
             _loadCharacters: function (_groupId) {
                 let pr = new CustomPromise();
 
-                api.eve.group.getAllowedCharactersForGroup(_groupId).then(function(_characters) {
+                api.eve.group.getAllowedCharacters(_groupId).then(function(_characters) {
                     this.characters = _characters;
                     pr.resolve();
                 }.bind(this),function(_err) {
@@ -98,7 +98,7 @@
                 // this.clearForm();
             },
             onEditSubmit: function () {
-                api.eve.group.updateAllowedCharactersForGroup(this._groupId, this.characters).then(function() {
+                api.eve.group.updateAllowedCharacters(this._groupId, this.characters).then(function() {
                     this.showDialog = false;
                 }.bind(this),function(_err) {
                     alert(_err);

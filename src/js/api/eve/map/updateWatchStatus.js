@@ -19,7 +19,7 @@ export default function (_options) {
         _e.success ? p.resolve() : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "map", "userWatchMapStatus"], {
+    this.send(id, ["api", "eve", "map", "updateWatchStatus"], {
         mapId: _options.mapId,
         status: _options.status
     });

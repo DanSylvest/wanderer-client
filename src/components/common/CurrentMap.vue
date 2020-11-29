@@ -192,7 +192,7 @@
             }
 
             if(this.selectedMap !== null)
-                api.eve.map.userWatchMapStatus({mapId: this.selectedMap, status: false});
+                api.eve.map.updateWatchStatus({mapId: this.selectedMap, status: false});
 
             this._destroyMap();
 
@@ -332,7 +332,7 @@
                 this.selectedDigit = null;
                 this.selectedLetter = _letter;
 
-                api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     tag: _letter
                 });
             },
@@ -340,14 +340,14 @@
                 this.selectedLetter = null;
                 this.selectedDigit = _digit;
 
-                api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     tag: _digit
                 });
             },
             onClearTag: function () {
                 this.selectedDigit = null;
                 this.selectedLetter = null;
-                api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     tag: ""
                 });
             },
@@ -355,7 +355,7 @@
                 cookie.set("selectedMap", _mapId);
 
                 this._destroyMap();
-                api.eve.map.userWatchMapStatus({mapId: _mapId, status: true}).then(() => this._initMap(_mapId));
+                api.eve.map.updateWatchStatus({mapId: _mapId, status: true}).then(() => this._initMap(_mapId));
             },
             onAAClick: function () {
                 this.isAutoAlignment = !this.isAutoAlignment;
@@ -364,10 +364,10 @@
             },
             onSaveClick: function () {
                 let positions = this.mapController.map.collectPositions();
-                api.eve.map.updateSystemsPosition(this.selectedMap, positions);
+                api.eve.map.solarSystem.updatePositions(this.selectedMap, positions);
             },
             onTimeStateChange: function (_state) {
-                api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
                     timeStatus: _state
                 });
             },
@@ -378,7 +378,7 @@
              * @param {number} _state
              */
             onMassStateChange: function (_state) {
-                api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
                     massStatus: _state
                 });
             },
@@ -389,7 +389,7 @@
              * @param {number} _state
              */
             onShipSizeTypeChange: function (_state) {
-                api.eve.map.updateLink(this.selectedMap, this._currentContextLink, {
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
                     shipSizeType: _state
                 });
             },
@@ -401,21 +401,21 @@
             //
             // },
             onLinkContextMenuRemove: function () {
-                api.eve.map.linkRemove(this.selectedMap, this._currentContextLink);
+                api.eve.map.link.remove(this.selectedMap, this._currentContextLink);
             },
             // onSystemContextMenuEdit: function() {
             //
             // },
             onSystemContextMenuRemove: function() {
-                api.eve.map.systemRemove(this.selectedMap, this._currentContextSystem);
+                api.eve.map.solarSystem.remove(this.selectedMap, [this._currentContextSystem]);
             },
             onSystemContextMenuLock: function () {
-                api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     isLocked: true
                 });
             },
             onSystemContextMenuUnlock: function () {
-                api.eve.map.updateSystem(this.selectedMap, this._currentContextSystem, {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     isLocked: false
                 });
             },
@@ -423,7 +423,7 @@
                 this._currentSelectedSystems = [];
             },
             onSystemsContextMenuRemove: function () {
-                api.eve.map.systemsRemove(this.selectedMap, this._currentSelectedSystems);
+                api.eve.map.solarSystem.remove(this.selectedMap, this._currentSelectedSystems);
             },
             onClosedSystemContext: function () {
                 this._currentContextSystem = null;

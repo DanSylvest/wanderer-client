@@ -6,11 +6,9 @@ import CustomPromise from "../../../env/promise";
 /**
  *
  * @param _characterId
- * @param {string} _type - may be "local", or "global" - when local info will be get by added character
- * default "global"
  * @returns {*}
  */
-export default function (_characterId, _type) {
+export default function (_characterId) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -18,9 +16,8 @@ export default function (_characterId, _type) {
         _e.success ? p.resolve(_e.result) : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "character", "charInfo"], {
-        characterId: _characterId,
-        type: _type || "global"
+    this.send(id, ["api", "eve", "character", "info"], {
+        characterId: _characterId
     });
 
     return p.native;

@@ -4,7 +4,7 @@
 
 import CustomPromise from "../../env/promise";
 
-export default function (_type, _options) {
+export default function (_type, _code) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -12,18 +12,9 @@ export default function (_type, _options) {
         _e.success ? p.resolve(_e) : p.reject(_e.message);
     }.bind(this));
 
-    if(_type === 0) {
-        this.send(id, ["api", "user", "register"], {
-            type: _type,
-            mail: _options.mail,
-            password: _options.password,
-        });
-    } else if(_type === 1) {
-        this.send(id, ["api", "user", "register"], {
-            type: _type,
-            code: _options.code
-        });
-    }
+    this.send(id, ["api", "user", "register"], {
+        code: _code
+    });
 
     return p.native;
 }

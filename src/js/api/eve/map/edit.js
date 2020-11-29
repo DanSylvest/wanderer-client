@@ -10,7 +10,6 @@ import CustomPromise from "../../../env/promise";
  * @param {Object} _options
  * @param {String} _options.name
  * @param {String} _options.description
- * @param {Boolean} _options.isPrivate
  * @param {Array<String>} _options.groups
  * @returns {*}
  */
@@ -26,7 +25,6 @@ export default function (_mapId, _options) {
         mapId: _mapId,
         name: _options.name,
         description: _options.description,
-        isPrivate: _options.isPrivate,
         groups: _options.groups,
     });
 

@@ -3,7 +3,7 @@
  */
 import CustomPromise from "../../../env/promise";
 
-export default function (_allianceId, _type) {
+export default function (_allianceId) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -12,8 +12,7 @@ export default function (_allianceId, _type) {
     }.bind(this));
 
     this.send(id, ["api", "eve", "alliance", "info"], {
-        allianceId: _allianceId,
-        type: _type || "global"
+        allianceId: _allianceId
     });
 
     return p.native;

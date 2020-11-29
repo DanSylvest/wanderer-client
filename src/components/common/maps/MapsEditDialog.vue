@@ -171,7 +171,6 @@
 
                         this.mapId = _options.mapId;
                         this.formName = _options.name;
-                        this.formIsPrivate = _options.isPrivate;
                         this.formDescription = _options.description;
                         this.searchAttachedGroups = _groups;
 
@@ -261,7 +260,6 @@
                 let options = {
                     name: this.formName,
                     description: this.formDescription,
-                    isPrivate: this.formIsPrivate,
                     // defaultGroup: this.formDefaultGroupItem.id,
                     groups: groups
                 };
@@ -280,7 +278,7 @@
                 pr.then(function(_event) {
                     if(this._state === "add") {
                         options.id = _event.mapId;
-                        options.owner = _event.userId;
+                        options.owner = _event.owner;
                     }
 
                     this.clearForm();

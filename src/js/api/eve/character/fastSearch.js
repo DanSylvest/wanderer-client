@@ -9,7 +9,6 @@ import CustomPromise from "../../../env/promise";
  * @param {Object} _options
  * @param {String} _options.name
  * @param {String} _options.description
- * @param {Boolean} _options.isPrivate
  * @param {Array<String>} _options.groups
  * @returns {*}
  */

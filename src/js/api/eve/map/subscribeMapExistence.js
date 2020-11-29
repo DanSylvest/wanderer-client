@@ -9,7 +9,7 @@ class MapExistenceSubscriber extends Subscriber {
     constructor(_options) {
         let base = extend({
             /** @type string */
-            characterId: null,
+            mapId: null,
             path: ["api", "eve", "map", "subscribeMapExistence"]
         }, _options);
 

@@ -8,19 +8,14 @@ import extend from "../../../env/tools/extend";
 class SubscribeAllowedMaps extends Subscriber {
     constructor(_options) {
         let base = extend({
-            /** @type string */
-            characterId: null,
             path: ["api", "eve", "map", "subscribeAllowedMaps"]
         }, _options);
 
         super(base);
-
-        this._mapId = base.mapId;
     }
 
     _sendData() {
         return {
-            mapId: this._mapId
         }
     }
 
@@ -29,9 +24,8 @@ class SubscribeAllowedMaps extends Subscriber {
     }
 }
 
-export default function (_mapId) {
+export default function () {
     return new SubscribeAllowedMaps({
-        dispatcher: this,
-        mapId: _mapId
+        dispatcher: this
     });
 }

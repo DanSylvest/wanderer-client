@@ -18,7 +18,7 @@ export default function (_options) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve({groupId: _e.groupId, userId: _e.userId}) : p.reject(_e.message);
+        _e.success ? p.resolve(_e.data) : p.reject(_e.message);
     }.bind(this));
 
     this.send(id, ["api", "eve", "group", "add"], {

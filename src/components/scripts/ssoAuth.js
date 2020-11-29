@@ -34,9 +34,7 @@ const auth = function () {
 }
 
 const register = function () {
-    api.user.register(1, {
-        code: data.code
-    }).then(function(_event){
+    api.user.register(data.code).then(function(_event){
         cookie.set("token", _event.token);
 
         let page = query.toString({

@@ -3,7 +3,7 @@
  */
 import CustomPromise from "../../../env/promise";
 
-export default function (_code) {
+export default function () {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -11,9 +11,7 @@ export default function (_code) {
         _e.success ? p.resolve(_e.data) : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "character", "list"], {
-        code: _code
-    });
+    this.send(id, ["api", "eve", "character", "list"], {});
 
     return p.native;
 }

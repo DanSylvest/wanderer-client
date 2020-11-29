@@ -18,11 +18,11 @@ class MapController extends Emitter {
     }
     init () {
         // we must subscribe on map systems and links
-        this._systemsSubscription = api.eve.map.subscribeMapSystems(this.mapId);
+        this._systemsSubscription = api.eve.map.solarSystem.subscribeSolarSystems(this.mapId);
         this._systemsSubscription.on("change", this._onSystemSubscriptionChange.bind(this));
 
         // we must subscribe on map systems and links
-        this._linksSubscription = api.eve.map.subscribeMapLinks(this.mapId);
+        this._linksSubscription = api.eve.map.link.subscribeLinks(this.mapId);
         this._linksSubscription.on("change", this._onLinksSubscriptionChange.bind(this));
 
         // we must subscribe on map systems and links
@@ -164,7 +164,7 @@ class MapController extends Emitter {
 
         switch (_data.type) {
             case "bulk":
-                api.eve.map.linkInfo(this.mapId, _data.list).then(function (_result) {
+                api.eve.map.link.info(this.mapId, _data.list).then(function (_result) {
                     for (let a = 0; a < _result.length; a++) {
                         this.links[_result[a].id] = new Link(this, this.map, this.mapId, _result[a].id);
                         this.links[_result[a].id].updateInfo(_result[a]);
@@ -177,7 +177,7 @@ class MapController extends Emitter {
                 }.bind(this));
                 break;
             case "add":
-                api.eve.map.linkInfo(this.mapId, [_data.linkId]).then(function (_result) {
+                api.eve.map.link.info(this.mapId, [_data.linkId]).then(function (_result) {
                     this.links[_data.linkId] = new Link(this, this.map, this.mapId, _data.linkId);
                     this.links[_data.linkId].updateInfo(_result[0]);
                     this.links[_data.linkId].init();

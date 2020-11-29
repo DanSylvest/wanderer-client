@@ -15,16 +15,12 @@
         <div class="maps-content">
             <md-table v-show="loaded && maps.length > 0" class="maps-table">
                 <md-table-row>
-                    <md-table-head style="width: 30px" class="tac">Public</md-table-head>
                     <md-table-head style="width: 150px">Name</md-table-head>
                     <md-table-head style="width: 180px">Owner</md-table-head>
                     <md-table-head>Description</md-table-head>
                 </md-table-row>
 
                 <md-table-row @contextmenu="onContextMenu(map.id, $event)" @click="onMapRowClick(map.id, $event)" class="cursor-pointer" v-for="map in maps" :key="map.id">
-                    <md-table-cell>
-                        <md-icon>{{!Boolean.fromString(map.private) ? "lock_open" : "lock"}}</md-icon>
-                    </md-table-cell>
                     <md-table-cell>{{map.name}}</md-table-cell>
                     <md-table-cell>{{map.owner}}</md-table-cell>
                     <md-table-cell>{{map.description}}</md-table-cell>
@@ -112,13 +108,11 @@
                 this.$refs.mapsEditDialogRef.show({
                     mapId : mapItem.id,
                     name : mapItem.name,
-                    isPrivate : Boolean.fromString(mapItem.private),
                     description : mapItem.description,
                     groups : mapItem.groups,
                 }).then(function(_options){
                     mapItem.name = _options.name;
                     mapItem.description = _options.description;
-                    mapItem.private = _options.isPrivate;
                     mapItem.groups = _options.groups;
                 }.bind(this), function(){
                     // do nothing
@@ -131,7 +125,6 @@
                         name        : _options.name,
                         owner       : _options.owner,
                         description : _options.description,
-                        private     : _options.isPrivate,
                         groups      : _options.groups,
                     });
                 }.bind(this), function(){
@@ -145,7 +138,6 @@
                         name        : _options.name,
                         owner       : _options.owner,
                         description : _options.description,
-                        private     : _options.isPrivate,
                         groups      : _options.groups,
                     });
                 }.bind(this), function(){

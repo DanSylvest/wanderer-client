@@ -4,7 +4,7 @@
         <md-card class="md-elevation-4" v-for="item in characters" :key="item.id" md-with-hover>
             <md-ripple>
                 <md-card-media-cover class="wd-character-cover">
-                    <md-card-media md-ratio="1:1" :style='"background-image: url(" + item.images.px512x512 + ")"'>
+                    <md-card-media md-ratio="1:1" :style='"background-image: url(https://images.evetech.net/characters/" + item.id + "/portrait)"'>
 
                         <div class="wd fs absolute top">
                             <md-icon
@@ -57,7 +57,7 @@
 <script>
     import query from "../../js/env/query";
     import api from "../../js/api";
-    import authRequest from "../../js/api/ssoAuth";
+    import authRequest from "../../js/utils/authRequest";
     import cookie from "../../js/env/cookie";
 
     export default {

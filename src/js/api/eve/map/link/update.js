@@ -1,6 +1,6 @@
-import CustomPromise from "../../../env/promise";
+import CustomPromise from "../../../../env/promise";
 
-export default function (_mapId, _systemsPosition) {
+export default function (_mapId, _linkId, _data) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -8,9 +8,10 @@ export default function (_mapId, _systemsPosition) {
         _e.success ? p.resolve(_e.data) : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "map", "updateSystemsPosition"], {
+    this.send(id, ["api", "eve", "map", "link", "update"], {
         mapId: _mapId,
-        systemsPosition: _systemsPosition
+        linkId: _linkId,
+        data: _data
     });
 
     return p.native;

@@ -62,7 +62,7 @@
         },
         mounted: function () {
 
-            api.eve.map.systemInfo(this.mapId, this.solarSystemId).then(function(_data){
+            api.eve.map.solarSystem.info(this.mapId, this.solarSystemId).then(function(_data){
                 this.loaded = true;
                 this.solarSystemName = _data.name;
                 this.constellationName = _data.constellationName;
@@ -79,7 +79,7 @@
                 }
 
                 return Promise.all(_data.onlineCharacters.map(function (_characterId) {
-                    return api.eve.character.charInfo(_characterId, "all")
+                    return api.eve.character.info(_characterId, "all")
                 }.bind(this)));
 
             }.bind(this)).then(function(_characters){

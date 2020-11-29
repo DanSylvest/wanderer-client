@@ -4,11 +4,11 @@
  
 import config from "./compiled.config";
 import API from "./utils/api";
-import __root from "./api/__root";
+import api from "./api/_dir";
 
 export default new API({
     protocol: config.connection.socket.proto,
     host: config.connection.socket.host,
     port: config.connection.socket.port,
-    handlers: __root
+    handlers: api
 })

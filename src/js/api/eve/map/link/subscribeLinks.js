@@ -2,15 +2,15 @@
  * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 5/21/20.
  */
 
-import Subscriber from "../../../utils/subscriber";
-import extend from "../../../env/tools/extend";
+import extend from "../../../../env/tools/extend";
+import Subscriber from "../../../../utils/subscriber";
 
-class MapSystemsSubscriber extends Subscriber {
+class MapLinksSubscriber extends Subscriber {
     constructor(_options) {
         let base = extend({
             /** @type string */
-            characterId: null,
-            path: ["api", "eve", "map", "subscribeMapSystems"]
+            mapId: null,
+            path: ["api", "eve", "map", "link", "subscribeLinks"]
         }, _options);
 
         super(base);
@@ -30,8 +30,10 @@ class MapSystemsSubscriber extends Subscriber {
 }
 
 export default function (_mapId) {
-    return new MapSystemsSubscriber({
+    return new MapLinksSubscriber({
         dispatcher: this,
         mapId: _mapId
     });
 }
+
+

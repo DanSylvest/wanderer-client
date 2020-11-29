@@ -8,7 +8,7 @@ export default function (_groupId, _characters) {
         _e.success ? p.resolve() : p.reject(_e.message);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "group", "updateAllowedCharactersForGroup"], {
+    this.send(id, ["api", "eve", "group", "updateAllowedCharacters"], {
         groupId: _groupId,
         characters: _characters
     });

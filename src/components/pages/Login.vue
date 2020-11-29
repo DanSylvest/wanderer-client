@@ -65,7 +65,7 @@
     import cookie from "../../js/env/cookie";
     import query from "../../js/env/query";
     import api from "../../js/api";
-    import authRequest from "../../js/api/ssoAuth";
+    import authRequest from "../../js/utils/authRequest";
 
     export default {
         name: "Login",

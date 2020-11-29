@@ -159,39 +159,19 @@
                     characterId: this.charactersItem.id
                 };
 
-                api.eve.map.addFast(data).then(function(mapData){
+                api.eve.map.addFast(data).then(function(data){
                     this.clearForm();
                     this.showEditDialog = false;
-                    this._showPromise.resolve(mapData);
+                    this._showPromise.resolve({
+                        id          : data.mapId,
+                        name        : data.name,
+                        owner       : data.owner,
+                        description : data.description,
+                        groups      : data.groups,
+                    });
                 }.bind(this), function(){
 
-                }.bind(this))
-
-                //
-                // let pr = new CustomPromise();
-                //
-                // switch(this._state) {
-                //     case "add":
-                //         pr = api.eve.map.add(options)
-                //         break;
-                //     case "edit":
-                //         pr = api.eve.map.edit(this.mapId, options)
-                //         break;
-                // }
-                //
-                // pr.then(function(_event) {
-                //     if(this._state === "add") {
-                //         options.id = _event.mapId;
-                //         options.owner = _event.userId;
-                //     }
-                //
-                //     this.clearForm();
-                //     this.showEditDialog = false;
-                //     this._showPromise.resolve(options);
-                //     // eslint-disable-next-line no-unused-vars
-                // }.bind(this), function(_errMsg) {
-                //     // do nothing
-                // }.bind(this));
+                }.bind(this));
             },
             onEditFormChange: function (/*_event*/) {
                 this.validateEditForm();

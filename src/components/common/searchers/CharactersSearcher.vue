@@ -18,7 +18,7 @@
                 </template>
 
                 <template slot="md-autocomplete-empty" slot-scope="{ term }">
-                    Such character {{ term }} not exist!
+                    Such character {{ term }} not exists!
                 </template>
             </md-autocomplete>
 

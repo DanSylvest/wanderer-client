@@ -134,7 +134,7 @@
                         out.push(oldSig);
                     }
                 }
-                api.eve.map.updateSystem(this.mapId, this.systemId, {
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
                     signatures: out
                 });
             },
@@ -156,7 +156,7 @@
 
                 out = out.concat(this.currentWaitSaveData.newSignatures);
 
-                api.eve.map.updateSystem(this.mapId, this.systemId, {
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
                     signatures: out
                 });
                 this.saveSigsDialogActive = false;
@@ -165,7 +165,7 @@
              * Remove non exists signatures from updated
              */
             onUpdateNonExists: function () {
-                api.eve.map.updateSystem(this.mapId, this.systemId, {
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
                     signatures: this.currentWaitSaveData.updatedSignatures.concat(this.currentWaitSaveData.newSignatures)
                 });
                 this.saveSigsDialogActive = false;
@@ -197,7 +197,7 @@
                     this.saveSigsDialogActive = true;
                     this.currentWaitSaveData = result;
                 } else {
-                    api.eve.map.updateSystem(this.mapId, this.systemId, {
+                    api.eve.map.solarSystem.update(this.mapId, this.systemId, {
                         signatures: result.updatedSignatures.concat(result.newSignatures).concat(result.oldSignatures)
                     });
                 }

@@ -156,7 +156,7 @@
                 let prarr = [];
 
                 for (let a = 0; a < _characters.length; a++) {
-                    prarr.push(api.eve.character.charInfo(_characters[a]));
+                    prarr.push(api.eve.character.getName(_characters[a]));
                 }
 
                 Promise.all(prarr).then(function (_result) {
@@ -260,7 +260,7 @@
                 pr.then(function (_event) {
                     if (this._state === "add") {
                         options.id = _event.groupId;
-                        options.owner = _event.userId;
+                        options.owner = _event.owner;
                     }
 
                     this.clearForm();
