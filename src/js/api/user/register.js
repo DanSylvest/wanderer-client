@@ -4,7 +4,7 @@
 
 import CustomPromise from "../../env/promise";
 
-export default function (_type, _code) {
+export default function (code) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -13,7 +13,7 @@ export default function (_type, _code) {
     }.bind(this));
 
     this.send(id, ["api", "user", "register"], {
-        code: _code
+        code: code
     });
 
     return p.native;
