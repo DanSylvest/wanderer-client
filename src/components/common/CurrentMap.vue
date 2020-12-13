@@ -93,6 +93,10 @@
                 <context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
             </context-menu>
 
+            <context-menu :c-activated.sync="rootCMActive" :c-offset-x="rootCMOffsetX" :c-offset-y="rootCMOffsetY" @c-closed="onRootCMClosed">
+                <context-menu-item c-title="Add system" c-icon="add_circle_outline" @click="onRootCMAddSystem" />
+            </context-menu>
+
             <tooltip
                 :c-offset-x="item.x"
                 :c-offset-y="item.y"
@@ -106,6 +110,8 @@
         </div>
 
         <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
+
+        <system-add-dialog ref="systemAddDialogRef"></system-add-dialog>
     </div>
 </template>
 
@@ -122,8 +128,9 @@
     import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
     import Tooltip from "../ui/Tooltip";
     import AreaSelection from "../ui/AreaSelection";
-    import SystemPanel from "./CurrentMap/SystemPanel"
-    import SystemCard from "./CurrentMap/SystemCard"
+    import SystemPanel from "./CurrentMap/SystemPanel";
+    import SystemCard from "./CurrentMap/SystemCard";
+    import SystemAddDialog from "./CurrentMap/SystemAddDialog.vue";
 
     export default {
         name: "CurrentMap",
@@ -133,7 +140,8 @@
             Tooltip,
             AreaSelection,
             SystemPanel,
-            SystemCard
+            SystemCard,
+            SystemAddDialog
         },
         props: [
 
@@ -154,6 +162,10 @@
                 isAutoAlignment: false,
                 characters: [],
 
+                rootCMActive: false,
+                rootCMOffsetX: 0,
+                rootCMOffsetY: 0,
+
                 linkCMOffsetX: 0,
                 linkCMOffsetY: 0,
                 linkCMActive: false,
@@ -166,6 +178,8 @@
                 systemsCMActive: false,
                 systemsCMOffsetX: 0,
                 systemsCMOffsetY: 0,
+
+
 
                 systemsTooltipDisplayed: []
             }
@@ -315,6 +329,14 @@
             // API
 
             // HANDLERS
+            onRootCMClosed: function () {
+
+            },
+            onRootCMAddSystem: function (event) {
+                let coord = this.mapController.convertPosition(event.x, event.y);
+
+                this.$refs.systemAddDialogRef.show(this.mapController.mapId, coord.x, coord.y);
+            },
 
             onSystemCopyName: function () {
                 let systemName = this.mapController.systems[this._currentContextSystem].info.name;
@@ -396,6 +418,11 @@
             onMapContainerContext: function (_event) {
                 _event.preventDefault();
                 _event.stopPropagation();
+
+                this.rootCMActive = true;
+                this.rootCMOffsetX = _event.x + 10;
+                this.rootCMOffsetY = _event.y + 10;
+
             },
             // onLinkContextMenuEdit: function() {
             //
@@ -535,11 +562,14 @@
                 this._offContexts();
                 this.mapController.map.deselectAll();
                 this.mapController.offSystemActive();
-                this.mapController.setSystemActive(_systemId);
 
-                if(this._currentOpenSystem === _systemId)
+                if(this._currentOpenSystem === _systemId) {
+                    this.$refs.systemPanel.hide();
+                    this._currentOpenSystem = null;
                     return;
+                }
 
+                this.mapController.setSystemActive(_systemId);
                 // todo
                 // Я полагаю что надо не закрывтаь, а потом открывать, а показывать загрузчик
                 // а потом перезагружать... Но только после того как разберус, какого хрена ничего не обновляется...

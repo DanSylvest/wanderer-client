@@ -70,7 +70,7 @@
                 this.securityStatus = _data.security;
                 this.securityClass = environment.securityClasses[_data.security];
 
-                if(_data.systemType === 3 && exists(_data.systemData.effectType)) {
+                if(/*_data.systemType === 3 && */exists(_data.systemData.effectType)) {
                     this.showEffect = true;
                     this.effectClass = environment.effects[_data.systemData.effectType];
                     this.effectName = _data.systemData.effectName;

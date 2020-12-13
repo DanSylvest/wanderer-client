@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 11/29/20.
+ * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 11/29/20.
  */
 
 import info from "./info";

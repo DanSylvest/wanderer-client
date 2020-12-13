@@ -37,6 +37,7 @@ class MapController extends Emitter {
         this.map.on("offsetChanged", this.emit.bind(this, "offsetChanged"));
         this.map.on("markerIn", this.emit.bind(this, "markerIn"));
         this.map.on("markerOut", this.emit.bind(this, "markerOut"));
+        this.map.on("newChain", this.onNewChain.bind(this));
         this.map.clear();
 
         this._existenceSubscription.subscribe();
@@ -72,6 +73,9 @@ class MapController extends Emitter {
         for (let a = 0; a < result.length; a++) {
             this.map.setSelectMarker(result[a], true);
         }
+    }
+    convertPosition (x,y) {
+        return this.map.getVirtualBy({x:x,y:y})
     }
     setOffset (x,y) {
         this.map.setOffset(x,y);
@@ -218,12 +222,15 @@ class MapController extends Emitter {
 
     }
     onMarkerClicked (_systemId, _event) {
-        if(_event.ctrlKey) {
+        if(_event.shiftKey) {
             let markerId = this.systems[_systemId].markerId;
             this.map.setSelectMarker(markerId, !this.map.isMarkerSelected(markerId));
         } else {
             this.emit("systemOpenInfo", _systemId, this.systems[_systemId].info);
         }
+    }
+    onNewChain (sourceSolarSystemId, targetSolarSystemId) {
+        api.eve.map.addChain(this.mapId, sourceSolarSystemId, targetSolarSystemId);
     }
     setSystemActive (systemId) {
         if(this.systems[systemId]) {

@@ -6,6 +6,7 @@ import link from "./link/_dir";
 import solarSystem from "./solarSystem/_dir";
 
 import add from "./add";
+import addChain from "./addChain";
 import addFast from "./addFast";
 import edit from "./edit";
 import list from "./list";
@@ -21,6 +22,7 @@ export default {
     solarSystem: solarSystem,
 
     add: add,
+    addChain: addChain,
     addFast: addFast,
     edit: edit,
     list: list,

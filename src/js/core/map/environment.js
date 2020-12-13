@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 8/31/20.
+ * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 8/31/20.
  */
 
 export default {
@@ -40,7 +40,7 @@ export default {
         "T"   : "eve-wh-type-color-thera",
         "H"   : "eve-wh-type-color-high",
         "L"   : "eve-wh-type-color-low",
-        "N"   : "eve-wh-type-color-null",
+        "N"   : "eve-wh-type-color-null"
     },
 
     kindClassed : {
@@ -51,14 +51,21 @@ export default {
         "4" : "eve-kind-color-thera",
         "5" : "eve-kind-color-abyss",
         "6" : "eve-kind-color-penalty",
+        "7" : "eve-kind-color-pochven",
     },
 
     effects : {
-        "pulsar":              "text-eve-wh-effect-color-pulsar",
-        "magnetar":            "text-eve-wh-effect-color-magnetar",
-        "wolfRayet":           "text-eve-wh-effect-color-wolfRayet",
-        "blackHole":           "text-eve-wh-effect-color-blackHole",
-        "cataclysmicVariable": "text-eve-wh-effect-color-cataclysmicVariable",
-        "redGiant":            "text-eve-wh-effect-color-redGiant",
+        "pulsar"                     : "text-eve-wh-effect-color-pulsar",
+        "magnetar"                   : "text-eve-wh-effect-color-magnetar",
+        "wolfRayet"                  : "text-eve-wh-effect-color-wolfRayet",
+        "blackHole"                  : "text-eve-wh-effect-color-blackHole",
+        "cataclysmicVariable"        : "text-eve-wh-effect-color-cataclysmicVariable",
+        "redGiant"                   : "text-eve-wh-effect-color-redGiant",
+
+        "dazhLiminalityLocus"        : "text-eve-wh-effect-color-dazhLiminalityLocus",
+        "imperialStellarObservatory" : "text-eve-wh-effect-color-imperialStellarObservatory",
+        "stateStellarObservatory"    : "text-eve-wh-effect-color-stateStellarObservatory",
+        "republicStellarObservatory" : "text-eve-wh-effect-color-republicStellarObservatory",
+        "federalStellarObservatory"  : "text-eve-wh-effect-color-federalStellarObservatory",
     }
 }

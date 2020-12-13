@@ -53,6 +53,14 @@ $active-color: #7be1ff;
                 border-radius: 5px;
                 cursor: pointer;
 
+                &.triglavian {
+                    background-image: linear-gradient(223deg, #a5000052, transparent);
+                }
+
+                &.edencom {
+                    background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);
+                }
+
                 &:hover {
                     background-color: $bg-3-major;
                 }
@@ -200,6 +208,8 @@ $active-color: #7be1ff;
 .map-link.link-top.time-state-1 {  }                                                                                     /* end of life */
 .map-link.link-top.mass-state-1.time-state-1 { stroke: $eve-link-color-top-mass-1-time-1; }
 .map-link.link-top.mass-state-2.time-state-1 { stroke: $eve-link-color-top-mass-2-time-1; }
+.map-link.link-top.temp-chain { stroke-width: 4px; stroke: $eve-link-color-temp; }
+
 
 .map-link.link-middle { pointer-events: none; }
 .map-link.link-middle.ship-size-0 { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7;}
@@ -210,7 +220,7 @@ $active-color: #7be1ff;
 .map-link.link-middle.mass-state-2 { stroke: $eve-link-color-middle-mass-2; }
 .map-link.link-middle.time-state-0 { stroke: $eve-link-color-middle-time-0; }
 .map-link.link-middle.time-state-1 { stroke: $eve-link-color-middle-time-1; }
-
+.map-link.link-top.temp-chain { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7; }
 
 .map-link.link-bottom { }
 .map-link.link-bottom.ship-size-0  { stroke-width: 5px; }
@@ -221,6 +231,7 @@ $active-color: #7be1ff;
 .map-link.link-bottom.mass-state-2 { }
 .map-link.link-bottom.time-state-0 {  }
 .map-link.link-bottom.time-state-1 {  }
+.map-link.link-top.temp-chain { stroke-width: 5px; }
 
 .eve-wh-effect-color-pulsar { fill: $eve-effect-pulsar; background-color: $eve-effect-pulsar; }
 .eve-wh-effect-color-magnetar { fill: $eve-effect-magnetar; background-color: $eve-effect-magnetar; }
@@ -235,6 +246,11 @@ $active-color: #7be1ff;
 .text-eve-wh-effect-color-blackHole { color: $fg-contrast; }
 .text-eve-wh-effect-color-cataclysmicVariable { color: $eve-effect-cataclysmicVariable; }
 .text-eve-wh-effect-color-redGiant { color: $eve-effect-redGiant; }
+.text-eve-wh-effect-color-dazhLiminalityLocus { color: $eve-effect-dazhLiminalityLocus; }
+.text-eve-wh-effect-color-imperialStellarObservatory { color: $eve-effect-imperialStellarObservatory; }
+.text-eve-wh-effect-color-stateStellarObservatory { color: $eve-effect-stateStellarObservatory; }
+.text-eve-wh-effect-color-republicStellarObservatory { color: $eve-effect-republicStellarObservatory; }
+.text-eve-wh-effect-color-federalStellarObservatory { color: $eve-effect-federalStellarObservatory; }
 
 .eve-security-color-10 { color: $eve-security-color-10; fill: $eve-security-color-10; }
 .eve-security-color-09 { color: $eve-security-color-09; fill: $eve-security-color-09; }
@@ -278,3 +294,4 @@ $active-color: #7be1ff;
 .eve-kind-color-thera { color: $eve-wh-type-color-thera; fill: $eve-wh-type-color-thera; }
 .eve-kind-color-abyss { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
 .eve-kind-color-penalty { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
+.eve-kind-color-pochven { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }

@@ -15,7 +15,8 @@ class ActionObserver extends Emitter {
             container: null,
             isDraggable: true,
             isClickable: true,
-            mdCondition: function() { return true }
+            mdCondition: function() { return true },
+            threshold: 5
         }, _options);
 
         this._state = "initial";
@@ -24,7 +25,6 @@ class ActionObserver extends Emitter {
         this._createHandlers();
         this.options.container.addEventListener("mousedown", this._h.mousedown);
         this.options.container.addEventListener("touchstart", this._h.mousedown);
-
     }
 
     destructor() {
@@ -109,7 +109,7 @@ class ActionObserver extends Emitter {
 
         switch (this._state) {
             case "wait":
-                if (currentMouse.distance(this._startedMouse) > 5) {
+                if (currentMouse.distance(this._startedMouse) > this.options.threshold) {
                     this._state = "drag";
                     this._dragStart(_event, currentMouse);
                 }
@@ -192,4 +192,5 @@ class ActionObserver extends Emitter {
         return new Vector2(parseInt(_event.clientX - bounds.x), parseInt(_event.clientY - bounds.y));
     }
 }
+
 export default ActionObserver;

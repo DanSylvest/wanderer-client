@@ -30,7 +30,7 @@
                     offOnOut: false,
                     container: this.parent,
                     mdCondition: function (_event) {
-                        return _event.originalEvent.ctrlKey;
+                        return _event.originalEvent.shiftKey;
                     }.bind(this)
                 });
 

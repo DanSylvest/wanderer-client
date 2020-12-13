@@ -1,3 +1,5 @@
+@import "~vue-material/dist/theme/engine";
+
 $eve-link-color-default: #333;
 $eve-link-color-top-mass-0: #333;
 $eve-link-color-top-mass-1: #5a4520;
@@ -10,6 +12,7 @@ $eve-link-color-middle-time-1: #ff00cd;
 
 $eve-link-color-top-mass-1-time-1: #796300;
 $eve-link-color-top-mass-2-time-1: #8c1717;
+$eve-link-color-temp: md-get-palette-color(orange, 500);
 
 $eve-effect-pulsar: #40aef5;
 $eve-effect-magnetar: #f058f8;
@@ -17,6 +20,11 @@ $eve-effect-wolfRayet: #ec591c;
 $eve-effect-blackHole: #1b1b1b;
 $eve-effect-cataclysmicVariable: #ffea90;
 $eve-effect-redGiant: #ff6464;
+$eve-effect-dazhLiminalityLocus: #ff6464;
+$eve-effect-imperialStellarObservatory: #6991ce;
+$eve-effect-stateStellarObservatory: #6991ce;
+$eve-effect-republicStellarObservatory: #6991ce;
+$eve-effect-federalStellarObservatory: #6991ce;
 
 $eve-wh-type-color-high: #5dffd2;
 $eve-wh-type-color-low: #f79400;

@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 8/31/20.
+ * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 8/31/20.
  */
 import Emitter from "../../env/tools/emitter";
 import extend from "../../env/tools/extend";
@@ -17,6 +17,8 @@ class Marker extends Emitter{
             shade: false
         }, _options);
 
+        this._enableActions = true;
+
         this.markerDownHandler = this._onMarkerDown.bind(this);
         this.markerContextHandler = this._onMarkerContext.bind(this);
         this.createMarker();
@@ -30,25 +32,25 @@ class Marker extends Emitter{
     }
     createMarker () {
         this.wrapper = _ui.fromText(`
-<div class="eve-marker">
-    <div class="eve-marker-body">
-        <div class="eve-marker-first-row off-events">
-            <div class="locked hidden"></div>
-            <div class="effect-color hidden"></div>
-            <div class="system-type"></div>
-            <div class="system-name"></div>
-            <div class="system-tag"></div>
-        </div>
-        <div class="eve-marker-second-row off-events">
-            <div class="online">
-                <div class="online-icon hidden"></div>    
-                <div class="online-count hidden">${Number.randomInt(0, 199)}</div>    
+            <div class="eve-marker">
+                <div class="eve-marker-body">
+                    <div class="eve-marker-first-row off-events">
+                        <div class="locked hidden"></div>
+                        <div class="effect-color hidden"></div>
+                        <div class="system-type"></div>
+                        <div class="system-name"></div>
+                        <div class="system-tag"></div>
+                    </div>
+                    <div class="eve-marker-second-row off-events">
+                        <div class="online">
+                            <div class="online-icon hidden"></div>    
+                            <div class="online-count hidden">${Number.randomInt(0, 199)}</div>    
+                        </div>
+                        <div class="wormhole-statics"></div>
+                    </div>
+                </div>
             </div>
-            <div class="wormhole-statics"></div>
-        </div>
-    </div>
-</div>
-                `);
+        `);
 
 
         this.wrapper.el.addEventListener("mousedown", this.markerDownHandler);
@@ -105,10 +107,29 @@ class Marker extends Emitter{
             }
         }
 
-        if (exists(_data.systemType) && _data.systemData.effectType) {
-            let effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
-            effectEl.el.classList.add(printf("eve-wh-effect-color-%s", _data.systemData.effectType));
-            effectEl.el.classList.remove("hidden");
+        if(exists(_data.systemData) && exists(_data.systemData.effectType)) {
+            if (exists(_data.systemType) && _data.systemType === 3) {
+                let effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
+                effectEl.el.classList.add(printf("eve-wh-effect-color-%s", _data.systemData.effectType));
+                effectEl.el.classList.remove("hidden");
+            }
+
+            let bodyEl;
+            switch(_data.systemData.effectType) {
+                case "dazhLiminalityLocus":
+                    bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
+                    bodyEl.el.classList.remove("edencom");
+                    bodyEl.el.classList.add("triglavian");
+                    break;
+                case "imperialStellarObservatory":
+                case "stateStellarObservatory":
+                case "republicStellarObservatory":
+                case "federalStellarObservatory":
+                    bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
+                    bodyEl.el.classList.remove("triglavian");
+                    bodyEl.el.classList.add("edencom");
+                    break;
+            }
         }
 
         if (exists(_data.isLocked) && _data.isLocked !== markerData.isLocked) {
@@ -132,6 +153,11 @@ class Marker extends Emitter{
                 case 4:
                     colorClass = environment.typeClasses[_data.systemData.typeName];
                     _data.systemData && _data.systemData.statics && this._createStatics(_data.systemData.statics)
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    colorClass = environment.kindClassed[_data.systemType];
                     break;
             }
 
@@ -179,12 +205,21 @@ class Marker extends Emitter{
             this.wrapper.el.classList.remove("active");
     }
     _onMarkerDown (_event) {
+        if(!this._enableActions)
+            return;
+
         this.emit("mousedown", _event);
     }
     _onMarkerContext (_event) {
+        if(!this._enableActions)
+            return;
+
         this.emit("contextmenu", _event);
     }
     _onMouseIn (_event){
+        if(!this._enableActions)
+            return;
+
         let bounds = this.wrapper.el.getBoundingClientRect();
 
         this.emit("mousein", {
@@ -194,10 +229,16 @@ class Marker extends Emitter{
         });
     }
     _onMouseOut (_event){
+        if(!this._enableActions)
+            return;
+
         this.emit("mouseout", _event);
     }
 
     _onMouseInLazy (_event) {
+        if(!this._enableActions)
+            return;
+
         let bounds = this.wrapper.el.getBoundingClientRect();
         this.emit("mouseinLazy", {
             x: bounds.x,
@@ -207,6 +248,9 @@ class Marker extends Emitter{
     }
 
     _onMouseOutLazy (_event){
+        if(!this._enableActions)
+            return;
+
         this.emit("mouseoutLazy", _event);
     }
 
@@ -219,6 +263,13 @@ class Marker extends Emitter{
         else
             this.wrapper.el.classList.remove("shaded");
 
+    }
+
+    enableActions (bool) {
+        this._enableActions = bool;
+
+        this.emit("mouseoutLazy");
+        this.emit("mouseout");
     }
 }
 

@@ -132,57 +132,51 @@
                 this.security = _data.security;
                 this.statics = _data.systemData.statics || [];
                 this.securityClass = environment.securityClasses[_data.security];
+                this.kind = _data.systemData.typeDescription;
 
                 switch (_data.systemType) {
                     case 0: // high-sec
-                        this.kind = "High-sec";
                         this.kindClass = environment.kindClassed[_data.systemType];
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         this.type = null;
                         break;
                     case 1: // low-sec
-                        this.kind = "Low-sec";
                         this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 2: // null-sec
-                        this.kind = "Null-sec";
                         this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 3: // WH
                     case 4: // Thera
-                        this.kind = "W-Space";
                         this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
                         this.typeClass = environment.typeClasses[_data.systemData.typeName];
                         this.solarSystemLink = "http://anoik.is/systems/";
                         break;
                     case 5: // abyss
-                        this.kind = "Abyss-Space";
                         this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
                         this.solarSystemLink = "";
                         break;
                     case 6: // penalty?
-                        this.kind = "Penalty-Space";
+                    case 7: // Pochven?
                         this.kindClass = environment.kindClassed[_data.systemType];
-                        this.type = _data.systemData.typeName;
+                        this.type = null;
                         this.solarSystemLink = "";
                         break;
                 }
 
-                // this.showEffect = false;
-
-                if(_data.systemType === 3 && exists(_data.systemData.effectType)) {
+                if(exists(_data.systemData.effectType)) {
                     this.showEffect = true;
                     this.effectColor = environment.effects[_data.systemData.effectType];
                     this.effectName = _data.systemData.effectName;
 
-                    let sorted = _data.systemData.effectData.sort(function(x,y){
-                        return (x.positive === y.positive)? 0 : x.positive? -1 : 1;
+                    let sorted = _data.systemData.effectData.sort(function (x, y) {
+                        return (x.positive === y.positive) ? 0 : x.positive ? -1 : 1;
                     });
 
                     this.effectData = sorted;
