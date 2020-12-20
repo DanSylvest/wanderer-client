@@ -86,6 +86,16 @@ const _ui = function (_tag) {
         return this;
     };
 
+    this.classAdd = function () {
+        let args = Array.prototype.slice.call(arguments);
+        args.map(className => !el.classList.contains(className) && el.classList.add(className))
+    };
+
+    this.classRemove = function () {
+        let args = Array.prototype.slice.call(arguments);
+        args.map(className => el.classList.contains(className) && el.classList.remove(className))
+    };
+
     Object.defineProperty(this, "el", {
         get: function () {
             return el;

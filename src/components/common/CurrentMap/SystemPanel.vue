@@ -16,7 +16,13 @@
         >
             <md-tabs ref="tabs" v-if="enabled" @md-changed="onTabChange" class="fh" >
                 <md-tab id="tab-overview" md-label="Overview"  exact>
-                    <overview :class="sizeDetectorClass" v-if="enabled" ref="systemInfo" @cupdated="onOverviewUpdated"></overview>
+                    <overview
+                            :class="sizeDetectorClass"
+                            v-if="enabled"
+                            ref="systemInfo"
+                            @cupdated="onOverviewUpdated"
+                            @changed="onOverviewChanged"
+                    ></overview>
                 </md-tab>
 
                 <md-tab id="tab-signatures" md-label="Signatures">
@@ -43,6 +49,7 @@
     import Popup from "../../ui/Popup";
     import Overview from "./systemPanel/Overview";
     import Signatures from "./systemPanel/Signatures";
+    import api from "../../../js/api.js";
     // import CustomPromise from "../../../js/env/promise";
 
     export default {
@@ -127,6 +134,22 @@
                 }.bind(this))
 
                 // this.refresh();
+            },
+
+            // eslint-disable-next-line no-unused-vars
+            onOverviewChanged (data) {
+                let isValid = false;
+                for (let key in data) {
+                    switch (key) {
+                        case "description":
+                            isValid = true;
+                            break;
+                        default:
+                            throw `Exception: "Trying to update unavailable attribute (${key})."`;
+                    }
+                }
+
+                isValid && api.eve.map.solarSystem.update(this.mapId, this.systemId, data);
             },
 
             refresh: function () {

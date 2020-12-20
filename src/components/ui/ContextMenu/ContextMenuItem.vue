@@ -1,7 +1,11 @@
 <template>
-    <md-content class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb" @click="onClick">
+    <md-content
+            class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb"
+            :class="{active: smActive}"
+            @click="onClick"
+    >
         <div class="wd-context-item-content wd nowrap flex flex-align-center">
-            <md-icon v-show="icon.length > 0" class="wd-context-expand-icon wd font-size-large">{{icon}}</md-icon>
+            <md-icon v-show="icon.length > 0" :class="'wd-context-expand-icon wd font-size-large ' + iconClass">{{icon}}</md-icon>
             <span>{{title}}</span>
         </div>
 
@@ -35,6 +39,10 @@
             cIsSubmenu: {
                 type: Boolean,
                 default: false
+            },
+            cIconClass: {
+                type: String,
+                default: ""
             }
         },
         data: function () {
@@ -45,6 +53,7 @@
 
                 title: this.cTitle,
                 icon: this.cIcon,
+                iconClass: this.cIconClass,
                 isSubmenu: this.cIsSubmenu,
             }
         },
@@ -170,12 +179,16 @@
             padding: 5px 5px !important;
             padding-right: 10px !important;
 
+            &.active {
+                background-color: transparentize($button-closed-color, 0.65);
+            }
+
             &:hover {
-                background-color: transparentize($button-closed-color, 0.55);
+                background-color: transparentize($button-closed-color, 0.65);
             }
 
             &:active {
-                background-color: transparentize($button-closed-color, 0.45);
+                background-color: transparentize($button-closed-color, 0.35);
             }
 
             & > span {

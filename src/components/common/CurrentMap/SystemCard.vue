@@ -12,6 +12,9 @@
                 </div>
                 <div class="constellation-name">{{constellationName}}</div>
                 <div class="region-name">{{regionName}}</div>
+                <div class="solar-system-effect wd-color-primary-2" v-if="status !== 0">
+                    (<span :class="statusClass">{{statusName}}</span>)
+                </div>
             </div>
             <div class="wd-system-card__divider" v-show="characters.length > 0"></div>
             <div class="wd-system-card__content" v-show="characters.length > 0">
@@ -57,7 +60,10 @@
                 securityClass: "",
                 showEffect: false,
                 effectClass: "",
-                effectName: ""
+                effectName: "",
+                status: 0,
+                statusName: "",
+                statusClass: ""
             }
         },
         mounted: function () {
@@ -70,7 +76,11 @@
                 this.securityStatus = _data.security;
                 this.securityClass = environment.securityClasses[_data.security];
 
-                if(/*_data.systemType === 3 && */exists(_data.systemData.effectType)) {
+                this.status = _data.status;
+                this.statusName = environment.statuses[_data.status].name;
+                this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
+
+                if(exists(_data.systemData.effectType)) {
                     this.showEffect = true;
                     this.effectClass = environment.effects[_data.systemData.effectType];
                     this.effectName = _data.systemData.effectName;

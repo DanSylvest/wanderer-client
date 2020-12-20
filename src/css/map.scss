@@ -53,13 +53,16 @@ $active-color: #7be1ff;
                 border-radius: 5px;
                 cursor: pointer;
 
-                &.triglavian {
-                    background-image: linear-gradient(223deg, #a5000052, transparent);
-                }
+                &.triglavian {background-image: linear-gradient(223deg, #a5000052, transparent);}
+                &.edencom {background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);}
 
-                &.edencom {
-                    background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);
-                }
+                &.system-status-unknown { }
+                &.system-status-friendly {background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);}
+                &.system-status-warning {background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);}
+                &.system-status-targetPrimary {background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);}
+                &.system-status-targetSecondary {background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);}
+                &.system-status-dangerousPrimary {background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);}
+                &.system-status-dangerousSecondary {background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);}
 
                 &:hover {
                     background-color: $bg-3-major;
@@ -295,3 +298,11 @@ $active-color: #7be1ff;
 .eve-kind-color-abyss { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
 .eve-kind-color-penalty { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
 .eve-kind-color-pochven { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
+
+.eve-system-status-color-unknown { }
+.eve-system-status-color-friendly {color: $eve-solar-system-status-color-friendly !important;}
+.eve-system-status-color-warning {color: $eve-solar-system-status-color-warning !important;}
+.eve-system-status-color-targetPrimary {color: $eve-solar-system-status-color-targetPrimary !important;}
+.eve-system-status-color-targetSecondary {color: $eve-solar-system-status-color-targetSecondary !important;}
+.eve-system-status-color-dangerousPrimary {color: $eve-solar-system-status-color-dangerousPrimary !important;}
+.eve-system-status-color-dangerousSecondary {color: $eve-solar-system-status-color-dangerousSecondary !important;}

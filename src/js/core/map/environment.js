@@ -67,5 +67,16 @@ export default {
         "stateStellarObservatory"    : "text-eve-wh-effect-color-stateStellarObservatory",
         "republicStellarObservatory" : "text-eve-wh-effect-color-republicStellarObservatory",
         "federalStellarObservatory"  : "text-eve-wh-effect-color-federalStellarObservatory",
-    }
+    },
+
+
+    statuses : [
+        {id: "unknown", name: "unknown", icon: "block"},
+        {id: "friendly", name: "friendly", icon: "invert_colors"},
+        {id: "warning", name: "warning", icon: "invert_colors"},
+        {id: "targetPrimary", name: "target primary", icon: "invert_colors"},
+        {id: "targetSecondary", name: "target secondary", icon: "invert_colors"},
+        {id: "dangerousPrimary", name: "dangerous primary", icon: "invert_colors"},
+        {id: "dangerousSecondary", name: "dangerous secondary", icon: "invert_colors"},
+    ]
 }

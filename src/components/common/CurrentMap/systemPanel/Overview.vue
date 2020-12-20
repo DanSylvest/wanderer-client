@@ -24,6 +24,12 @@
                                     <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
                                 </div>
                             </div>
+                            <div class="wd-system-info__system-item" v-if="status !== 0" >
+                                <span class="wd fg-contrast" >Status</span>
+                                <div class="wd fg-contrast" >
+                                    <span :class="statusClass">{{statusName}}</span>
+                                </div>
+                            </div>
                             <div class="wd-system-info__system-item" v-if="statics.length > 0">
                                 <span class="wd fg-contrast">Statics</span>
                                 <div class="text-right wd fg-contrast">
@@ -54,14 +60,12 @@
         </div>
 
         <md-card class="wd-system-overview__card-description">
-            <md-card-header>
-                <div class="wd-system-overview__card-header">
-                    <div>Description</div>
-                </div>
-            </md-card-header>
-
             <md-card-content>
-
+                <md-field class="wd-overview-description">
+                    <label>Description</label>
+                    <md-textarea @input="onDescriptionChange" v-model="description"></md-textarea>
+                    <span v-if="savingDescription" class="md-helper-text green">Saving delay (5 seconds)... wait for save.</span>
+                </md-field>
             </md-card-content>
         </md-card>
 
@@ -71,7 +75,7 @@
 <script>
     import exists from "../../../../js/env/tools/exists";
     import environment from "../../../../js/core/map/environment";
-    // import SizeObserver from "../../../../js/env/sizeObserver";
+    import SpamFilter from "../../../../js/env/spamFilter.js";
 
     export default {
         name: "Overview",
@@ -99,12 +103,20 @@
                 effectColor: "",
                 effectName: "",
                 effectData: [],
-                solarSystemLink: ""
+                solarSystemLink: "",
+                status: 0,
+                statusName: "",
+                statusClass: "",
+                savingDescription: false,
+
+                description: ""
             }
         },
         mounted: function () {
             // this._so = new SizeObserver(this.$el, this._onResize.bind(this));
-
+            this._sfInput = new SpamFilter(this._inputChanged.bind(this), 5000);
+            this._descriptionIsNotSetted = true;
+            this.needToSave = true;
         },
         beforeDestroy: function () {
             // this._so.destructor();
@@ -125,6 +137,21 @@
             refresh: function () {
 
             },
+            onDescriptionChange (event) {
+                if(!this.needToSave) {
+                    this.needToSave = true;
+                    return;
+                }
+
+                this.savingDescription = true;
+                this._sfInput.call(event);
+            },
+            _inputChanged (event) {
+                this.savingDescription = false;
+                this.$emit("changed", {
+                    description: event
+                });
+            },
             update: function (_data) {
                 this.systemName = _data.name;
                 this.regionName = _data.regionName;
@@ -133,38 +160,37 @@
                 this.statics = _data.systemData.statics || [];
                 this.securityClass = environment.securityClasses[_data.security];
                 this.kind = _data.systemData.typeDescription;
+                this.kindClass = environment.kindClassed[_data.systemType];
+                this.status = _data.status;
+                this.statusName = environment.statuses[_data.status].name;
+                this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
+                this.updateDescription(_data.description, true);
 
                 switch (_data.systemType) {
                     case 0: // high-sec
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         this.type = null;
                         break;
                     case 1: // low-sec
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 2: // null-sec
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
                         this.solarSystemLink = "https://evemaps.dotlan.net/system/";
                         break;
                     case 3: // WH
                     case 4: // Thera
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
                         this.typeClass = environment.typeClasses[_data.systemData.typeName];
                         this.solarSystemLink = "http://anoik.is/systems/";
                         break;
                     case 5: // abyss
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = _data.systemData.typeName;
                         this.solarSystemLink = "";
                         break;
                     case 6: // penalty?
                     case 7: // Pochven?
-                        this.kindClass = environment.kindClassed[_data.systemType];
                         this.type = null;
                         this.solarSystemLink = "";
                         break;
@@ -185,6 +211,19 @@
                 }
 
                 // debugger;
+            },
+            updateDescription (description, isUpdateModel) {
+                if(isUpdateModel && !exists(description) || description.length === 0 || description === this.description) {
+                    return;
+                }
+
+                if(isUpdateModel)
+                    this.description = description;
+
+                if(this._descriptionIsNotSetted) {
+                    this._descriptionIsNotSetted = false;
+                    this.needToSave = false;
+                }
             }
         }
     }
@@ -231,7 +270,6 @@
             }
 
             & > .solar-system-name {
-                /*color: #848484;*/
                 font-weight: bold;
             }
 
@@ -266,6 +304,10 @@
 
         .wd-system-overview__card-description {
             color: $fg-contrast;
+
+            .wd-overview-description textarea {
+                height: 200px;
+            }
         }
 
         .effect-bonuses-list {

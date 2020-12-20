@@ -9,6 +9,7 @@ $bg-3-minor: rgba(68, 68, 68, 0.53);
 $bg-3-major: #5c5c5c;
 
 $fg-contrast: #ccc;
+$fg-contrast-2: #e3e3e3;
 $fg-primary: #aaaaaa;
 $fg-primary-1: #9e9e9e;
 $fg-primary-2: #868686;
@@ -16,6 +17,7 @@ $fg-primary-3: #656565;
 $fg-secondary: #5c5c5c;
 $fg-positive: #72fc72;
 $fg-negative: #fa6161;
+$fg-theme-primary: transparentize(md-get-palette-color(orange, 400), 0.7);
 
 $border-color-primary-1: #9e9e9e;
 $border-color-primary-2: #868686;

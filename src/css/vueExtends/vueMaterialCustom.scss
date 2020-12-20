@@ -1,4 +1,6 @@
 @import "src/css/variables";
+@import "~vue-material/dist/theme/engine";
+$helper-text: md-get-palette-color(green, 300);
 
 .md-content.md-tabs-content,
 .md-dialog-container.md-theme-default {
@@ -20,4 +22,65 @@
 
 .md-tabs.md-alignment-left .md-tabs-navigation.wd.flex-justify-center {
     justify-content: center;
+}
+
+.wd-overview-description {
+    //padding-top: 0 !important;
+
+    &.md-field.md-theme-default.md-has-textarea:not(.md-autogrow):after {
+        border-color: $border-color-primary-5;
+    }
+
+    &.md-field.md-theme-default.md-has-textarea:not(.md-autogrow):before {
+        border-color: $fg-theme-primary;
+    }
+
+    &.md-focused {
+        .md-textarea {
+            color: $fg-contrast-2 !important;
+        }
+    }
+
+    .md-textarea {
+        transition: all 250ms;
+        font-size: 14px !important;
+        color: $fg-primary !important;
+        -webkit-text-fill-color: initial !important;
+        resize: none !important;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+        &::-webkit-scrollbar:hover {
+
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.0);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            transition: background-color 200ms;
+            width: 8px;
+            border-radius: 3px;
+            background-color: rgba(95, 83, 83, 0.5);
+            cursor: pointer;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(128, 126, 126, 0.5);
+        }
+    }
+}
+
+.md-field:last-child{
+    margin-bottom: 10px;
+}
+
+.md-field.md-theme-default label {
+    color: var(--md-theme-default-primary-on-background, #ffd180)
+}
+
+.md-helper-text.green {
+    color: $helper-text !important;
 }

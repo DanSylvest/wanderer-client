@@ -80,6 +80,16 @@
                         <context-menu-item :c-title="item.toString()" v-for="item in digits" :key="item" @click="onDigitClick(item)" />
                     </context-menu-item>
                 </context-menu-item>
+                <context-menu-item c-title="Status" c-icon="report_problem" :c-is-submenu="true">
+                    <context-menu-item
+                            :c-title="item.name"
+                            :c-icon="item.icon"
+                            :c-icon-class="'eve-system-status-color-' + item.id"
+                            v-for="(item, index) in statuses"
+                            :key="item.name"
+                            @click="onStatusClick(index)"
+                    />
+                </context-menu-item>
                 <context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
                 <context-menu-item c-title="Waypoints" c-icon="call_split" :c-is-submenu="true" v-show="isSystemInKSpace">
                     <context-menu-item :c-title="item.name" :c-is-submenu="true" v-for="item in characters" :key="item.id">
@@ -123,6 +133,7 @@
     import MapController from "./CurrentMap/controller/mapController";
     import Map from "../../js/core/map/map";
     import exists from "../../js/env/tools/exists";
+    import environment from "../../js/core/map/environment.js";
 
     import ContextMenu from "../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
@@ -154,6 +165,7 @@
                 letters: [
                     "A","B","C","D","E","F","X","Y","Z",
                 ],
+                statuses: environment.statuses.slice(),
                 selectedMap: null,
                 allowedMaps: [],
                 showMapEmpty: false,
@@ -366,6 +378,11 @@
                     tag: _digit
                 });
             },
+            onStatusClick (status) {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
+                    status: status
+                });
+            },
             onClearTag: function () {
                 this.selectedDigit = null;
                 this.selectedLetter = null;
@@ -419,6 +436,7 @@
                 _event.preventDefault();
                 _event.stopPropagation();
 
+                this._offContexts();
                 this.rootCMActive = true;
                 this.rootCMOffsetX = _event.x + 10;
                 this.rootCMOffsetY = _event.y + 10;
@@ -514,6 +532,7 @@
                 }
             },
             _offContexts: function () {
+                this.rootCMActive = false;
                 this.systemsCMActive = false;
                 this.systemCMActive = false;
                 this.linkCMActive = false;

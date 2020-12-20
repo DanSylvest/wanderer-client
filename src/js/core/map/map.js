@@ -214,17 +214,17 @@ class Map extends Emitter {
                 obj.fx = undefined;
                 obj.fy = undefined;
             }
+            this._sfForce.call();
         }
 
         if (exists(_data.position) && marker.data.position && (_data.position.x !== marker.data.position.x || _data.position.y !== marker.data.position.y)) {
             let obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
             obj.x = _data.position.x;
             obj.y = _data.position.y;
+            this._sfForce.call();
         }
 
         marker.update(_data);
-
-        this._sfForce.call();
     }
     _onMarkerDown (_markerId, _event) {
         // var marker = this.findMarker(_event.mouse);
@@ -430,16 +430,9 @@ class Map extends Emitter {
         link.model.update(_data);
     }
     removeLink (_linkId) {
-        let linkData = this._links[_linkId];
-
-        this.linksLayer.remove(linkData.element);
-        this.linksLayer.remove(linkData.element2);
-        this.linksLayer.remove(linkData.element3);
-
+        this._links[_linkId].model.destructor();
         delete this._links[_linkId];
-
         this._forceLinks = this.forceLinks();
-
         this._sfForce.call();
     }
     enableForce (_bool) {

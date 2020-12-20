@@ -60,3 +60,19 @@ $eve-security-color-m-07: #ff4444;
 $eve-security-color-m-08: #ff4444;
 $eve-security-color-m-09: #ff4444;
 $eve-security-color-m-10: #ff4444;
+
+$eve-solar-system-status-unknown: transparent;
+$eve-solar-system-status-friendly: #3bbd3952;
+$eve-solar-system-status-warning: #906518a6;
+$eve-solar-system-status-targetPrimary: #b439ff6b;
+$eve-solar-system-status-targetSecondary: rgba(255, 57, 249, 0.35);
+$eve-solar-system-status-dangerousPrimary: #d54040;
+$eve-solar-system-status-dangerousSecondary: #fd54437a;
+
+$eve-solar-system-status-color-unknown: transparent;
+$eve-solar-system-status-color-friendly: #3bbd39;
+$eve-solar-system-status-color-warning: #ffb93b;
+$eve-solar-system-status-color-targetPrimary: #b439ff;
+$eve-solar-system-status-color-targetSecondary: rgba(255, 57, 249, 1);
+$eve-solar-system-status-color-dangerousPrimary: #d54040;
+$eve-solar-system-status-color-dangerousSecondary: #fd5443;
