@@ -1,74 +1,128 @@
 <template>
-    <div class="wd-system-overview wd off-user-select" :class="{'wd-show-effect': showEffect}">
-        <div class="wd-info-block wd" :class="{'margin-bottom-primary': showEffect}">
-
-            <md-card class="wd-info-block__card-info" >
-                <md-card-header>
-                    <div class="wd-system-overview__card-header wd-system-overview__header">
-                        <div :class="securityClass + ' solar-system-security'">{{security}}</div>
-                        <div class="solar-system-name">
-                            <a v-if="solarSystemLink !== ''" target="_blank" :href="solarSystemLink + systemName" >{{systemName}}</a>
-                            <span v-if="solarSystemLink === ''">{{systemName}}</span>
+    <div
+        class="wd-system-overview wd off-user-select"
+        :class="{
+            'wd-show-effect': showEffect,
+            'wd-system-panel-size-compact': localIsCompact,
+            'wd-system-panel-size-full': !localIsCompact
+        }"
+    >
+        <div class="wd-content" :class="{'is-compact':localIsCompact, 'without-effect': !showEffect}">
+            <div class="wd-content__module">
+                <!--       solar system info         -->
+                <md-card class="wd-module-card" >
+                    <md-card-header>
+                        <div class="wd-system-overview__card-header wd-system-overview__header">
+                            <div :class="securityClass + ' solar-system-security'">{{security}}</div>
+                            <div class="solar-system-name">
+                                <a v-if="solarSystemLink !== ''" target="_blank" :href="solarSystemLink + systemName" >{{systemName}}</a>
+                                <span v-if="solarSystemLink === ''">{{systemName}}</span>
+                            </div>
+                            <div class="constellation-name">{{constellationName}}</div>
+                            <div class="region-name">{{regionName}}</div>
                         </div>
-                        <div class="constellation-name">{{constellationName}}</div>
-                        <div class="region-name">{{regionName}}</div>
-                    </div>
-                </md-card-header>
+                    </md-card-header>
 
-                <md-card-content>
-                    <div class="wd-system-overview-content wd flex flex-justify-sb">
-                        <div class="wd-system-info wd f-width">
-                            <div class="wd-system-info__system-item" >
-                                <span class="wd fg-contrast" >Type</span>
-                                <div class="wd fg-contrast" >
-                                    <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
+                    <md-card-content>
+                        <div class="wd-system-overview-content wd flex flex-justify-sb">
+                            <div class="wd-system-info wd f-width">
+                                <div class="wd-system-info__system-item" >
+                                    <span class="wd fg-contrast" >Type</span>
+                                    <div class="wd fg-contrast" >
+                                        <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="wd-system-info__system-item" v-if="status !== 0" >
-                                <span class="wd fg-contrast" >Status</span>
-                                <div class="wd fg-contrast" >
-                                    <span :class="statusClass">{{statusName}}</span>
+                                <div class="wd-system-info__system-item" v-if="status !== 0" >
+                                    <span class="wd fg-contrast" >Status</span>
+                                    <div class="wd fg-contrast" >
+                                        <span :class="statusClass">{{statusName}}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="wd-system-info__system-item" v-if="statics.length > 0">
-                                <span class="wd fg-contrast">Statics</span>
-                                <div class="text-right wd fg-contrast">
-                                    <div v-for="item in statics" :key="item.id">
-                                        <span>{{item.id}}</span>
-                                        (<span :class="getStaticClassColor(item.type)">{{item.fullName}}</span>)
+                                <div class="wd-system-info__system-item" v-if="statics.length > 0">
+                                    <span class="wd fg-contrast">Statics</span>
+                                    <div class="text-right wd fg-contrast">
+                                        <div v-for="item in statics" :key="item.id">
+                                            <span>{{item.id}}</span>
+                                            (<span :class="getStaticClassColor(item.type)">{{item.fullName}}</span>)
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </md-card-content>
-            </md-card>
+                    </md-card-content>
+                </md-card>
+            </div>
+            <div class="wd-content__module" v-if="localIsCompact || showEffect">
+                <!--       Effect   (when full)      -->
+                <md-card class="wd-module-card" v-if="!localIsCompact && showEffect">
+                    <md-card-header>
+                        <div class="wd-system-overview__card-header">
+                            <div :class="' ' + effectColor">{{effectName}}</div>
+                        </div>
+                    </md-card-header>
 
-            <md-card class="wd-info-block__card-effect" v-if="showEffect">
-                <md-card-header>
-                    <div class="wd-system-overview__card-header">
-                        <div :class="' ' + effectColor">{{effectName}}</div>
-                    </div>
-                </md-card-header>
+                    <md-card-content>
+                        <div class="effect-bonuses-list">
+                            <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
+                        </div>
+                    </md-card-content>
+                </md-card>
 
-                <md-card-content>
-                    <div class="effect-bonuses-list">
-                        <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
-                    </div>
-                </md-card-content>
-            </md-card>
+                <!--       routes  (when compact)      -->
+                <md-card class="wd-module-card" v-if="localIsCompact">
+                    <md-card-header>
+                        <div class="wd-system-overview__card-header">
+                            <div>Routes</div>
+                        </div>
+                    </md-card-header>
+
+                    <md-card-content>
+
+                    </md-card-content>
+                </md-card>
+            </div>
+            <div class="wd-content__module" v-if="!localIsCompact || showEffect">
+                <!--       Effect   (when compact)      -->
+                <md-card class="wd-module-card" v-if="localIsCompact && showEffect">
+                    <md-card-header>
+                        <div class="wd-system-overview__card-header">
+                            <div :class="' ' + effectColor">{{effectName}}</div>
+                        </div>
+                    </md-card-header>
+
+                    <md-card-content>
+                        <div class="effect-bonuses-list">
+                            <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
+                        </div>
+                    </md-card-content>
+                </md-card>
+
+                <!--       routes  (when full)      -->
+                <md-card class="wd-module-card" v-if="!localIsCompact">
+                    <md-card-header>
+                        <div class="wd-system-overview__card-header">
+                            <div>Routes</div>
+                        </div>
+                    </md-card-header>
+
+                    <md-card-content>
+
+                    </md-card-content>
+                </md-card>
+            </div>
+            <div class="wd-content__module">
+                <!--       description      -->
+                <md-card class="wd-module-card">
+                    <md-card-content>
+                        <md-field class="wd-overview-description">
+                            <label>Description</label>
+                            <md-textarea @input="onDescriptionChange" v-model="description"></md-textarea>
+                            <span v-if="savingDescription" class="md-helper-text green">Saving delay (5 seconds)... wait for save.</span>
+                        </md-field>
+                    </md-card-content>
+                </md-card>
+            </div>
         </div>
-
-        <md-card class="wd-system-overview__card-description">
-            <md-card-content>
-                <md-field class="wd-overview-description">
-                    <label>Description</label>
-                    <md-textarea @input="onDescriptionChange" v-model="description"></md-textarea>
-                    <span v-if="savingDescription" class="md-helper-text green">Saving delay (5 seconds)... wait for save.</span>
-                </md-field>
-            </md-card-content>
-        </md-card>
-
     </div>
 </template>
 
@@ -79,9 +133,12 @@
 
     export default {
         name: "Overview",
-        props: [
-
-        ],
+        props: {
+            isCompact: {
+                type: Boolean,
+                default: false
+            }
+        },
         data: function () {
             return {
                 saveSigsDialogActive: false,
@@ -109,7 +166,13 @@
                 statusClass: "",
                 savingDescription: false,
 
-                description: ""
+                description: "",
+                localIsCompact: this.isCompact
+            }
+        },
+        watch: {
+            isCompact: function (_newVal) {
+                this.localIsCompact = _newVal;
             }
         },
         mounted: function () {
@@ -129,7 +192,6 @@
             getStaticClassColor: function (_staticClass) {
                 return environment.typeClasses[_staticClass];
             },
-
             _onResize: function () {
                 // eslint-disable-next-line no-debugger
                 debugger;
@@ -233,11 +295,53 @@
 <style lang="scss">
     @import "/src/css/variables";
 
+    .md-card {
+        height: 100%;
+    }
+
+    .wd-content {
+        display: grid;
+        grid-column-gap: 5px;
+        grid-row-gap: 5px;
+
+        & > .wd-content__module {
+            width: 100%;
+        }
+
+        & > .wd-content__module {
+            grid-column-start: 1;
+            grid-column-end: 3;
+        }
+
+        & > .wd-content__module:nth-child(1) {
+            grid-column-start: 1;
+            grid-column-end: 2;
+        }
+
+        & > .wd-content__module:nth-child(2) {
+            grid-column-start: 2;
+            grid-column-end: 3;
+        }
+
+        &.without-effect,
+        &.is-compact {
+            & > .wd-content__module:nth-child(1),
+            & > .wd-content__module:nth-child(2) {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+        }
+    }
+
     .wd-system-overview {
         color: $fg-primary;
 
         .wd-info-block {
             display: flex;
+        }
+
+        & > *:not(:last-child) {
+            margin-bottom: 10px;
         }
 
         .md-card-header {
@@ -306,7 +410,7 @@
             color: $fg-contrast;
 
             .wd-overview-description textarea {
-                height: 200px;
+                height: 150px;
             }
         }
 
@@ -322,105 +426,6 @@
 
             & > .wd-effect-negative {
                 color: $fg-negative;
-            }
-        }
-    }
-
-
-    .wd-system-panel-size-compact {
-        &.wd-system-overview {
-            display: flex;
-            flex-wrap: wrap;
-
-            .wd-info-block {
-                width: 100%;
-                margin-bottom: 10px;
-
-                &__card-info {
-                    width: 100%;
-                }
-            }
-
-            .wd-system-overview__card-description {
-                width: 100%;
-            }
-        }
-
-        &.wd-system-overview.wd-show-effect {
-            display: initial;
-
-            .wd-info-block {
-                flex-wrap: wrap;
-
-                & {
-                    &__card-info {
-                        width: 100%;
-                        margin-bottom: 10px;
-                    }
-
-                    &__card-effect {
-                        width: 100%;
-                    }
-                }
-            }
-
-            .wd-system-overview__card-description {
-                width: initial;
-            }
-        }
-    }
-
-    .wd-system-panel-size-full {
-
-        &.wd-system-overview {
-            display: flex;
-
-            .wd-info-block {
-                flex-wrap: initial;
-                width: 400px;
-                margin-right: 10px;
-
-                & {
-                    &__card-info {
-                        width: 100%;
-                    }
-
-                    &__card-effect {
-                        width: initial;
-                    }
-                }
-            }
-
-            .wd-system-overview__card-description {
-                width: 70%;
-            }
-        }
-
-        &.wd-system-overview.wd-show-effect {
-            display: initial;
-
-            .wd-info-block {
-                width: initial;
-                margin-right: initial;
-
-                & {
-                    &__card-info {
-                        width: 400px;
-                        margin-right: 10px;
-                    }
-
-                    &__card-effect {
-                        width: 70%;
-                    }
-
-                    &__card-description {
-                        width: 100%;
-                    }
-                }
-            }
-
-            .wd-system-overview__card-description {
-                width: initial;
             }
         }
     }

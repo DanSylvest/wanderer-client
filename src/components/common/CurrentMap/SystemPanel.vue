@@ -17,7 +17,7 @@
             <md-tabs ref="tabs" v-if="enabled" @md-changed="onTabChange" class="fh" >
                 <md-tab id="tab-overview" md-label="Overview"  exact>
                     <overview
-                            :class="sizeDetectorClass"
+                            :is-compact="isCompact"
                             v-if="enabled"
                             ref="systemInfo"
                             @cupdated="onOverviewUpdated"
@@ -70,7 +70,8 @@
                 panelHeight: 200,
                 panelTitle: "Default info title",
                 currentTab: "tab-overview",
-                sizeDetectorClass: ""
+                sizeDetectorClass: "",
+                isCompact: false
             }
         },
         mounted: function () {
@@ -255,11 +256,7 @@
         this.panelWidth = bounds.width * 0.4 < 400 ? 400 : bounds.width * 0.45;
         this.panelHeight = bounds.height - 55;
 
-        if(bounds.width > 1400) {
-            this.sizeDetectorClass = "wd-system-panel-size-full";
-        } else if(bounds.width <= 1400) {
-            this.sizeDetectorClass = "wd-system-panel-size-compact";
-        }
+        this.isCompact = bounds.width <= 1400;
 
         switch(this.currentTab) {
             case "tab-overview":
@@ -290,6 +287,85 @@
         .wd-popup__content,
         &.wd-popup {
             padding:0;
+        }
+    }
+
+    .wd-grid {
+        display: grid;
+        grid-column-gap: 5px;
+        grid-row-gap: 5px;
+
+        & > .wd-grid__element {
+            width: 100%;
+            height: 50px;
+            background-color: #808080;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        & > .wd-grid__element:nth-child(1) {
+            grid-column-start: 1;
+            grid-column-end: 2;
+        }
+
+        & > .wd-grid__element:nth-child(2) {
+            grid-column-start: 2;
+            grid-column-end: 3;
+        }
+
+        & > .wd-grid__element {
+            grid-column-start: 1;
+            grid-column-end: 3;
+        }
+
+    }
+
+    .wd-kek {
+        display: flex;
+        flex-wrap: wrap;
+
+        & > .wd-kek__element {
+            width: 100%;
+            height: 50px;
+            background-color: #808080;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        & > .wd-kek__element {
+            flex-grow: 2;
+            box-sizing: border-box;
+        }
+
+        & > .wd-kek__element:not(:last-child) {
+            margin-bottom: 5px;
+        }
+
+        & > .wd-kek__element:nth-child(1) {
+            flex-grow: 1;
+            width: calc(50% - 3px);
+            margin-right: 6px;
+        }
+
+        & > .wd-kek__element:nth-child(2) {
+            flex-grow: 1;
+            width: calc(50% - 3px);
+        }
+
+        .order-1 {
+            order: 1;
+        }
+
+        .order-2 {
+            order: 2;
+        }
+
+        .order-3 {
+            order: 3;
         }
     }
 </style>
