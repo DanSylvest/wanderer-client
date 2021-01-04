@@ -113,7 +113,7 @@
                         <md-field class="wd-overview-description">
                             <label>Description</label>
                             <md-textarea @input="onDescriptionChange" v-model="description"></md-textarea>
-                            <span v-if="savingDescription" class="md-helper-text green">Saving delay (5 seconds)... wait for save.</span>
+                            <span v-if="savingDescription" class="md-helper-text green">Saving delay ({{savingDelay}} seconds)... wait for save.</span>
                         </md-field>
                     </md-card-content>
                 </md-card>
@@ -127,6 +127,7 @@
     import environment from "../../../../js/core/map/environment";
     import SpamFilter from "../../../../js/env/spamFilter.js";
     import Routes from "./Overview/Routes.vue";
+    import IntervalEmitter from "../../../../js/env/intervalEmitter.js";
 
     export default {
         name: "Overview",
@@ -171,6 +172,8 @@
                 mapId: null,
                 solarSystemId: null,
 
+                savingDelay: 3,
+
                 routesUpdater: 0
             }
         },
@@ -180,7 +183,10 @@
             }
         },
         mounted: function () {
-            this._sfInput = new SpamFilter(this._inputChanged.bind(this), 5000);
+            this._descIE = new IntervalEmitter(3000, 100);
+            this._descIE.on("interval", delta => this.savingDelay = (delta / 1000).toFixed(1));
+
+            this._sfInput = new SpamFilter(this._inputChanged.bind(this), 3000);
             this._descriptionIsNotSetted = true;
             this.needToSave = true;
         },
@@ -209,6 +215,8 @@
                     return;
                 }
 
+                this._descIE.start();
+                this.savingDelay = 3;
                 this.savingDescription = true;
                 this._sfInput.call(event);
             },
