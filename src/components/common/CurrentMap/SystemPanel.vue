@@ -17,11 +17,14 @@
             <md-tabs ref="tabs" v-if="enabled" @md-changed="onTabChange" class="fh" >
                 <md-tab id="tab-overview" md-label="Overview"  exact>
                     <overview
-                            :is-compact="isCompact"
-                            v-if="enabled"
-                            ref="systemInfo"
-                            @cupdated="onOverviewUpdated"
-                            @changed="onOverviewChanged"
+                        :map-id="mapId"
+                        :is-compact="isCompact"
+                        v-if="enabled"
+                        ref="systemInfo"
+                        @cupdated="onOverviewUpdated"
+                        @changed="onOverviewChanged"
+                        @highlight-route="onHighlightRoute"
+                        @hubs-updated="onHubsUpdated"
                     ></overview>
                 </md-tab>
 
@@ -50,7 +53,6 @@
     import Overview from "./systemPanel/Overview";
     import Signatures from "./systemPanel/Signatures";
     import api from "../../../js/api.js";
-    // import CustomPromise from "../../../js/env/promise";
 
     export default {
         name: "SystemPanel",
@@ -80,22 +82,7 @@
             this.mapId = null;
             this.systemId = null;
             this._so = new SizeObserver(null, this.refresh.bind(this));
-
-            // this.$nextTick(function () {
-            //     this.$refs.systemInfo.$on("cupdated", function () {
-            //         this.$refs.tabs.callResizeFunctions();
-            //     }.bind(this))
-            // }.bind(this))
-
-            //
-            // this.longRefresh().then(function(){
-            //     this.$refs.systemInfo.$on("cupdated", function () {
-            //         // this.$refs.tabs.callResizeFunctions();
-            //         this.refresh();
-            //     }.bind(this))
-            // }.bind(this))
         },
-
         beforeDestroy: function () {
             this.showPopup = false;
             this._rtid !== -1 && clearTimeout(this._rtid);
@@ -109,35 +96,18 @@
             this.panelTitle = "";
             window.focus();
         },
-        // updated: function () {
-        //     this.$nextTick(function () {
-        //         // Код, который будет запущен только после
-        //         // обновления всех представлений
-        //         this.refresh();
-        //     })
-        // },
         methods: {
-            // longRefresh: function () {
-            //     var pr = new CustomPromise();
-            //     if(!this.$refs.systemInfo) {
-            //         setTimeout(this.longRefresh.bind(this), 10)
-            //     } else {
-            //         pr.resolve();
-            //     }
-            //
-            //     return pr.native;
-            // },
-            // API
-
+            onHighlightRoute(route) {
+                this.$emit("highlight-route", route);
+            },
+            onHubsUpdated(hubs) {
+                this.$emit("hubs-updated", hubs);
+            },
             onOverviewUpdated: function () {
                 this.$nextTick(function () {
                     this.$refs.tabs.setIndicatorStyles();
-                }.bind(this))
-
-                // this.refresh();
+                }.bind(this));
             },
-
-            // eslint-disable-next-line no-unused-vars
             onOverviewChanged (data) {
                 let isValid = false;
                 for (let key in data) {
@@ -204,16 +174,12 @@
 
                 switch (this.currentTab) {
                     case "tab-overview":
-                        this.$refs.systemInfo.update(this.currentSystemData);
+                        this.$refs.systemInfo.update(this.mapId, this.currentSystemData);
                         break;
                     case "tab-signatures":
                         this.$refs.signatures.update(this.currentSystemData.signatures);
                         break;
                 }
-
-                // setTimeout(function () {
-                //     this.refresh();
-                // }.bind(this), 300);
             },
 
             onTabChange: function (_tabName) {
@@ -224,7 +190,7 @@
 
                 switch (_tabName) {
                     case "tab-overview":
-                        this.$refs.systemInfo.update(this.currentSystemData);
+                        this.$refs.systemInfo.update(this.mapId, this.currentSystemData);
                         break;
                     case "tab-signatures":
                         this.$refs.signatures.load(this.mapId, this.systemId);
@@ -245,7 +211,28 @@
                     }
                 }.bind(this));
 
-            }
+            },
+            systemRemoved (data) {
+                this.$refs.systemInfo && this.$refs.systemInfo.systemRemoved(data);
+            },
+            systemAdded (data) {
+                this.$refs.systemInfo && this.$refs.systemInfo.systemAdded(data);
+            },
+            linkRemoved (data) {
+                this.$refs.systemInfo && this.$refs.systemInfo.linkRemoved(data);
+            },
+            linkUpdated (data) {
+                this.$refs.systemInfo && this.$refs.systemInfo.linkUpdated(data);
+            },
+            linkAdded (data) {
+                this.$refs.systemInfo && this.$refs.systemInfo.linkAdded(data);
+            },
+            addHub (solarSystemId) {
+                this.$refs.systemInfo && this.$refs.systemInfo.addHub(solarSystemId);
+            },
+            removeHub (solarSystemId) {
+                this.$refs.systemInfo && this.$refs.systemInfo.removeHub(solarSystemId);
+            },
         }
     }
 

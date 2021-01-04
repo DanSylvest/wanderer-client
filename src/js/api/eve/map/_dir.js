@@ -3,6 +3,7 @@
  */
 
 import link from "./link/_dir";
+import routes from "./routes/_dir";
 import solarSystem from "./solarSystem/_dir";
 
 import add from "./add";
@@ -19,6 +20,7 @@ import updateWatchStatus from "./updateWatchStatus";
 
 export default {
     link: link,
+    routes: routes,
     solarSystem: solarSystem,
 
     add: add,

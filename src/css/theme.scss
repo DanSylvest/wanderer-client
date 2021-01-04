@@ -20,9 +20,9 @@
     }
 
     &-layout-secondary {
-        color: $fg-primary;
-        background-color: $bg-secondary;
-        border-color: $border-color-primary-6;
+        color: $fg-primary !important;
+        background-color: $bg-secondary !important;
+        border-color: $border-color-primary-6 !important;
     }
 
     &-color-primary-2 {

@@ -46,7 +46,7 @@
             </md-empty-state>
         </div>
         <div style="height: 0">
-            <system-panel ref="systemPanel" />
+            <system-panel ref="systemPanel" @highlight-route="onHighlightRoute" @hubs-updated="onHubsUpdated" />
 
             <context-menu :c-activated.sync="linkCMActive" :c-offset-x="linkCMOffsetX" :c-offset-y="linkCMOffsetY" @c-closed="onClosedLinkContext">
                 <context-menu-item c-title="Time state" c-icon="access_time" :c-is-submenu="true" >
@@ -74,20 +74,33 @@
                 <context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">
                     <context-menu-item c-title="Clear" c-icon="block" @click="onClearTag"/>
                     <context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
-                        <context-menu-item :c-title="item.toString()" v-for="item in letters" :key="item" @click="onLetterClick(item)" />
+                        <context-menu-item
+                            :c-active="item.active"
+                            :c-title="item.tagName.toString()"
+                            v-for="item in letters"
+                            :key="item.uid"
+                            @click="onLetterClick(item.tagName)"
+                        />
                     </context-menu-item>
                     <context-menu-item c-title="Digit" c-icon="edit" :c-is-submenu="true">
-                        <context-menu-item :c-title="item.toString()" v-for="item in digits" :key="item" @click="onDigitClick(item)" />
+                        <context-menu-item
+                            :c-active="item.active"
+                            :c-title="item.tagName.toString()"
+                            v-for="item in digits"
+                            :key="item.uid"
+                            @click="onDigitClick(item.tagName)"
+                        />
                     </context-menu-item>
                 </context-menu-item>
                 <context-menu-item c-title="Status" c-icon="report_problem" :c-is-submenu="true">
                     <context-menu-item
-                            :c-title="item.name"
-                            :c-icon="item.icon"
-                            :c-icon-class="'eve-system-status-color-' + item.id"
-                            v-for="(item, index) in statuses"
-                            :key="item.name"
-                            @click="onStatusClick(index)"
+                        :c-active="item.active"
+                        :c-title="item.name"
+                        :c-icon="item.icon"
+                        :c-icon-class="'eve-system-status-color-' + item.id"
+                        v-for="(item, index) in statuses"
+                        :key="item.uid"
+                        @click="onStatusClick(index)"
                     />
                 </context-menu-item>
                 <context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
@@ -98,6 +111,10 @@
                         <context-menu-item c-title="Add Waypoint Back" c-icon="call_missed_outgoing" @click="onAddWaypointBack(item.id)" />
                     </context-menu-item>
                 </context-menu-item>
+
+                <context-menu-item c-title="Mark as hub" c-icon="near_me" v-show="systemContextMenuMarkAsHub" @click="onMarkAsHub(true)" />
+                <context-menu-item c-title="Unmark as hub" c-icon="near_me_disabled" v-show="!systemContextMenuMarkAsHub" @click="onMarkAsHub(false)" />
+
                 <context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
                 <context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
                 <context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
@@ -121,7 +138,7 @@
 
         <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
 
-        <system-add-dialog ref="systemAddDialogRef"></system-add-dialog>
+        <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
     </div>
 </template>
 
@@ -159,18 +176,16 @@
         ],
         data: function () {
             return {
-                digits: [
-                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-                ],
-                letters: [
-                    "A","B","C","D","E","F","X","Y","Z",
-                ],
-                statuses: environment.statuses.slice(),
+                digits: [],
+                letters: [],
+                statuses: [],
+                uidCounter: 0, // this is need for correct updating statuses active item
                 selectedMap: null,
                 allowedMaps: [],
                 showMapEmpty: false,
                 isLoaded: false,
                 systemContextMenuLockedItem: false,
+                systemContextMenuMarkAsHub: true,
                 isAutoAlignment: false,
                 characters: [],
 
@@ -191,9 +206,9 @@
                 systemsCMOffsetX: 0,
                 systemsCMOffsetY: 0,
 
+                systemsTooltipDisplayed: [],
 
-
-                systemsTooltipDisplayed: []
+                isActiveSystemAddDialog: false
             }
         },
         mounted: function () {
@@ -341,13 +356,19 @@
             // API
 
             // HANDLERS
+            onSystemAdd (solarSystemId) {
+                api.eve.map.solarSystem.addManual(this.mapController.mapId, solarSystemId, this.tempCoord.x, this.tempCoord.y).then(()=>{
+                    this.isActiveSystemAddDialog = false;
+                }, (errMsg) => {
+                    alert(errMsg);
+                });
+            },
             onRootCMClosed: function () {
 
             },
             onRootCMAddSystem: function (event) {
-                let coord = this.mapController.convertPosition(event.x, event.y);
-
-                this.$refs.systemAddDialogRef.show(this.mapController.mapId, coord.x, coord.y);
+                this.tempCoord = this.mapController.convertPosition(event.x, event.y);
+                this.isActiveSystemAddDialog = true;
             },
 
             onSystemCopyName: function () {
@@ -363,38 +384,44 @@
             },
 
             onLetterClick: function (_letter) {
-                this.selectedDigit = null;
-                this.selectedLetter = _letter;
-
                 api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     tag: _letter
                 });
+                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                systemInfo.tag = _letter;
             },
             onDigitClick: function (_digit) {
-                this.selectedLetter = null;
-                this.selectedDigit = _digit;
-
                 api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     tag: _digit
                 });
+                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                systemInfo.tag = _digit;
+            },
+            onClearTag: function () {
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
+                    tag: ""
+                });
+                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                systemInfo.tag = "";
             },
             onStatusClick (status) {
                 api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
                     status: status
                 });
-            },
-            onClearTag: function () {
-                this.selectedDigit = null;
-                this.selectedLetter = null;
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    tag: ""
-                });
+
+                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                systemInfo.status = status;
             },
             onMapSelected: function(_mapId) {
                 cookie.set("selectedMap", _mapId);
 
                 this._destroyMap();
-                api.eve.map.updateWatchStatus({mapId: _mapId, status: true}).then(() => this._initMap(_mapId));
+                api.eve.map.updateWatchStatus({mapId: _mapId, status: true})
+                    .then(() => api.eve.map.routes.hubs(_mapId))
+                    .then((hubs) => {
+                        this.hubs = hubs;
+                        this._initMap(_mapId)
+                    });
             },
             onAAClick: function () {
                 this.isAutoAlignment = !this.isAutoAlignment;
@@ -485,6 +512,28 @@
             onAddWaypointBack: function (_characterId) {
                 api.eve.map.waypoint(_characterId, 2, this._currentContextSystem);
             },
+            onHighlightRoute (route) {
+                this.mapController.highlightRoute(route);
+            },
+            onHubsUpdated (hubs) {
+                this.hubs = hubs;
+            },
+            onMarkAsHub(bool) {
+                if(bool) {
+                    api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem).then(() => {
+                        this.$refs.systemPanel.addHub(this._currentContextSystem);
+                    }, errMsg => {
+                        alert(errMsg);
+                    });
+                    this.hubs.push(this._currentContextSystem);
+                } else {
+                    api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem).then (() => {
+                        this.$refs.systemPanel.removeHub(this._currentContextSystem);
+                    });
+                    this.hubs.removeByValue(this._currentContextSystem);
+                }
+            },
+
             // HANDLERS
 
 
@@ -518,6 +567,7 @@
                 this.mapController.on("systemsContextMenu", this._onSystemsContextMenu.bind(this));
                 this.mapController.on("systemOpenInfo", this._onSystemOpenInfo.bind(this));
                 this.mapController.on("systemChange", this._onSystemChange.bind(this));
+                this.mapController.on("linkChanged", this._onLinkChanged.bind(this));
                 this.mapController.on("dragStarted", this._onDragStarted.bind(this));
                 this.mapController.on("mapClicked", this._onMapClicked.bind(this));
                 this.mapController.on("offsetChanged", this._onMapOffsetChanged.bind(this));
@@ -554,6 +604,28 @@
                 this.systemContextMenuLockedItem = systemInfo.isLocked;
                 this.systemCMOffsetX = _event.x + 10;
                 this.systemCMOffsetY = _event.y + 10;
+
+                this.statuses = environment.statuses.slice().map((x, i) => {
+                    x.active = i === systemInfo.status;
+                    x.uid = this.uidCounter++;
+                    return x;
+                });
+
+                this.digits = environment.digits.map(x => ({
+                    active: x.toString() === systemInfo.tag,
+                    uid: this.uidCounter++,
+                    tagName: x
+                }));
+
+                this.letters = environment.letters.map(x => ({
+                    active: x.toString() === systemInfo.tag,
+                    uid: this.uidCounter++,
+                    tagName: x
+                }));
+
+                this.systemContextMenuMarkAsHub = this.hubs.indexOf(this._currentContextSystem) === -1;
+                // eslint-disable-next-line no-debugger
+                // debugger
 
                 switch (systemInfo.systemType) {
                     case 0:
@@ -618,6 +690,7 @@
             _onMapClicked: function () {
                 this.mapController.map.deselectAll();
                 this._offContexts();
+                this.mapController.offAllShade();
             },
             _onMapOffsetChanged: function (_offset) {
                 cookie.set(`offset_${this.mapController.mapId}`, `${_offset.x},${_offset.y}`, {expires: 60 * 60 * 24 * 365 * 1000});
@@ -633,12 +706,14 @@
                 this._destroyMap();
                 this.selectMapOnStart();
             },
-            _onSystemChange: function (_data) {
+            _onSystemChange (_data) {
                 switch (_data.type) {
                     case "removed":
                         if(_data.systemId === this._currentOpenSystem)
                             this.$refs.systemPanel.hide();
 
+                        this.mapController.offAllShade();
+                        this.$refs.systemPanel.systemRemoved(_data.data);
                         break;
                     case "systemUpdated":
                         if(_data.systemId === this._currentOpenSystem)
@@ -646,7 +721,28 @@
                         break;
                     case "bulk":
                     case "updatedSystemsPosition":
+                        break;
                     case "add":
+                        this.mapController.offAllShade();
+                        this.$refs.systemPanel.systemAdded(_data.data);
+                        break;
+                }
+            },
+            _onLinkChanged (_data) {
+                switch (_data.type) {
+                    case "removed":
+                        this.mapController.offAllShade();
+                        this.$refs.systemPanel.linkRemoved(_data.data);
+                        break;
+                    case "bulk":
+                        break;
+                    case "linkUpdated":
+                        this.mapController.offAllShade();
+                        this.$refs.systemPanel.linkUpdated(_data.data);
+                        break;
+                    case "add":
+                        this.mapController.offAllShade();
+                        this.$refs.systemPanel.linkAdded(_data.data);
                         break;
                 }
             }

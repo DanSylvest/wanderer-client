@@ -37,7 +37,7 @@
             </div>
 
             <md-dialog-actions>
-                <md-button class="md-primary md-accent" @click="showEditDialog = false">Close</md-button>
+                <md-button class="md-primary md-accent" @click="close">Close</md-button>
                 <md-button
                         class="md-primary md-raised"
                         @click="onEditSubmit"
@@ -52,22 +52,24 @@
 <script>
     import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
-    // import exists from "../../../js/env/tools/exists";
     import SpamFilter from "../../../js/env/spamFilter.js";
     import environment from "../../../js/core/map/environment.js";
 
     export default {
         name: "MapsEditDialogSimple",
-        props: [
-
-        ],
+        props: {
+            activated: {
+                type: Boolean,
+                default: false
+            },
+        },
         data: function () {
             return {
                 systems: [],
                 currentSystem: "",
                 selectedValue: "",
-                showEditDialog: false,
-                formButtonDisabled: true
+                showEditDialog: this.activated,
+                formButtonDisabled: true,
             }
         },
         mounted: function () {
@@ -81,21 +83,12 @@
             this._otid !== -1 && clearTimeout(this._otid);
             this._otid = -1;
         },
+        watch: {
+            activated: function (val) {
+                this.showEditDialog = val;
+            }
+        },
         methods: {
-            show: function (mapId, x, y) {
-                this._otid !== -1 && clearTimeout(this._otid);
-                this._otid = -1;
-
-                this._showPromise = new CustomPromise();
-
-                this.mapId = mapId;
-                this.x = x;
-                this.y = y;
-                this.showEditDialog = true;
-
-                return this._showPromise.native;
-            },
-
             close: function () {
                 this._otid !== -1 && clearTimeout(this._otid);
                 this._otid = -1;
@@ -104,7 +97,7 @@
                 this.selectedItem = null;
                 this.systems = [];
                 this.formButtonDisabled = true;
-                this.showEditDialog = false;
+                this.$emit("update:activated", false);
             },
 
             // ========= SEARCHING GROUPS PART ===========
@@ -161,7 +154,7 @@
                     case 0:
                     case 1:
                     case 2:
-                        colorClass = environment.securityClasses[data.security];
+                        colorClass = environment.securityForegroundClasses[data.security];
                         break;
                     case 3:
                     case 4:
@@ -185,13 +178,7 @@
                 this.close();
             },
             onEditSubmit: function () {
-                api.eve.map.solarSystem.addManual(this.mapId, this.selectedItem.solarSystemId, this.x, this.y).then(()=>{
-                    this.close();
-                }, (errMsg) => {
-                    alert(errMsg);
-                });
-            },
-            onEditFormChange: function (/*_event*/) {
+                this.$emit("system-selected", this.selectedItem.solarSystemId);
             },
             // ========= EDITING DIALOG PART ===========
 
@@ -202,8 +189,7 @@
                     // eslint-disable-next-line no-debugger
                     debugger
                 }.bind(this))
-            },
-
+            }
         }
     }
 </script>

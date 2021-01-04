@@ -13,6 +13,14 @@ Array.prototype.removeByValue = function removeByValue (value) {
     index !== -1 && this.removeByIndex();
 }
 
+Array.prototype.first = function () {
+    return this[0];
+}
+
+Array.prototype.last = function () {
+    return this[this.length - 1];
+}
+
 Boolean.fromString = function (_val) {
     if(typeof _val === "boolean")
         return _val;

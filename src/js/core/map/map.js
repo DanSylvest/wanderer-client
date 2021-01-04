@@ -99,7 +99,6 @@ class Map extends Emitter {
         this.render();
     }
     _createActionObservers () {
-        // try {
         this._ao2 = new ActionObserver({
             offOnOut: false,
             container: this.svg.el,
@@ -107,7 +106,6 @@ class Map extends Emitter {
                 return !_event.originalEvent.ctrlKey && !_event.originalEvent.shiftKey && !this.findMarker(_event.mouse);
             }.bind(this)
         });
-// } catch(e) {alert(JSON.stringify(e))}
         let rlStarted = null;
         let savedAxis = null;
 

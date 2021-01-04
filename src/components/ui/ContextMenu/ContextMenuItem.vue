@@ -1,8 +1,8 @@
 <template>
     <md-content
-            class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb"
-            :class="{active: smActive}"
-            @click="onClick"
+        class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb"
+        :class="{active: smActive, 'item-activated': active}"
+        @click="onClick"
     >
         <div class="wd-context-item-content wd nowrap flex flex-align-center">
             <md-icon v-show="icon.length > 0" :class="'wd-context-expand-icon wd font-size-large ' + iconClass">{{icon}}</md-icon>
@@ -43,6 +43,10 @@
             cIconClass: {
                 type: String,
                 default: ""
+            },
+            cActive: {
+                type: Boolean,
+                default: false
             }
         },
         data: function () {
@@ -55,6 +59,7 @@
                 icon: this.cIcon,
                 iconClass: this.cIconClass,
                 isSubmenu: this.cIsSubmenu,
+                active: this.cActive,
             }
         },
         mounted: function () {
@@ -189,6 +194,10 @@
 
             &:active {
                 background-color: transparentize($button-closed-color, 0.35);
+            }
+
+            &.item-activated {
+                background-color: transparentize($button-closed-color, 0.65);
             }
 
             & > span {

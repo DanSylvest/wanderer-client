@@ -28,6 +28,11 @@ body {
         align-items: center;
     }
 
+
+    &.flex-align-end {
+        align-items: end;
+    }
+
     &.flex-h-top {
         align-items: start;
     }
@@ -108,6 +113,14 @@ body {
 
     .hidden {
         display: none;
+    }
+
+    &.initial-height {
+        height: initial !important;
+    }
+
+    &.initial-line-height {
+        line-height: 22px !important;
     }
 }
 

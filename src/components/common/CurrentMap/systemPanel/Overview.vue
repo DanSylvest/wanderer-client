@@ -69,17 +69,15 @@
                 </md-card>
 
                 <!--       routes  (when compact)      -->
-                <md-card class="wd-module-card" v-if="localIsCompact">
-                    <md-card-header>
-                        <div class="wd-system-overview__card-header">
-                            <div>Routes</div>
-                        </div>
-                    </md-card-header>
-
-                    <md-card-content>
-
-                    </md-card-content>
-                </md-card>
+                <routes
+                    :key="routesUpdater"
+                    class="wd-module-card"
+                    :map-id="mapId"
+                    :solar-system-id="solarSystemId"
+                    v-if="localIsCompact"
+                    @highlight-route="onHighlightRoute"
+                    @hubs-updated="onHubsUpdated"
+                />
             </div>
             <div class="wd-content__module" v-if="!localIsCompact || showEffect">
                 <!--       Effect   (when compact)      -->
@@ -98,17 +96,15 @@
                 </md-card>
 
                 <!--       routes  (when full)      -->
-                <md-card class="wd-module-card" v-if="!localIsCompact">
-                    <md-card-header>
-                        <div class="wd-system-overview__card-header">
-                            <div>Routes</div>
-                        </div>
-                    </md-card-header>
-
-                    <md-card-content>
-
-                    </md-card-content>
-                </md-card>
+                <routes
+                    :key="routesUpdater"
+                    class="wd-module-card"
+                    :map-id="mapId"
+                    :solar-system-id="solarSystemId"
+                    v-if="!localIsCompact"
+                    @highlight-route="onHighlightRoute"
+                    @hubs-updated="onHubsUpdated"
+                />
             </div>
             <div class="wd-content__module">
                 <!--       description      -->
@@ -130,9 +126,13 @@
     import exists from "../../../../js/env/tools/exists";
     import environment from "../../../../js/core/map/environment";
     import SpamFilter from "../../../../js/env/spamFilter.js";
+    import Routes from "./Overview/Routes.vue";
 
     export default {
         name: "Overview",
+        components : {
+            Routes
+        },
         props: {
             isCompact: {
                 type: Boolean,
@@ -167,7 +167,11 @@
                 savingDescription: false,
 
                 description: "",
-                localIsCompact: this.isCompact
+                localIsCompact: this.isCompact,
+                mapId: null,
+                solarSystemId: null,
+
+                routesUpdater: 0
             }
         },
         watch: {
@@ -176,25 +180,25 @@
             }
         },
         mounted: function () {
-            // this._so = new SizeObserver(this.$el, this._onResize.bind(this));
             this._sfInput = new SpamFilter(this._inputChanged.bind(this), 5000);
             this._descriptionIsNotSetted = true;
             this.needToSave = true;
         },
         beforeDestroy: function () {
-            // this._so.destructor();
-            // delete this._so;
+
         },
         updated() {
             this.$emit("cupdated")
         },
         methods: {
+            onHighlightRoute (route) {
+                this.$emit("highlight-route", route);
+            },
+            onHubsUpdated (hubs) {
+                this.$emit("hubs-updated", hubs);
+            },
             getStaticClassColor: function (_staticClass) {
                 return environment.typeClasses[_staticClass];
-            },
-            _onResize: function () {
-                // eslint-disable-next-line no-debugger
-                debugger;
             },
             refresh: function () {
 
@@ -214,13 +218,15 @@
                     description: event
                 });
             },
-            update: function (_data) {
+            update: function (mapId, _data) {
+                this.mapId = mapId;
+                this.solarSystemId = _data.id;
                 this.systemName = _data.name;
                 this.regionName = _data.regionName;
                 this.constellationName = _data.constellationName;
                 this.security = _data.security;
                 this.statics = _data.systemData.statics || [];
-                this.securityClass = environment.securityClasses[_data.security];
+                this.securityClass = environment.securityForegroundClasses[_data.security];
                 this.kind = _data.systemData.typeDescription;
                 this.kindClass = environment.kindClassed[_data.systemType];
                 this.status = _data.status;
@@ -271,8 +277,6 @@
                 } else {
                     this.showEffect = false;
                 }
-
-                // debugger;
             },
             updateDescription (description, isUpdateModel) {
                 if(isUpdateModel && !exists(description) || description.length === 0 || description === this.description) {
@@ -286,7 +290,28 @@
                     this._descriptionIsNotSetted = false;
                     this.needToSave = false;
                 }
-            }
+            },
+            systemRemoved (/*data*/) {
+                this.routesUpdater += 1;
+            },
+            systemAdded (/*data*/) {
+                this.routesUpdater += 1;
+            },
+            linkRemoved (/*data*/) {
+                this.routesUpdater += 1;
+            },
+            linkUpdated (/*data*/) {
+                this.routesUpdater += 1;
+            },
+            linkAdded (/*data*/) {
+                this.routesUpdater += 1;
+            },
+            addHub (/*solarSystemId*/) {
+                this.routesUpdater += 1;
+            },
+            removeHub (/*solarSystemId*/) {
+                this.routesUpdater += 1;
+            },
         }
     }
 
@@ -306,9 +331,6 @@
 
         & > .wd-content__module {
             width: 100%;
-        }
-
-        & > .wd-content__module {
             grid-column-start: 1;
             grid-column-end: 3;
         }
@@ -348,11 +370,9 @@
             padding-bottom: 5px;
         }
 
-        & {
-            &__card-header {
-                border-bottom: 1px solid $border-color-primary-4;
-                padding-bottom: 5px;
-            }
+        .wd-system-overview__card-header {
+            border-bottom: 1px solid $border-color-primary-4;
+            padding-bottom: 5px;
         }
 
         .wd-system-overview__header {

@@ -5,7 +5,7 @@
         </div>
         <div v-show="loaded">
             <div class="wd-system-card__header">
-                <div :class="securityClass + ' solar-system-security'">{{securityStatus}}</div>
+                <div :class="typeNameClass">{{typeName}}</div>
                 <div class="solar-system-name">{{solarSystemName}}</div>
                 <div class="solar-system-effect wd-color-primary-2" v-if="showEffect">
                     [<span :class="effectClass">{{effectName}}</span>]
@@ -34,6 +34,7 @@
     import api from "../../../js/api";
     import environment from "../../../js/core/map/environment";
     import exists from "../../../js/env/tools/exists";
+    import extend from "../../../js/env/tools/extend.js";
 
     export default {
         name: "SystemCard",
@@ -45,6 +46,14 @@
             cMapId: {
                 type: String,
                 default: null
+            },
+            data: {
+                type: Object,
+                default: null
+            },
+            isLoadCharData: {
+                type: Boolean,
+                default: true
             }
         },
         data: function () {
@@ -63,52 +72,110 @@
                 effectName: "",
                 status: 0,
                 statusName: "",
-                statusClass: ""
+                statusClass: "",
+                typeName: "",
+                typeNameClass: "",
+                localData: this.data,
+                localIsLoadCharData: this.isLoadCharData,
             }
         },
         mounted: function () {
-
-            api.eve.map.solarSystem.info(this.mapId, this.solarSystemId).then(function(_data){
-                this.loaded = true;
-                this.solarSystemName = _data.name;
-                this.constellationName = _data.constellationName;
-                this.regionName = _data.regionName;
-                this.securityStatus = _data.security;
-                this.securityClass = environment.securityClasses[_data.security];
-
-                this.status = _data.status;
-                this.statusName = environment.statuses[_data.status].name;
-                this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
-
-                if(exists(_data.systemData.effectType)) {
-                    this.showEffect = true;
-                    this.effectClass = environment.effects[_data.systemData.effectType];
-                    this.effectName = _data.systemData.effectName;
-                } else {
-                    this.showEffect = false;
-                }
-
-                return Promise.all(_data.onlineCharacters.map(function (_characterId) {
-                    return api.eve.character.info(_characterId, "all")
-                }.bind(this)));
-
-            }.bind(this)).then(function(_characters){
-                this.characters = _characters;
-                // eslint-disable-next-line no-unused-vars
-            }.bind(this)).catch(function(_err){
-                // eslint-disable-next-line no-debugger
-                debugger
-            }.bind(this))
+            if(!exists(this.localData)) {
+                api.eve.map.solarSystem.info(this.mapId, this.solarSystemId).then(data => {
+                    this.setData(data);
+                }, errMsg => {
+                    alert(errMsg);
+                });
+            } else {
+                this.setData(this.localData);
+            }
         },
         beforeDestroy: function () {
 
 
         },
         methods: {
+            setData (_data) {
+                _data.systemData && extend(_data, _data.systemData)
+                this.systemData = _data;
+
+                this.loaded = true;
+                this.solarSystemName = _data.solarSystemName;
+                this.constellationName = _data.constellationName;
+                this.regionName = _data.regionName;
+
+                if(exists(_data.status)) {
+                    this.status = _data.status;
+                    this.statusName = environment.statuses[_data.status].name;
+                    this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
+                }
+
+                let data = _data.systemData;
+                if(!exists(data)) {
+                    data = {
+                        effectType: _data.effectType !== "" ? _data.effectType : undefined,
+                        effectName: _data.effectName !== "" ? _data.effectName : undefined,
+                    }
+                }
+
+                if(exists(data.effectType)) {
+                    this.showEffect = true;
+                    this.effectClass = environment.effects[data.effectType];
+                    this.effectName = data.effectName;
+                } else {
+                    this.showEffect = false;
+                }
+
+                this.typeName = this.getTypeName();
+                this.typeNameClass = this.getTypeNameClasses();
+
+                if(this.localIsLoadCharData) {
+                    return Promise.all(_data.onlineCharacters.map(function (_characterId) {
+                        return api.eve.character.info(_characterId, "all")
+                    }.bind(this))).then(characters => {
+                        this.characters = characters;
+                    }, errMsg => {
+                        alert(errMsg);
+                    });
+                }
+            },
+
             // API
             refresh: function () {
 
+            },
+
+            getTypeName () {
+                switch (this.systemData.systemType) {
+                    case 0: // high-sec
+                    case 1: // low-sec
+                    case 2: // null-sec
+                        return this.systemData.security;
+                    case 3: // WH
+                    case 4: // Thera
+                        return this.systemData.typeName;
+                    case 5: // abyss
+                    case 6: // penalty?
+                    case 7: // Pochven?
+                        return this.systemData.security;
+                }
+            },
+            getTypeNameClasses () {
+                switch (this.systemData.systemType) {
+                    case 0: // high-sec
+                    case 1: // low-sec
+                    case 2: // null-sec
+                        return environment.securityForegroundClasses[this.systemData.security];
+                    case 3: // WH
+                    case 4: // Thera
+                        return environment.typeClasses[this.systemData.typeName];
+                    case 5: // abyss
+                    case 6: // penalty?
+                    case 7: // Pochven?
+                        return environment.kindClassed[this.systemData.systemType];
+                }
             }
+
         }
     }
 </script>

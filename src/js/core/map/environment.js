@@ -3,7 +3,14 @@
  */
 
 export default {
-    securityClasses : {
+    digits: [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    ],
+    letters: [
+        "A","B","C","D","E","F","X","Y","Z",
+    ],
+
+    securityForegroundClasses : {
         "1.0": "eve-security-color-10",
         "0.9": "eve-security-color-09",
         "0.8": "eve-security-color-08",
@@ -28,6 +35,31 @@ export default {
         "-1.0": "eve-security-color-m-10"
     },
 
+    securityBackgroundClasses : {
+        "1.0": "eve-security-background-10",
+        "0.9": "eve-security-background-09",
+        "0.8": "eve-security-background-08",
+        "0.7": "eve-security-background-07",
+        "0.6": "eve-security-background-06",
+        "0.5": "eve-security-background-05",
+        "0.4": "eve-security-background-04",
+        "0.3": "eve-security-background-03",
+        "0.2": "eve-security-background-02",
+        "0.1": "eve-security-background-01",
+        "0.0": "eve-security-background-00",
+        "-0.0": "eve-security-background-00",
+        "-0.1": "eve-security-background-m-01",
+        "-0.2": "eve-security-background-m-02",
+        "-0.3": "eve-security-background-m-03",
+        "-0.4": "eve-security-background-m-04",
+        "-0.5": "eve-security-background-m-05",
+        "-0.6": "eve-security-background-m-06",
+        "-0.7": "eve-security-background-m-07",
+        "-0.8": "eve-security-background-m-08",
+        "-0.9": "eve-security-background-m-09",
+        "-1.0": "eve-security-background-m-10"
+    },
+
     typeClasses : {
         "C1"  : "eve-wh-type-color-c1",
         "C2"  : "eve-wh-type-color-c2",
@@ -35,12 +67,27 @@ export default {
         "C4"  : "eve-wh-type-color-c4",
         "C5"  : "eve-wh-type-color-c5",
         "C6"  : "eve-wh-type-color-c6",
+        "C12" : "eve-wh-type-color-thera",
         "C13" : "eve-wh-type-color-c13",
         "D"   : "eve-wh-type-color-drifter",
-        "T"   : "eve-wh-type-color-thera",
         "H"   : "eve-wh-type-color-high",
         "L"   : "eve-wh-type-color-low",
         "N"   : "eve-wh-type-color-null"
+    },
+
+    typeBackgroundClasses : {
+        "C1"  : "eve-wh-type-background-c1",
+        "C2"  : "eve-wh-type-background-c2",
+        "C3"  : "eve-wh-type-background-c3",
+        "C4"  : "eve-wh-type-background-c4",
+        "C5"  : "eve-wh-type-background-c5",
+        "C6"  : "eve-wh-type-background-c6",
+        "C12" : "eve-wh-type-background-thera",
+        "C13" : "eve-wh-type-background-c13",
+        "D"   : "eve-wh-type-background-drifter",
+        "H"   : "eve-wh-type-background-high",
+        "L"   : "eve-wh-type-background-low",
+        "N"   : "eve-wh-type-background-null"
     },
 
     kindClassed : {
@@ -52,6 +99,18 @@ export default {
         "5" : "eve-kind-color-abyss",
         "6" : "eve-kind-color-penalty",
         "7" : "eve-kind-color-pochven",
+    },
+
+
+    kindBackgroundClasses : {
+        "0" : "eve-kind-background-high",
+        "1" : "eve-kind-background-low",
+        "2" : "eve-kind-background-null",
+        "3" : "eve-kind-background-wh",
+        "4" : "eve-kind-background-thera",
+        "5" : "eve-kind-background-abyss",
+        "6" : "eve-kind-background-penalty",
+        "7" : "eve-kind-background-pochven",
     },
 
     effects : {

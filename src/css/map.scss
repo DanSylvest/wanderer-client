@@ -255,40 +255,76 @@ $active-color: #7be1ff;
 .text-eve-wh-effect-color-republicStellarObservatory { color: $eve-effect-republicStellarObservatory; }
 .text-eve-wh-effect-color-federalStellarObservatory { color: $eve-effect-federalStellarObservatory; }
 
-.eve-security-color-10 { color: $eve-security-color-10; fill: $eve-security-color-10; }
-.eve-security-color-09 { color: $eve-security-color-09; fill: $eve-security-color-09; }
-.eve-security-color-08 { color: $eve-security-color-08; fill: $eve-security-color-08; }
-.eve-security-color-07 { color: $eve-security-color-07; fill: $eve-security-color-07; }
-.eve-security-color-06 { color: $eve-security-color-06; fill: $eve-security-color-06; }
-.eve-security-color-05 { color: $eve-security-color-05; fill: $eve-security-color-05; }
-.eve-security-color-04 { color: $eve-security-color-04; fill: $eve-security-color-04; }
-.eve-security-color-03 { color: $eve-security-color-03; fill: $eve-security-color-03; }
-.eve-security-color-02 { color: $eve-security-color-02; fill: $eve-security-color-02; }
-.eve-security-color-01 { color: $eve-security-color-01; fill: $eve-security-color-01; }
-.eve-security-color-00 { color: $eve-security-color-00; fill: $eve-security-color-00; }
-.eve-security-color-m-01 { color: $eve-security-color-m-01; fill: $eve-security-color-m-01; }
-.eve-security-color-m-02 { color: $eve-security-color-m-02; fill: $eve-security-color-m-02; }
-.eve-security-color-m-03 { color: $eve-security-color-m-03; fill: $eve-security-color-m-03; }
-.eve-security-color-m-04 { color: $eve-security-color-m-04; fill: $eve-security-color-m-04; }
-.eve-security-color-m-05 { color: $eve-security-color-m-05; fill: $eve-security-color-m-05; }
-.eve-security-color-m-06 { color: $eve-security-color-m-06; fill: $eve-security-color-m-06; }
-.eve-security-color-m-07 { color: $eve-security-color-m-07; fill: $eve-security-color-m-07; }
-.eve-security-color-m-08 { color: $eve-security-color-m-08; fill: $eve-security-color-m-08; }
-.eve-security-color-m-09 { color: $eve-security-color-m-09; fill: $eve-security-color-m-09; }
-.eve-security-color-m-10 { color: $eve-security-color-m-10; fill: $eve-security-color-m-10; }
+.eve-security-color-10 { color: $eve-security-color-10 !important; fill: $eve-security-color-10; }
+.eve-security-color-09 { color: $eve-security-color-09 !important; fill: $eve-security-color-09; }
+.eve-security-color-08 { color: $eve-security-color-08 !important; fill: $eve-security-color-08; }
+.eve-security-color-07 { color: $eve-security-color-07 !important; fill: $eve-security-color-07; }
+.eve-security-color-06 { color: $eve-security-color-06 !important; fill: $eve-security-color-06; }
+.eve-security-color-05 { color: $eve-security-color-05 !important; fill: $eve-security-color-05; }
+.eve-security-color-04 { color: $eve-security-color-04 !important; fill: $eve-security-color-04; }
+.eve-security-color-03 { color: $eve-security-color-03 !important; fill: $eve-security-color-03; }
+.eve-security-color-02 { color: $eve-security-color-02 !important; fill: $eve-security-color-02; }
+.eve-security-color-01 { color: $eve-security-color-01 !important; fill: $eve-security-color-01; }
+.eve-security-color-00 { color: $eve-security-color-00 !important; fill: $eve-security-color-00; }
+.eve-security-color-m-01 { color: $eve-security-color-m-01 !important; fill: $eve-security-color-m-01; }
+.eve-security-color-m-02 { color: $eve-security-color-m-02 !important; fill: $eve-security-color-m-02; }
+.eve-security-color-m-03 { color: $eve-security-color-m-03 !important; fill: $eve-security-color-m-03; }
+.eve-security-color-m-04 { color: $eve-security-color-m-04 !important; fill: $eve-security-color-m-04; }
+.eve-security-color-m-05 { color: $eve-security-color-m-05 !important; fill: $eve-security-color-m-05; }
+.eve-security-color-m-06 { color: $eve-security-color-m-06 !important; fill: $eve-security-color-m-06; }
+.eve-security-color-m-07 { color: $eve-security-color-m-07 !important; fill: $eve-security-color-m-07; }
+.eve-security-color-m-08 { color: $eve-security-color-m-08 !important; fill: $eve-security-color-m-08; }
+.eve-security-color-m-09 { color: $eve-security-color-m-09 !important; fill: $eve-security-color-m-09; }
+.eve-security-color-m-10 { color: $eve-security-color-m-10 !important; fill: $eve-security-color-m-10; }
+
+.eve-security-background-10 { background-color: $eve-security-color-10; fill: $eve-security-color-10; }
+.eve-security-background-09 { background-color: $eve-security-color-09; fill: $eve-security-color-09; }
+.eve-security-background-08 { background-color: $eve-security-color-08; fill: $eve-security-color-08; }
+.eve-security-background-07 { background-color: $eve-security-color-07; fill: $eve-security-color-07; }
+.eve-security-background-06 { background-color: $eve-security-color-06; fill: $eve-security-color-06; }
+.eve-security-background-05 { background-color: $eve-security-color-05; fill: $eve-security-color-05; }
+.eve-security-background-04 { background-color: $eve-security-color-04; fill: $eve-security-color-04; }
+.eve-security-background-03 { background-color: $eve-security-color-03; fill: $eve-security-color-03; }
+.eve-security-background-02 { background-color: $eve-security-color-02; fill: $eve-security-color-02; }
+.eve-security-background-01 { background-color: $eve-security-color-01; fill: $eve-security-color-01; }
+.eve-security-background-00 { background-color: $eve-security-color-00; fill: $eve-security-color-00; }
+.eve-security-background-m-01 { background-color: $eve-security-color-m-01; fill: $eve-security-color-m-01; }
+.eve-security-background-m-02 { background-color: $eve-security-color-m-02; fill: $eve-security-color-m-02; }
+.eve-security-background-m-03 { background-color: $eve-security-color-m-03; fill: $eve-security-color-m-03; }
+.eve-security-background-m-04 { background-color: $eve-security-color-m-04; fill: $eve-security-color-m-04; }
+.eve-security-background-m-05 { background-color: $eve-security-color-m-05; fill: $eve-security-color-m-05; }
+.eve-security-background-m-06 { background-color: $eve-security-color-m-06; fill: $eve-security-color-m-06; }
+.eve-security-background-m-07 { background-color: $eve-security-color-m-07; fill: $eve-security-color-m-07; }
+.eve-security-background-m-08 { background-color: $eve-security-color-m-08; fill: $eve-security-color-m-08; }
+.eve-security-background-m-09 { background-color: $eve-security-color-m-09; fill: $eve-security-color-m-09; }
+.eve-security-background-m-10 { background-color: $eve-security-color-m-10; fill: $eve-security-color-m-10; }
 
 .eve-wh-type-color-high { color: $eve-wh-type-color-high; fill: $eve-wh-type-color-high; font-weight: bold !important; }
 .eve-wh-type-color-low { color: $eve-wh-type-color-low; fill: $eve-wh-type-color-low; font-weight: bold !important; }
 .eve-wh-type-color-null { color: $eve-wh-type-color-null; fill: $eve-wh-type-color-null; font-weight: bold !important;}
-.eve-wh-type-color-c1 { color: $eve-wh-type-color-c1; fill: $eve-wh-type-color-c1; font-weight: bold !important; }
-.eve-wh-type-color-c2 { color: $eve-wh-type-color-c2; fill: $eve-wh-type-color-c2; font-weight: bold !important; }
-.eve-wh-type-color-c3 { color: $eve-wh-type-color-c3; fill: $eve-wh-type-color-c3; font-weight: bold !important; }
-.eve-wh-type-color-c4 { color: $eve-wh-type-color-c4; fill: $eve-wh-type-color-c4; font-weight: bold !important; }
-.eve-wh-type-color-c5 { color: $eve-wh-type-color-c5; fill: $eve-wh-type-color-c5; font-weight: bold !important; }
-.eve-wh-type-color-c6 { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; font-weight: bold !important; }
-.eve-wh-type-color-c13 { color: $eve-wh-type-color-c13; fill: $eve-wh-type-color-c13;  }
-.eve-wh-type-color-drifter { color: $eve-wh-type-color-drifter; fill: $eve-wh-type-color-drifter; }
-.eve-wh-type-color-thera { color: $eve-wh-type-color-thera; fill: $eve-wh-type-color-thera; }
+.eve-wh-type-color-c1 { color: $eve-wh-type-color-c1 !important; fill: $eve-wh-type-color-c1; font-weight: bold !important; }
+.eve-wh-type-color-c2 { color: $eve-wh-type-color-c2 !important; fill: $eve-wh-type-color-c2; font-weight: bold !important; }
+.eve-wh-type-color-c3 { color: $eve-wh-type-color-c3 !important; fill: $eve-wh-type-color-c3; font-weight: bold !important; }
+.eve-wh-type-color-c4 { color: $eve-wh-type-color-c4 !important; fill: $eve-wh-type-color-c4; font-weight: bold !important; }
+.eve-wh-type-color-c5 { color: $eve-wh-type-color-c5 !important; fill: $eve-wh-type-color-c5; font-weight: bold !important; }
+.eve-wh-type-color-c6 { color: $eve-wh-type-color-c6 !important; fill: $eve-wh-type-color-c6; font-weight: bold !important; }
+.eve-wh-type-color-c13 { color: $eve-wh-type-color-c13 !important; fill: $eve-wh-type-color-c13;  }
+.eve-wh-type-color-drifter { color: $eve-wh-type-color-drifter !important; fill: $eve-wh-type-color-drifter; }
+.eve-wh-type-color-thera { color: $eve-wh-type-color-thera !important; fill: $eve-wh-type-color-thera; }
+
+.eve-wh-type-background-high { background-color: $eve-wh-type-color-high; }
+.eve-wh-type-background-low { background-color: $eve-wh-type-color-low; }
+.eve-wh-type-background-null { background-color: $eve-wh-type-color-null; }
+.eve-wh-type-background-c1 { background-color: $eve-wh-type-color-c1; }
+.eve-wh-type-background-c2 { background-color: $eve-wh-type-color-c2; }
+.eve-wh-type-background-c3 { background-color: $eve-wh-type-color-c3; }
+.eve-wh-type-background-c4 { background-color: $eve-wh-type-color-c4; }
+.eve-wh-type-background-c5 { background-color: $eve-wh-type-color-c5; }
+.eve-wh-type-background-c6 { background-color: $eve-wh-type-color-c6; }
+.eve-wh-type-background-c13 { background-color: $eve-wh-type-color-c13; }
+.eve-wh-type-background-drifter { background-color: $eve-wh-type-color-drifter; }
+.eve-wh-type-background-thera { background-color: $eve-wh-type-color-thera; }
+
 
 .eve-kind-color-high { color: $eve-wh-type-color-high; fill: $eve-wh-type-color-high; }
 .eve-kind-color-low { color: $eve-wh-type-color-low; fill: $eve-wh-type-color-low; font-weight: bold; }
@@ -299,6 +335,15 @@ $active-color: #7be1ff;
 .eve-kind-color-penalty { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
 .eve-kind-color-pochven { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
 
+.eve-kind-background-high { background-color: $eve-wh-type-color-high; }
+.eve-kind-background-low { background-color: $eve-wh-type-color-low; }
+.eve-kind-background-null { background-color: $eve-wh-type-color-null; }
+.eve-kind-background-wh { background-color: $eve-wh-type-color-c6; }
+.eve-kind-background-thera { background-color: $eve-wh-type-color-thera; }
+.eve-kind-background-abyss { background-color: $eve-wh-type-color-c6; }
+.eve-kind-background-penalty { background-color: $eve-wh-type-color-c6; }
+.eve-kind-background-pochven { background-color: $eve-wh-type-color-c6; }
+
 .eve-system-status-color-unknown { }
 .eve-system-status-color-friendly {color: $eve-solar-system-status-color-friendly !important;}
 .eve-system-status-color-warning {color: $eve-solar-system-status-color-warning !important;}
@@ -306,3 +351,11 @@ $active-color: #7be1ff;
 .eve-system-status-color-targetSecondary {color: $eve-solar-system-status-color-targetSecondary !important;}
 .eve-system-status-color-dangerousPrimary {color: $eve-solar-system-status-color-dangerousPrimary !important;}
 .eve-system-status-color-dangerousSecondary {color: $eve-solar-system-status-color-dangerousSecondary !important;}
+
+.wd-route-system-shape-triangle {
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+}
+.wd-route-system-shape-circle {
+    border-radius: 40%;
+    //margin-left: 1px;
+}

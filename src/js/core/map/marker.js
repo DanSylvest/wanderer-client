@@ -153,7 +153,7 @@ class Marker extends Emitter{
                 case 0:
                 case 1:
                 case 2:
-                    colorClass = environment.securityClasses[_data.security];
+                    colorClass = environment.securityForegroundClasses[_data.security];
                     break;
                 case 3:
                 case 4:

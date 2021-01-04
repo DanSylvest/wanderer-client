@@ -202,6 +202,8 @@ class MapController extends Emitter {
                 }
                 break;
         }
+
+        this.emit("linkChanged", _data);
     }
     _onLinkContextMenu (_linkId, _event) {
         this.emit("linkContextMenu", _linkId, _event)
@@ -247,6 +249,42 @@ class MapController extends Emitter {
     }
     getSystem (_systemId) {
         return this.systems[_systemId]
+    }
+    highlightRoute (route) {
+        this.map.shadeAll(true);
+
+        let filteredSystems = route.filter(x => this.systems[x] !== undefined);
+
+        if(route.length > 1) {
+            let links = [];
+            for (let a = 1; a < filteredSystems.length; a++) {
+                let origin = route[a - 1];
+                let dest = route[a];
+                links.push(this.getLinkBySystems(origin, dest));
+            }
+
+            links.map(x => this.map.shadeLink(x, false));
+        }
+
+        filteredSystems.map(x => this.map.shadeMarker(this.systems[x].markerId, false));
+    }
+    offAllShade () {
+        this.map.shadeAll(false);
+    }
+    getLinkBySystems (origin, destination) {
+        origin = origin.toString();
+        destination = destination.toString();
+
+        for(let linkId in this.links) {
+            let link = this.links[linkId];
+
+            if(
+                origin === link.info.solarSystemSource && destination === link.info.solarSystemTarget
+                || destination === link.info.solarSystemSource && origin === link.info.solarSystemTarget
+            ) {
+                return link.uiLinkId;
+            }
+        }
     }
 }
 
