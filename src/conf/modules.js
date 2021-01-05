@@ -40,11 +40,17 @@ const modules = {
         componentName: "Maps",
         path: "common/Maps"
     },
-    groups: {
+    groupsOwn: {
         isProtected: true,
         isComponent: true,
-        componentName: "Groups",
-        path: "common/Groups"
+        componentName: "GroupsOwn",
+        path: "common/GroupsOwn"
+    },
+    groupsAllowed: {
+        isProtected: true,
+        isComponent: true,
+        componentName: "GroupsAllowed",
+        path: "common/GroupsAllowed"
     }
 }
 

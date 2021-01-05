@@ -180,17 +180,11 @@
                 let isValidName = validateName(this.formName, 3);
                 let isValidDescription = validateName(this.formDescription, 0);
 
-                this.setFieldState("Name", isValidName);
-                this.setFieldState("Description", isValidDescription);
-
                 let isValidCharacter = exists(this.charactersItem);
 
                 this.formButtonDisabled = !(isValidName && isValidDescription && isValidCharacter);
             },
             // ========= EDITING DIALOG PART ===========
-            setFieldState: function (_type, _field, _valid) {
-                this["form" + _field + "Icon"] = _valid ? "done": "warning";
-            },
             clearForm: function () {
                 this.formName = "";
                 this.formDescription = "";

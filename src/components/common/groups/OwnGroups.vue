@@ -7,31 +7,25 @@
             </md-button>
         </div>
 
-        <md-table v-if="groups.length > 0 && loaded" class="wd-own-groups-table">
-            <md-table-row>
-                <md-table-head style="width: 150px">Name</md-table-head>
-                <md-table-head style="width: 180px">Owner</md-table-head>
-                <md-table-head>Description</md-table-head>
-            </md-table-row>
-
+        <md-table v-model="groups" v-if="groups.length > 0 && loaded" class="wd-own-groups-table" md-fixed-header >
             <md-table-row
                 @contextmenu="onContextMenu(item.id, $event)"
                 @click="onRowClick(item.id, $event)"
                 class="cursor-pointer"
-                v-for="item in groups"
-                :key="item.id"
+                slot="md-table-row"
+                slot-scope="{ item }"
             >
-                <md-table-cell>{{item.name}}</md-table-cell>
-                <md-table-cell>{{item.owner}}</md-table-cell>
-                <md-table-cell>{{item.description}}</md-table-cell>
+                <md-table-cell md-sort-by="name" md-label="Name">{{item.name}}</md-table-cell>
+                <md-table-cell md-sort-by="owner"  md-label="Owner">{{item.owner}}</md-table-cell>
+                <md-table-cell md-sort-by="description"  md-label="Description">{{item.description}}</md-table-cell>
             </md-table-row>
         </md-table>
 
         <md-empty-state
-                v-if="groups.length === 0 && loaded"
-                md-icon="layers"
-                md-label="Create your group!"
-                md-description="Group allow you attach characters, corporations and alliances. Also you able to attach group to your own map."
+            v-if="groups.length === 0 && loaded"
+            md-icon="layers"
+            md-label="Create your group!"
+            md-description="Group allow you attach characters, corporations and alliances. Also you able to attach group to your own map."
         >
             <md-button class="md-dense md-primary md-raised" @click="onShowCreateDialog">
                 <span style="vertical-align: middle">Create</span>
@@ -52,7 +46,6 @@
     import ContextMenu from "../../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../../ui/ContextMenu/ContextMenuItem";
     import GroupEditDialog from "./GroupEditDialog";
-    import CustomPromise from "../../../js/env/promise";
 
     import api from "../../../js/api";
 
@@ -72,14 +65,12 @@
             }
         },
         beforeMount() {
-            this._mountedPromise = new CustomPromise();
         },
         mounted: function () {
             //todo this some bullshit but... i don't know how fix it
-            this._mountedPromise.resolve();
+            this.$nextTick().then(this._loadData);
         },
         beforeDestroy() {
-            this._mountedPromise.native.cancel();
         },
         methods: {
             _loadData: function () {
@@ -92,17 +83,6 @@
                     // eslint-disable-next-line no-debugger
                     debugger
                 }.bind(this))
-            },
-            close: function () {
-
-            },
-            load: function () {
-                // setTimeout(function () {
-                //     this._mountedPromise.native.then(this._loadData.bind(this));
-                // }.bind(this), 400)
-
-                this._loadData();
-                // this._loadData();
             },
             onRowClick: function (_groupId/*, _event*/) {
                 this.edit(_groupId);
@@ -185,10 +165,35 @@
         }
 
         & > .wd-own-groups-table {
+            height: calc(100vh - 118px);
+
+            .md-content.md-table-content {
+                height: initial !important;
+                max-height: initial !important;;
+            }
+
             &.md-card.md-table,
             &.md-table.md-theme-default .md-table-content,
             &.md-table.md-theme-default .md-table-alternate-header {
-                background-color: $bg-secondary;
+                background-color: $bg-primary;
+            }
+
+            .md-table-fixed-header {
+                padding-right: 0 !important;
+                background-color: $bg-secondary
+            }
+
+            .md-table-head,
+            .md-table-cell {
+                &:nth-child(2) {
+                    .md-table-cell-container {
+                        white-space: nowrap;
+                    }
+                }
+
+                &:nth-child(3) {
+                    width: 100%;
+                }
             }
         }
     }

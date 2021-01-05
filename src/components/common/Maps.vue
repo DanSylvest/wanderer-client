@@ -12,26 +12,26 @@
             </md-button>
         </div>
 
-        <div class="maps-content">
-            <md-table v-show="loaded && maps.length > 0" class="maps-table">
-                <md-table-row>
-                    <md-table-head style="width: 150px">Name</md-table-head>
-                    <md-table-head style="width: 180px">Owner</md-table-head>
-                    <md-table-head>Description</md-table-head>
-                </md-table-row>
-
-                <md-table-row @contextmenu="onContextMenu(map.id, $event)" @click="onMapRowClick(map.id, $event)" class="cursor-pointer" v-for="map in maps" :key="map.id">
-                    <md-table-cell>{{map.name}}</md-table-cell>
-                    <md-table-cell>{{map.owner}}</md-table-cell>
-                    <md-table-cell>{{map.description}}</md-table-cell>
+        <div class="maps-content md-scrollbar">
+            <md-table v-model="maps" v-show="loaded && maps.length > 0" class="maps-table" md-fixed-header>
+                <md-table-row
+                    slot="md-table-row"
+                    @contextmenu="onContextMenu(item.id, $event)"
+                    @click="onMapRowClick(item.id, $event)"
+                    slot-scope="{ item }"
+                >
+                    <md-table-cell md-sort-by="name" md-label="Name">{{item.name}}</md-table-cell>
+                    <md-table-cell md-sort-by="owner"  md-label="Owner">{{item.owner}}</md-table-cell>
+                    <md-table-cell md-sort-by="description"  md-label="Description">{{item.description}}</md-table-cell>
                 </md-table-row>
             </md-table>
 
+
             <md-empty-state
-                    v-if="loaded && maps.length === 0"
-                    md-icon="layers"
-                    md-label="Create your map!"
-                    md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
+                v-if="loaded && maps.length === 0"
+                md-icon="layers"
+                md-label="Create your map!"
+                md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
             >
                 <md-button class="md-dense md-primary md-raised" @click="addSimple">
                     <span style="vertical-align: middle">Create</span>
@@ -180,6 +180,9 @@
     @import "src/css/variables";
 
     .wd-maps {
+        display: flex;
+        flex-direction: column;
+
         & > .maps-toolbar {
             padding-bottom: 10px;
             padding-top: 5px;
@@ -187,10 +190,34 @@
 
         & > .maps-content {
             .maps-table {
+                height: calc(100vh - 118px);
+
+                .md-content.md-table-content {
+                    height: initial !important;
+                    max-height: initial !important;;
+                }
+
                 &.md-card.md-table,
                 &.md-table.md-theme-default .md-table-content,
                 &.md-table.md-theme-default .md-table-alternate-header {
                     background-color: $bg-primary;
+                }
+
+                .md-table-fixed-header {
+                    padding-right: 0 !important;
+                }
+
+                .md-table-head,
+                .md-table-cell {
+                    &:nth-child(2) {
+                        .md-table-cell-container {
+                            white-space: nowrap;
+                        }
+                    }
+
+                    &:nth-child(3) {
+                        width: 100%;
+                    }
                 }
             }
         }

@@ -12,14 +12,15 @@
                 <AppMenu>
                     <AppMenuItem icon="my_location" title="Map" @click="onCurrentMapClick" :active="currentMapButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="library_add" title="Maps" @click="onMapsClick" :active="mapsButtonIsActive"></AppMenuItem>
-                    <AppMenuItem icon="group_add" title="Groups" @click="onGroupsClick" :active="groupsButtonIsActive"></AppMenuItem>
+                    <AppMenuItem icon="groups" title="Own Groups" @click="onOwnGroupsClick" :active="groupsOwnButtonIsActive"></AppMenuItem>
+                    <AppMenuItem icon="sensors" title="Available Groups" @click="onAllowedGroupsClick" :active="groupsAllowedButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="person_add" title="Characters" @click="onCharClick" :active="charactersButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="build" title="Profile" @click="onProfileClick" :active="profileButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="system_update_alt" title="Log out" @click="onLogOut"></AppMenuItem>
                 </AppMenu>
             </template>
 
-            <component ref="contentRef" v-bind:is="mainPageContent"></component>
+            <component ref="contentRef" :is="mainPageContent" @change-page="onChangePage"></component>
         </App>
     </div>
 </template>
@@ -53,7 +54,8 @@
                 charactersButtonIsActive: false,
                 mapsButtonIsActive: false,
                 profileButtonIsActive: false,
-                groupsButtonIsActive: false,
+                groupsOwnButtonIsActive: false,
+                groupsAllowedButtonIsActive: false,
             }
         },
         mounted: function () {
@@ -81,8 +83,14 @@
             onMapsClick: function  () {
                 this._load("maps");
             },
-            onGroupsClick: function  () {
-                this._load("groups");
+            onOwnGroupsClick: function  () {
+                this._load("groupsOwn");
+            },
+            onAllowedGroupsClick: function  () {
+                this._load("groupsAllowed");
+            },
+            onChangePage (page) {
+                this._load(page);
             },
             onLogOut: function () {
                 window.history.replaceState(null, null, ".");
@@ -104,7 +112,8 @@
                 this.mapsButtonIsActive = false;
                 this.profileButtonIsActive = false;
                 this.currentMapButtonIsActive = false;
-                this.groupsButtonIsActive = false;
+                this.groupsOwnButtonIsActive = false;
+                this.groupsAllowedButtonIsActive = false;
             },
             onMenuOpened: function () {
                 this._tid !== -1 && clearTimeout(this._tid);

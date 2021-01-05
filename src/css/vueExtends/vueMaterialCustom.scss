@@ -2,6 +2,7 @@
 @import "~vue-material/dist/theme/engine";
 $helper-text: md-get-palette-color(green, 300);
 
+.md-table-head-container,
 .md-content.md-tabs-content,
 .md-dialog-container.md-theme-default {
     background-color: $bg-secondary;

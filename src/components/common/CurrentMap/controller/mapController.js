@@ -3,6 +3,7 @@ import api from "../../../../js/api";
 import Link from "./link";
 import System from "./system";
 import exists from "../../../../js/env/tools/exists";
+import CustomPromise from "../../../../js/env/promise.js";
 
 class MapController extends Emitter {
     constructor (_map, _mapId) {
@@ -40,13 +41,16 @@ class MapController extends Emitter {
         this.map.on("newChain", this.onNewChain.bind(this));
         this.map.clear();
 
-        this._existenceSubscription.subscribe();
+        let initPromise = new CustomPromise();
 
-        this._systemsSubscription.subscribe().then(function () {
-            this._linksSubscription.subscribe();
-        }.bind(this))
+        this._existenceSubscription.subscribe()
+            .then(() => this._systemsSubscription.subscribe())
+            .then(() => this._linksSubscription.subscribe())
+            .then(() => {initPromise.resolve();})
+            .catch(() => initPromise.reject());
 
         this._inited = true;
+        return initPromise.native;
     }
     deinit () {
         this._inited = false;
@@ -250,6 +254,10 @@ class MapController extends Emitter {
     getSystem (_systemId) {
         return this.systems[_systemId]
     }
+    getLink (linkId) {
+        return this.links[linkId]
+    }
+
     highlightRoute (route) {
         this.map.shadeAll(true);
 

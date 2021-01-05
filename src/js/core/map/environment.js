@@ -137,5 +137,33 @@ export default {
         {id: "targetSecondary", name: "target secondary", icon: "invert_colors"},
         {id: "dangerousPrimary", name: "dangerous primary", icon: "invert_colors"},
         {id: "dangerousSecondary", name: "dangerous secondary", icon: "invert_colors"},
+    ],
+
+    advices : [
+        {type: "joke", name: "", description: "Sabre on DScan"},
+
+        {type: "advice", name: "", description: "Don't forget close a K162 before the klac klac"},
+
+        {type: "mapperHelp", name: "", description: "You can add yourself, corporations and alliances to your group"},
+        {type: "mapperHelp", name: "", description: "Don't forget check available groups."},
+        {type: "mapperHelp", name: "", description: "Available groups - groups to which you have access."},
+        {type: "mapperHelp", name: "", description: "You can check route on your map - just mark system as hub."},
+    ],
+
+    timeStatuses: [
+        {title: "Not yet begun", icon: "done_all", id: 0},
+        {title: "End of life", icon: "error_outline", id: 1},
+    ],
+
+    massStatuses: [
+        {title: "Whole", icon: "done", id: 0},
+        {title: "Less than half", icon: "trending_down", id: 1},
+        {title: "Verge of collapse", icon: "error_outline", id: 2},
+    ],
+
+    shipSizeStatuses: [
+        {title: "Frigate (S)", icon: "done", id: 0},
+        {title: "Normal (M/L)", icon: "trending_down", id: 1},
+        {title: "Capital (XL)", icon: "error_outline", id: 2},
     ]
 }
