@@ -3,9 +3,9 @@
         <div class="wd fs fms flex flex-column">
 
             <!--  Header Menu  -->
-            <div class="c-header wd flex-justify-center">
+            <div class="c-header wd flex-justify-center" >
                 <div class="c-header-content">
-                    <div class="c-menu">
+                    <div class="c-menu" style="display: none">
                         <div>Login</div>
                         <div>Guide</div>
                         <div>About</div>
@@ -22,7 +22,12 @@
                     <div class="c-module c-login-module wd flex-column flex-align-center">
                         <div class="wd fs fms md-layout md-alignment-center-center flex-column" style="min-height: 250px;">
                             <div class="c-module-header">
-                                <a class="c-link" title="What it is?" style="margin-right: 5px;" target="_blank" href="http://community.eveonline.com/news/dev-blogs/eve-online-sso-and-what-you-need-to-know" >Authorize</a>
+                                <a
+                                    class="c-link"
+                                    title="What it is?"
+                                    style="margin-right: 5px;" target="_blank"
+                                    href="http://community.eveonline.com/news/dev-blogs/eve-online-sso-and-what-you-need-to-know"
+                                >Authorize</a>
                                 <span>with your EVE account</span>
                             </div>
                             <div class="md-elevation-2 c-login-eve-sso-button" @click="onEveSSOLogin">
@@ -32,26 +37,91 @@
                     </div>
 
                     <div class="c-module wd flex flex-column flex-align-center">
-                        <div class="c-module-header">Read the guide</div>
+                        <div class="c-module-header">
+                            <h3>About wanderer</h3>
+                        </div>
                         <div class="c-module-content">
-                            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
-                            <p>1) kek</p>
-                            <p>2) kek</p>
-                            <p>3) kek</p>
-                            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
+                            <br />
+                            <div class="wd text-align-center">
+                                <span class="c-text-dec-accent" >Greetings, Pilot!</span>
+                                &nbsp;
+                                <span>I am happy to meet you here!</span>
+                            </div>
+                            <p class="wd flex flex-justify-center">This is a first beta test of this mapper, and you have ability to make mapper better!</p>
+                            <p class="wd flex flex-justify-center">Here will be small guide wideo, when i make it :)</p>
+                            <p class="wd text-align-center">
+                                I started it in 2020, and now this mapper tool have enough functional for normal testing.
+                                Sometimes i will drop databases, or mapper will be down. You can go to
+                                <a class="c-link" target="_blank" href="https://t.me/joinchat/G1FrT_bDz8ozcGGg">Telegram group</a>
+                                and ask any questions or report about bug or your ideas.
+
+                                Also this is an
+                                <a class="c-link" target="_blank" href="https://github.com/DanSylvest">open source code project</a>
+                                and you can found it on <a>GitHub</a>.
+                            </p>
+
+                            <br />
+                            <br />
+
+                            <h4 class="wd flex flex-justify-center">This project client side created with:</h4>
+                            <div class="wd flex flex-justify-center">
+                                <ul class="wd-list" style="width: 300px">
+                                    <li>Vue - as core</li>
+                                    <li>VueMaterial - as ui framework</li>
+                                    <li>d3js - as force library</li>
+                                </ul>
+                            </div>
+
+                            <h4 class="wd flex flex-justify-center">This project server side created with:</h4>
+                            <div class="wd flex flex-justify-center">
+                                <ul class="wd-list"  style="width: 300px">
+                                    <li>NodeJS - as platform</li>
+                                    <li>PostgreSQL - as SQL library</li>
+                                </ul>
+                            </div>
+
+                            <br />
+                            <br />
+
                         </div>
                     </div>
 
-                    <div class="c-module wd flex flex-column flex-align-center">
-                        <div class="c-module-header">About wanderer</div>
-                        <div class="c-module-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-                    </div>
+<!--                    <div class="c-module wd flex flex-column flex-align-center">-->
+<!--                        <div class="c-module-header">Read the guide</div>-->
+<!--                        <div class="c-module-content">-->
+<!--                            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>-->
+<!--                            <p>1) kek</p>-->
+<!--                            <p>2) kek</p>-->
+<!--                            <p>3) kek</p>-->
+<!--                            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="c-module wd flex flex-column flex-align-center">
-                        <div class="c-module-header">Read the announcements</div>
-                        <div class="c-module-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+<!--                    <div class="c-module wd flex flex-column flex-align-center">-->
+<!--                        <div class="c-module-header">Read the announcements</div>-->
+<!--                        <div class="c-module-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>-->
+<!--                    </div>-->
+
+                    <div class="c-module wd flex flex-column flex-align-center" style="min-height: initial !important;">
+                        <div class="c-module-header"><h3>License</h3></div>
+                        <div class="c-module-content">
+                            <div class="wd-license wd flex-align-center flex c-content">
+                                <img src="ccpLogo.png" width="130" style="margin-right: 20px">
+                                <div class="wd-color-primary-2">
+                                    EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights are reserved worldwide.
+                                    All other trademarks are the property of their respective owners.
+                                    EVE Online, the EVE logo, EVE and all associated logos and designs are the intellectual property of CCP hf.
+                                    All artwork, screenshots, characters, vehicles, storylines, world facts or other recognizable features of the
+                                    intellectual property relating to these trademarks are likewise the intellectual property of CCP hf.
+                                    CCP is in no way responsible for the content on or functioning of this website, nor can it be liable for
+                                    any damage arising from the use of this website.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+
             </div>
 
         </div>
@@ -88,7 +158,26 @@
     }
 </script>
 
-<style>
+<style lang="scss">
+    h1,h2,h3,h4,h5,h6, ul {
+        margin: 0;
+        padding:0;
+    }
+
+    h4 {
+        margin: 5px 0;
+    }
+
+    ul.wd-list {
+        & > li {
+            margin-left: 65px;
+        }
+    }
+
+    .wd-license {
+        width: 800px;
+    }
+
     .c-login-page::-webkit-scrollbar {
         width: 10px;
     }
@@ -114,8 +203,8 @@
 </style>
 
 <style lang="scss">
-    $linkColor: #3c558e;
-    $linkColorHover: #6486d4;
+    $linkColor: #6486d4;
+    $linkColorHover: #b0c3ef;
     $headerContentBackground: rgba(22,22,22,0.2);
 
     $background1: #212121;
@@ -143,6 +232,13 @@
     a.c-link:hover {
         text-decoration: none;
         color: $linkColorHover !important;
+    }
+
+
+    .c-text-dec-accent {
+        transition: color 200ms;
+        color: rgb(246, 212, 144);
+        /*cursor: pointer;*/
     }
 
     .c-login-page {
@@ -201,6 +297,7 @@
                 }
 
                 .c-module-content {
+                    /*width: 100%;*/
                     text-align: left;
                     color: $foreground2;
                 }
