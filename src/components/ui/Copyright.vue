@@ -1,6 +1,6 @@
 <template>
     <div class="wd-copyright wd flex flex-justify-center">
-        Copyright © | DanSylvest - All Rights Reserved.
+        Copyright © | DanSylvest<!-- - All Rights Reserved.-->
     </div>
 </template>
 

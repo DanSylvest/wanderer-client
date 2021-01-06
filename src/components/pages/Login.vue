@@ -17,6 +17,9 @@
             <!--    Content        -->
             <div class="c-content wd flex-justify-center">
                 <div class="wd flex c-modules">
+                    <div class="wd-logo">
+                        Wanderer
+                    </div>
 
                     <!-- Login -->
                     <div class="c-module c-login-module wd flex-column flex-align-center">
@@ -47,20 +50,19 @@
                                 &nbsp;
                                 <span>I am happy to meet you here!</span>
                             </div>
-                            <p class="wd flex flex-justify-center">This is a first beta test of this mapper, and you have ability to make mapper better!</p>
-                            <p class="wd flex flex-justify-center">Here will be small guide wideo, when i make it :)</p>
+                            <p class="wd flex flex-justify-center">This is a first beta test of this mapper and you can make it better!</p>
+                            <p class="wd flex flex-justify-center">Here will be small guide video when i make it :)</p>
                             <p class="wd text-align-center">
-                                I started it in 2020, and now this mapper tool have enough functional for normal testing.
+                                I started it in 2020 and now this mapper tool has enough functionality for normal testing.
                                 Sometimes i will drop databases, or mapper will be down. You can go to
                                 <a class="c-link" target="_blank" href="https://t.me/joinchat/G1FrT_bDz8ozcGGg">Telegram group</a>
-                                and ask any questions or report about bug or your ideas.
+                                and ask any questions or report bug or your ideas.
 
                                 Also this is an
                                 <a class="c-link" target="_blank" href="https://github.com/DanSylvest">open source code project</a>
-                                and you can found it on <a>GitHub</a>.
+                                and you can find it on <a>GitHub</a>.
                             </p>
 
-                            <br />
                             <br />
 
                             <h4 class="wd flex flex-justify-center">This project client side created with:</h4>
@@ -80,7 +82,6 @@
                                 </ul>
                             </div>
 
-                            <br />
                             <br />
 
                         </div>
@@ -117,6 +118,7 @@
                                     any damage arising from the use of this website.
                                 </div>
                             </div>
+                            <div class="wd-copyright">© 2020-2021 | DanSylvest </div>
                         </div>
                     </div>
                 </div>
@@ -172,6 +174,33 @@
         & > li {
             margin-left: 65px;
         }
+    }
+
+    .wd-logo {
+        position: absolute;
+        font-size: 20px;
+        font-family: unset;
+        text-transform: uppercase;
+        letter-spacing: 8px;
+        transform: translate(28px, -122px);
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        color: #fff;
+        text-shadow: 0 0 7px rgba(255,255,255,1);
+    }
+
+    .wd-copyright {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        font-family: unset;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        transform: translate(0px, 0px);
+        color: rgba(255, 255, 255, 0.16);
+        font-size: 12px;
     }
 
     .wd-license {
@@ -290,6 +319,7 @@
 
                 .c-module-header {
                     user-select: none;
+                    margin-top: 10px;
                     margin-bottom: 20px;
                     font-size: 18px;
                     text-align: center;

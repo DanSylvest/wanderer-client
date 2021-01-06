@@ -32,22 +32,24 @@
                     </md-field>
                 </div>
 
-                <md-speed-dial class="md-bottom-left" md-direction="top" style="margin-left: -20px; margin-bottom: -25px">
-                    <md-speed-dial-target class="md-hover">
-                        <md-icon class="md-morph-initial">settings</md-icon>
-                        <md-icon class="md-morph-final">edit</md-icon>
-                    </md-speed-dial-target>
+                <transition name="fade">
+                    <md-speed-dial class="md-bottom-left" md-direction="top" style="margin-left: -20px; margin-bottom: -25px" v-if="!loadingMap">
+                        <md-speed-dial-target class="md-hover">
+                            <md-icon class="md-morph-initial">settings</md-icon>
+                            <md-icon class="md-morph-final">edit</md-icon>
+                        </md-speed-dial-target>
 
-                    <md-speed-dial-content>
-                        <md-button class="md-icon-button" @click="onSaveClick">
-                            <md-icon>save</md-icon>
-                        </md-button>
+                        <md-speed-dial-content>
+                            <md-button class="md-icon-button" @click="onSaveClick">
+                                <md-icon>save</md-icon>
+                            </md-button>
 
-                        <md-button class="md-icon-button" :class="{ 'md-accent': isAutoAlignment }" @click="onAAClick">
-                            <md-icon>scatter_plot</md-icon>
-                        </md-button>
-                    </md-speed-dial-content>
-                </md-speed-dial>
+                            <md-button class="md-icon-button" :class="{ 'md-accent': isAutoAlignment }" @click="onAAClick">
+                                <md-icon>scatter_plot</md-icon>
+                            </md-button>
+                        </md-speed-dial-content>
+                    </md-speed-dial>
+                </transition>
 
             </div>
 
