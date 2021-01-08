@@ -59,8 +59,8 @@
                                 and ask any questions or report bug or your ideas.
 
                                 Also this is an
-                                <a class="c-link" target="_blank" href="https://github.com/DanSylvest">open source code project</a>
-                                and you can find it on <a>GitHub</a>.
+                                <a class="c-link" target="_blank" href="https://github.com/DanSylvest/wanderer-project">open source code project</a>
+                                and you can find it on <span class="c-text-dec-accent">GitHub</span>.
                             </p>
 
                             <br />
