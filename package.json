@@ -9,6 +9,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^0.5.2",
+    "analytics": "^0.6.5",
     "core-js": "^3.8.2",
     "d3-force": "^2.1.1",
     "node-sass": "^5.0.0",
