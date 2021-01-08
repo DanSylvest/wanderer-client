@@ -100,10 +100,6 @@
                 location.reload();
             },
             _load: function (_componentId) {
-                analytics.track('open_page', {
-                    category: _componentId
-                });
-
                 let info = modules[_componentId];
                 asyncComponentLoader(_componentId).then(function () {
                     setItem(_componentId);
