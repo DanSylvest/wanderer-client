@@ -4,7 +4,7 @@
 
 import Analytics from 'analytics'
 import googleAnalytics from '@analytics/google-analytics'
-const config = require('./compiled.config.js')
+import config from "./compiled.config.js";
 
 const analytics = Analytics({
     app: 'Wanderer',
