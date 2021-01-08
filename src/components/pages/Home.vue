@@ -36,6 +36,7 @@
     import AppToolbar from "../ui/App/AppToolbar";
     import AppMenu from "../ui/App/AppMenu";
     import AppMenuItem from "../ui/App/AppMenuItem";
+    import analytics from "../../js/analytics.js";
 
     export default {
         name: "Home",
@@ -99,6 +100,10 @@
                 location.reload();
             },
             _load: function (_componentId) {
+                analytics.track('open_page', {
+                    category: _componentId
+                });
+
                 let info = modules[_componentId];
                 asyncComponentLoader(_componentId).then(function () {
                     setItem(_componentId);

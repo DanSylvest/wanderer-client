@@ -14,6 +14,9 @@ export default {
             port: "1400"
         }
     },
+    analytics: {
+        trackingId: ''
+    },
     eve: {
         sso: {
             client: {
