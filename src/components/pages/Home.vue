@@ -35,7 +35,7 @@
     import App from "../ui/App/App";
     import AppToolbar from "../ui/App/AppToolbar";
     import AppMenu from "../ui/App/AppMenu";
-    import AppMenuItem from "../ui/App/AppMenuItem";\
+    import AppMenuItem from "../ui/App/AppMenuItem";
 
     export default {
         name: "Home",
