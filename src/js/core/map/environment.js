@@ -165,5 +165,24 @@ export default {
         {title: "Frigate (S)", icon: "done", id: 0},
         {title: "Normal (M/L)", icon: "trending_down", id: 1},
         {title: "Capital (XL)", icon: "error_outline", id: 2},
-    ]
+    ],
+
+    dScan: {
+        kinds: [
+            {id: "Cosmic Signature"},
+            {id: "Cosmic Anomaly"},
+        ],
+        groups: [
+            {id: "Gas Site"},
+            {id: "Relic Site"},
+            {id: "Data Site"},
+            {id: "Ore Site"},
+            {id: "Combat Site"},
+            {id: "Wormhole"},
+            {id: ""},
+        ],
+        names: [
+            {id: ""}
+        ]
+    }
 }

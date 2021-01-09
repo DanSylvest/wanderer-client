@@ -16,9 +16,8 @@
                     <div class="wd-loader" v-show="loading" >
                         <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="50" md-mode="indeterminate"></md-progress-spinner>
                     </div>
-                    <template>
+                    <template v-if="routes.length === 0 && !loading">
                         <md-empty-state
-                            v-show="routes.length === 0 && !loading"
                             class="md-primary"
                             md-label="No hubs or systems added"
                             md-description="Here may be your routes for navigating to hubs or systems.">
