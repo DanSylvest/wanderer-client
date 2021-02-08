@@ -168,6 +168,15 @@ export default {
     ],
 
     dScan: {
+        kindNames: {
+            cosmicSignature: "Cosmic Signature",
+            cosmicAnomaly: "Cosmic Anomaly",
+            structure: "Structure",
+            starbase: "Starbase",
+            drone: "Drone",
+            deployable: "Deployable",
+            ship: "Ship",
+        },
         kinds: [
             {id: "Cosmic Signature"},
             {id: "Cosmic Anomaly"},
@@ -184,5 +193,15 @@ export default {
         names: [
             {id: ""}
         ]
-    }
+    },
+
+    signaturesTypes : [
+        {id: "cosmicAnomaly", title: "Show Anomalies", value: true},
+        {id: "cosmicSignature", title: "Show Cosmic Signatures", value: true},
+        {id: "deployable", title: "Show Deployables", value: true},
+        {id: "structure", title: "Show Structures", value: true},
+        {id: "starbase", title: "Show Starbase", value: true},
+        {id: "ship", title: "Show Ships", value: true},
+        {id: "drone", title: "Show Drones And Charges", value: true},
+    ]
 }

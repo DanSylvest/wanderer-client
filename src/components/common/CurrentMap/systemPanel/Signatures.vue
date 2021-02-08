@@ -1,11 +1,16 @@
 <template>
     <div>
         <div v-if="enable === true">
-            <md-content v-if="signatures.length > 0">
+            <div v-if="signatures.length > 0" class="wd flex flex-justify-end">
+                <md-button class="md-icon-button" @click="showFilterDialog = true">
+                    <md-icon>tune</md-icon>
+                </md-button>
+            </div>
+            <md-content v-if="filteredSignatures.length > 0">
                 <md-table
                     class="wd-small-table-cell"
                     ref="signaturesTable"
-                    v-model="signatures"
+                    v-model="filteredSignatures"
                     md-sort="email"
                     md-sort-order="asc"
                     md-card
@@ -21,7 +26,7 @@
                         md-selectable="multiple"
                     >
                         <md-table-cell md-label="id" md-sort-by="id" width="40" style="white-space: nowrap">{{ item.id }}</md-table-cell>
-                        <md-table-cell md-label="group" md-sort-by="group" width="100">{{ item.group }}</md-table-cell>
+                        <md-table-cell md-label="group" md-sort-by="group">{{ item.group }}</md-table-cell>
                         <md-table-cell md-label="name" md-sort-by="name">{{ item.name }}</md-table-cell>
                         <md-table-cell md-label="created" md-sort-by="created" width="120">
                             <time-left :c-date="new Date(item.created)"></time-left>
@@ -49,6 +54,13 @@
                 md-description="Just paste (ctrl + v) for update signatures.">
             </md-empty-state>
 
+            <md-empty-state
+                v-if="signatures.length !== 0 && filteredSignatures.length === 0"
+                md-icon="announcement"
+                md-label="All existing signatures were filtered"
+                md-description="">
+            </md-empty-state>
+
             <div style="width: 1000px;">
                 <md-dialog :md-active.sync="saveSigsDialogActive">
                     <md-dialog-title>Some of signatures was not found in paste list</md-dialog-title>
@@ -64,6 +76,21 @@
 
             <input type="text" class="c-hidden-input">
         </div>
+
+        <md-dialog :md-active.sync="showFilterDialog">
+            <md-dialog-title>Filter signatures</md-dialog-title>
+
+            <div class="wd-filter-content">
+                <template v-for="item in filterTypes">
+                    <md-checkbox :key="item.title" v-model="item.value">{{item.title}}</md-checkbox>
+                </template>
+            </div>
+
+            <md-dialog-actions>
+                <md-button class="md-primary" @click="showFilterDialog = false;">Close</md-button>
+                <md-button class="md-primary" @click="showFilterDialog = false; _saveFilter()">Save</md-button>
+            </md-dialog-actions>
+        </md-dialog>
     </div>
 </template>
 
@@ -74,6 +101,7 @@
     import TabObserver from "../../../../js/env/tabObserver";
     import environment from "../../../../js/core/map/environment.js";
     import exists from "../../../../js/env/tools/exists.js";
+    import cookie from "../../../../js/env/cookie.js";
 
     export default {
         name: "Signatures",
@@ -85,8 +113,12 @@
         },
         data: function () {
             return {
+                showFilterDialog: false,
+                filterTypes: [],
+
                 saveSigsDialogActive: false,
                 signatures: [],
+                filteredSignatures: [],
                 selected: [],
                 enable: true
             }
@@ -99,14 +131,12 @@
             this._to.on("in", this._onTabIn.bind(this));
 
             this._hiddenInput = this.$el.querySelector(".c-hidden-input");
-
-            // this._focusHandler = this.focus.bind(this);
             this._pasteHandler = this.onPaste.bind(this);
             this._hiddenInput.addEventListener("paste", this._pasteHandler);
-            // window.addEventListener("mousedown", this._focusHandler);
+
+            this._loadFilterData();
         },
         beforeDestroy: function () {
-            // window.removeEventListener("mousedown", this._focusHandler);
             this._hiddenInput.removeEventListener("paste", this._pasteHandler);
 
             this._rtid !== -1 && clearTimeout(this._rtid);
@@ -117,6 +147,30 @@
             this._to.destructor();
         },
         methods: {
+            _loadFilterData () {
+                let savedFilter = cookie.get("filteredAnomalies");
+                if(!savedFilter) {
+                    this.filterTypes = environment.signaturesTypes.slice();
+                } else {
+                    this.filterTypes = JSON.parse(savedFilter);
+                }
+            },
+            _saveFilter () {
+                cookie.set("filteredAnomalies", JSON.stringify(this.filterTypes),{expires: 60 * 60 * 24 * 365 * 1000});
+                this.filteredSignatures = this._applyFilter(this.signatures);
+                this.refresh();
+            },
+            _applyFilter (signatures) {
+                let filtered = signatures;
+                this.filterTypes.map(filter => {
+                    if(!filter.value) {
+                        let title = environment.dScan.kindNames[filter.id];
+                        filtered = filtered.filter(x => x.kind !== title);
+                    }
+                });
+
+                return filtered;
+            },
             updateHiddenInput: function () {
                 this._hiddenInput.removeEventListener("paste", this._pasteHandler);
 
@@ -158,19 +212,6 @@
              * Just save as is signatures
              */
             onUpdateAllSigs: function () {
-                // let out = [];
-                // for (let a = 0; a < this.signatures.length; a++) {
-                //     let oldSignature = this.signatures[a];
-                //     let updatedSignature = this.currentWaitSaveData.updatedSignatures.searchByObjectKey("id", oldSignature.id);
-                //
-                //     if(updatedSignature)
-                //         out.push(updatedSignature);
-                //     else
-                //         out.push(oldSignature);
-                // }
-                //
-                // out = out.concat(this.currentWaitSaveData.newSignatures);
-
                 api.eve.map.solarSystem.update(this.mapId, this.systemId, {
                     signatures: this.currentWaitSaveData.actualSigs.concat(this.currentWaitSaveData.forRemoveSigs)
                 });
@@ -193,6 +234,7 @@
             update: function (_signatures) {
                 this.selected = [];
                 this.signatures = _signatures;
+                this.filteredSignatures = this._applyFilter(_signatures);
             },
             focus: function () {
                 this._hiddenInput.focus();
@@ -216,16 +258,6 @@
                         signatures: result.actualSigs
                     });
                 }
-
-                // if(result.nonExistingSignatures.length > 0) {
-                //     we need remove it from updated and show dialog
-                    // this.saveSigsDialogActive = true;
-                    // this.currentWaitSaveData = result;
-                // } else {
-                //     api.eve.map.solarSystem.update(this.mapId, this.systemId, {
-                //         signatures: result.updatedSignatures.concat(result.newSignatures).concat(result.oldSignatures)
-                //     });
-                // }
             },
             _processSignatures: function (signatures) {
                 // let kinds = environment.dScan.kinds.map(x => x.id);
@@ -233,7 +265,7 @@
                 // let names = environment.dScan.names.map(x => x.id);
 
                 // also we need filter not interested sigs
-                let filteredSignatures = signatures.filter(sig => sig.kind !== "Cosmic Anomaly");
+                let filteredSignatures = signatures/*.filter(sig => sig.kind !== "Cosmic Anomaly")*/;
 
                 // make object for old sigs
                 // as key will be sig id
@@ -295,58 +327,6 @@
                 }
 
             }
-            // _processSignatures: function (_signatures) {
-            //     let kinds = ["Cosmic Signature", "Cosmic Anomaly"];
-            //     let names = ["Unstable Wormhole", "Gas Site", "Relic Site", "Data Site"]
-            //
-            //     let nonExistingSignatures = [];
-            //
-            //     for (let a = 0; a < this.signatures.length; a++) {
-            //         let oldSignature = this.signatures[a];
-            //
-            //         if (!_signatures.searchByObjectKey("id", oldSignature.id))
-            //             nonExistingSignatures.push(oldSignature.id);
-            //     }
-            //
-            //     let oldSignatures = [];
-            //     let updatedSignatures = [];
-            //     let newSignatures = [];
-            //
-            //     for (let a = 0; a < _signatures.length; a++) {
-            //         let signature = _signatures[a];
-            //
-            //         let oldSig = this.signatures.searchByObjectKey("id", signature.id);
-            //
-            //         if (oldSig) {
-            //             if (kinds.in(oldSig.kind)) {
-            //                 if (
-            //                     oldSig.name === "" && signature.name !== ""
-            //                     && oldSig.name !== "" && names.in(oldSig.name) && !names.in(signature.name)
-            //                 ) {
-            //                     updatedSignatures.push({
-            //                         id: oldSig.id,
-            //                         kind: signature.kind,
-            //                         type: signature.type,
-            //                         name: signature.name,
-            //                         description: signature.description,
-            //                         created: oldSig.created
-            //                     })
-            //                 } else {
-            //                     oldSignatures.push(oldSig)
-            //                 }
-            //             }
-            //         } else {
-            //             newSignatures.push(signature);
-            //         }
-            //     }
-            //
-            //     return {
-            //         nonExistingSignatures: nonExistingSignatures,
-            //         updatedSignatures: updatedSignatures,
-            //         newSignatures: newSignatures,
-            //         oldSignatures: oldSignatures,
-            //     }
-            // }
         }
     }
 
@@ -419,20 +399,12 @@
                 continue;
             }
 
-            // if(!sigArrInfo[1] || sigArrInfo[1] !== "Cosmic Signature") {
-            //     continue;
-            // }
-
             outArr.push({
                 id: sigArrInfo[0],
                 kind: sigArrInfo[1],
                 group: sigArrInfo[2],
-                name: sigArrInfo[3],
-                // description: "",
-                // created: new Date().toUTCString()
-            })
-
-            // debugger;
+                name: sigArrInfo[3]
+            });
         }
 
         return outArr;
@@ -452,6 +424,12 @@
 
     .wd-small-table-cell .md-table-cell {
         height: 35px;
+    }
+
+    .wd-filter-content {
+        display: flex;
+        flex-direction: column;
+        padding: 10px 25px;
     }
 
 </style>
