@@ -11,11 +11,12 @@
                 <Router @ready="onRouterReady"></Router>
             </div>
         </transition>
+
+        <notifications group="mainNotifications" position="bottom right"/>
     </div>
 </template>
 
 <script>
-
     import MainLoader from './components/ui/MainLoader.vue'
     import Copyright from "./components/ui/Copyright";
     import Router from "./components/Router";
@@ -25,7 +26,7 @@
         components: {
             Router,
             Copyright,
-            MainLoader
+            MainLoader,
         },
         mounted: function () {
 

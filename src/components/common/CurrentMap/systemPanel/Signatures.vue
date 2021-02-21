@@ -102,6 +102,7 @@
     import environment from "../../../../js/core/map/environment.js";
     import exists from "../../../../js/env/tools/exists.js";
     import cookie from "../../../../js/env/cookie.js";
+    import helper from "../../../../js/utils/helper.js";
 
     export default {
         name: "Signatures",
@@ -203,28 +204,40 @@
                         out.push(oldSig);
                     }
                 }
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
-                    signatures: out
-                });
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: out})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
 
             /**
              * Just save as is signatures
              */
             onUpdateAllSigs: function () {
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
-                    signatures: this.currentWaitSaveData.actualSigs.concat(this.currentWaitSaveData.forRemoveSigs)
-                });
                 this.saveSigsDialogActive = false;
+
+                let data = {
+                    signatures: this.currentWaitSaveData.actualSigs.concat(this.currentWaitSaveData.forRemoveSigs)
+                }
+
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, data)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             /**
              * Remove non exists signatures from updated
              */
             onUpdateNonExists: function () {
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, {
-                    signatures: this.currentWaitSaveData.actualSigs
-                });
                 this.saveSigsDialogActive = false;
+
+                api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: this.currentWaitSaveData.actualSigs})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             load: function (_mapId, _systemId) {
                 this.mapId = _mapId;
@@ -254,9 +267,11 @@
                     this.saveSigsDialogActive = true;
                     this.currentWaitSaveData = result;
                 } else {
-                    api.eve.map.solarSystem.update(this.mapId, this.systemId, {
-                        signatures: result.actualSigs
-                    });
+                    api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: result.actualSigs})
+                        .then(
+                            helper.dummy,
+                            err => helper.errorHandler(this, err)
+                        );
                 }
             },
             _processSignatures: function (signatures) {

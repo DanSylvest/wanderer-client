@@ -2,6 +2,14 @@
 @import "~vue-material/dist/theme/engine";
 $helper-text: md-get-palette-color(green, 300);
 
+.wd-color-positive {
+    color: $fg-positive !important;
+}
+
+.wd-color-negative {
+    color: $fg-negative !important;
+}
+
 .md-table-head-container,
 .md-content.md-tabs-content,
 .md-dialog-container.md-theme-default {

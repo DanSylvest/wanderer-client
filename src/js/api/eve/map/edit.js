@@ -18,7 +18,7 @@ export default function (_mapId, _options) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve(_e) : p.reject(_e.message);
+        _e.success ? p.resolve(_e) : p.reject(_e.error);
     }.bind(this));
 
     this.send(id, ["api", "eve", "map", "edit"], {

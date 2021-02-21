@@ -50,17 +50,19 @@ const register = function () {
 };
 
 const attach = function () {
-    api.eve.character.add(data.code).then(function(){
-        let page = query.toString({
-            page: "home",
-            item: "characters"
-        });
-        window.location = printf("%s%s?%s", window.location.origin, window.location.pathname, page);
-    }.bind(this), function(_err){
-        // todo need show dialog with error response
-        alert(JSON.stringify(_err, true, 3));
-        window.location = window.location.origin + window.location.pathname;
-    }.bind(this));
+    api.eve.character.add(data.code)
+        .then(
+            () => {
+                window.location = printf("%s%s?%s", window.location.origin, window.location.pathname, query.toString({
+                    page: "home",
+                    item: "characters"
+                }));
+            },
+            err => {
+                alert(JSON.stringify(err, true, 3));
+                window.location = window.location.origin + window.location.pathname;
+            }
+        );
 }
 
 enableAuth && auth();

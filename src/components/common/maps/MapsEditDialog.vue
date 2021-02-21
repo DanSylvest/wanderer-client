@@ -103,14 +103,13 @@
                         :disabled="formButtonDisabled">Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
-
-
     </div>
 </template>
 
 <script>
     import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "MapsEditDialog",
@@ -146,14 +145,14 @@
             prarr.push(api.eve.group.list());
             prarr.push(api.eve.map.list());
 
-            Promise.all(prarr).then(function(_arr){
-                this.groups = _arr[0];
-                this.maps = _arr[1];
-                // eslint-disable-next-line no-unused-vars
-            }.bind(this), function(_err){
-                // eslint-disable-next-line no-debugger
-                debugger; // todo
-            }.bind(this))
+            Promise.all(prarr)
+                .then(
+                    arr => {
+                        this.groups = arr[0];
+                        this.maps = arr[1];
+                    },
+                    err => helper.errorHandler(this, err)
+                );
         },
         methods: {
             _load: function () {
@@ -166,17 +165,18 @@
                 this._showPromise = new CustomPromise();
 
                 if(_options) {
-                    this._loadGroups(_options.groups).then(function (_groups) {
-                        this.showEditDialog = true;
+                    this._loadGroups(_options.groups)
+                        .then(
+                            groups => {
+                                this.showEditDialog = true;
 
-                        this.mapId = _options.mapId;
-                        this.formName = _options.name;
-                        this.formDescription = _options.description;
-                        this.searchAttachedGroups = _groups;
-
-                    }.bind(this), function () {
-                        // do nothing
-                    }.bind(this));
+                                this.mapId = _options.mapId;
+                                this.formName = _options.name;
+                                this.formDescription = _options.description;
+                                this.searchAttachedGroups = groups;
+                            },
+                            err => this._showPromise.reject(err)
+                        );
                 } else {
                     this.showEditDialog = true;
                 }
@@ -187,23 +187,20 @@
 
             },
 
-            _loadGroups: function (_groups) {
+            _loadGroups (groups) {
                 let pr = new CustomPromise();
 
-                let prarr = [];
-
-                for (let a = 0; a < _groups.length; a++) {
-                    prarr.push(api.eve.group.info(_groups[a]));
-                }
-
-                Promise.all(prarr).then(function(_result){
-                    for (let a = 0; a < _result.length; a++) {
-                        _result[a].id = _groups[a];
-                    }
-                    pr.resolve(_result);
-                }.bind(this), function(_err){
-                    pr.reject(_err);
-                }.bind(this))
+                Promise.all(groups.map(x => api.eve.group.info(x)))
+                    .then(
+                        result => {
+                            result.map((x, i) => result[i].id = groups[i])
+                            pr.resolve(result);
+                        },
+                        err => {
+                            helper.errorHandler(this, err);
+                            pr.reject(err);
+                        }
+                    );
 
                 return pr.native;
             },
@@ -260,7 +257,6 @@
                 let options = {
                     name: this.formName,
                     description: this.formDescription,
-                    // defaultGroup: this.formDefaultGroupItem.id,
                     groups: groups
                 };
 
@@ -275,19 +271,19 @@
                         break;
                 }
 
-                pr.then(function(_event) {
-                    if(this._state === "add") {
-                        options.id = _event.mapId;
-                        options.owner = _event.owner;
-                    }
+                pr.then(
+                    data => {
+                        if(this._state === "add") {
+                            options.id = data.mapId;
+                            options.owner = data.owner;
+                        }
 
-                    this.clearForm();
-                    this.showEditDialog = false;
-                    this._showPromise.resolve(options);
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function(_errMsg) {
-                    // do nothing
-                }.bind(this));
+                        this.clearForm();
+                        this.showEditDialog = false;
+                        this._showPromise.resolve(options);
+                    },
+                    err => helper.errorHandler(this, err)
+                );
             },
             onEditFormChange: function (/*_event*/) {
                 this.validateEditForm();

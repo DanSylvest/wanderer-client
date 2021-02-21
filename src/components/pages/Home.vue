@@ -4,7 +4,14 @@
 
             <template v-slot:AppToolbar>
                 <AppToolbar>
-
+                    <div class="wd-app-toolbar-content">
+                        <div>
+                            TQ status is
+                            <span :class="classColor">
+                                {{$store.state.eveServerStatus.online ? "online" : "offline"}}
+                            </span>
+                        </div>
+                    </div>
                 </AppToolbar>
             </template>
 
@@ -36,6 +43,7 @@
     import AppToolbar from "../ui/App/AppToolbar";
     import AppMenu from "../ui/App/AppMenu";
     import AppMenuItem from "../ui/App/AppMenuItem";
+    import cache from "../../js/cache/cache.js";
 
     export default {
         name: "Home",
@@ -58,7 +66,15 @@
                 groupsAllowedButtonIsActive: false,
             }
         },
+        beforeDestroy() {
+            this.unsubscribeOnline && this.unsubscribeOnline();
+            this.unsubscribeOnline = null;
+        },
+        beforeMount() {
+            this.unsubscribeOnline = cache.serverStatus.subscribe();
+        },
         mounted: function () {
+
             this._tid = -1;
 
             let page = _getSubPage();
@@ -67,7 +83,15 @@
                 this._load(page === null ? "currentMap" : page);
             }, 1300);
         },
+        computed: {
+            classColor () {
+                return this.$store.state.eveServerStatus.online ? "wd-online" : "wd-offline";
+            },
+        },
         methods: {
+            // classColor () {
+            //     return this.unsubscribe && this.$store.state.eveServerStatus.online ? "wd-online" : "wd-offline";
+            // },
             toggleMenu () {
                 this.menuVisible = !this.menuVisible
             },
@@ -154,8 +178,26 @@
 
 </script>
 
-<style>
+<style lang="scss">
+    @import "src/css/variables";
+    .wd-app-toolbar-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 5px 20px;
+        box-sizing: border-box;
+        color: $fg-primary;
 
+        .wd-online {
+            color: $fg-positive;
+        }
+
+        .wd-offline {
+            color: $fg-negative2;
+        }
+    }
 </style>
 
 

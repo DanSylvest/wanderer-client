@@ -2,18 +2,31 @@
     <div class="wd-characters-search">
         <div class="wd flex flex-align-center box-sizing padding-vertical-primary">
             <md-autocomplete
-                    v-model="currentValue"
-                    :md-options="searchList"
-                    md-layout="box"
-                    @md-selected="currentValue = $event.name; onElementSelected($event)"
-                    @md-changed="onElementChanged"
-                    @md-opened="onACOpened"
-                    md-dense
+                v-model="currentValue"
+                :md-options="searchList"
+                md-layout="box"
+                @md-selected="currentValue = $event.name; onElementSelected($event)"
+                @md-changed="onElementChanged"
+                @md-opened="onACOpened"
+                md-dense
+                :disabled="!this.$store.state.eveServerStatus.online"
             >
-                <label><md-icon>search</md-icon>Search characters</label>
+
+                <template v-if="this.$store.state.eveServerStatus.online">
+                    <label class="wd-search-placeholder">
+                        <md-icon>search</md-icon>
+                        <span>Search characters</span>
+                    </label>
+                </template>
+                <template v-else>
+                    <label class="wd-search-placeholder">
+                        <md-icon class="wd-color-negative">wifi_tethering_off</md-icon>
+                        <span>TQ has been down and search not work</span>
+                    </label>
+                </template>
 
                 <template slot="md-autocomplete-item" slot-scope="{ item, term }">
-                    <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" style="margin-right: 10px;" alt="Char portrait"/>
+                    <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" style="margin-right: 10px;" alt=""/>
                     <md-highlight-text :md-fuzzy-search="false" :md-term="term">{{ item.name }}</md-highlight-text>
                 </template>
 
@@ -52,12 +65,12 @@
         </md-table>
 
         <md-empty-state
-                v-show="elements.length === 0"
-                md-icon="group_add"
-                md-label="Add characters"
-                md-description="In this group is not added any characters. Here you can search characters and attach them to group."
-        >
-        </md-empty-state>
+            v-show="elements.length === 0"
+            md-icon="group_add"
+            md-label="Add characters"
+            md-description="In this group is not added any characters. Here you can search characters and attach them to group."
+        />
+
     </div>
 </template>
 
@@ -65,6 +78,8 @@
     import SpamFilter from "../../../js/env/spamFilter";
     import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
+    import cache from "../../../js/cache/cache.js";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "CharactersSearcher",
@@ -74,9 +89,15 @@
                 currentValue: "",
                 elements: [],
                 buttonDisabled: true,
-
                 searchList: []
             }
+        },
+        beforeDestroy() {
+            this.unsubscribeOnline && this.unsubscribeOnline();
+            this.unsubscribeOnline = null;
+        },
+        beforeMount() {
+            this.unsubscribeOnline = cache.serverStatus.subscribe();
         },
         mounted: function () {
             this._passChange = false;
@@ -126,12 +147,11 @@
                 this.elementsSelected = [];
             },
             _makeSearch: function (_match, _pr) {
-                api.eve.character.fastSearch({type: "byAll", match: _match}).then(function (_result) {
-                    _pr.resolve(_result);
-                }.bind(this), function () {
-                    // eslint-disable-next-line no-debugger
-                    debugger
-                }.bind(this))
+                api.eve.character.fastSearch({type: "byAll", match: _match})
+                    .then(
+                        _result => _pr.resolve(_result),
+                        err => helper.errorHandler(this, err)
+                    )
             },
             getElements: function () {
                 return this.elements;
@@ -147,6 +167,16 @@
     @import "./src/css/variables";
 
     .wd-characters-search {
+        .wd-search-placeholder {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+
+            & > *:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+
         .md-autocomplete.md-field {
             margin: 0;
         }

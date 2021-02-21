@@ -174,7 +174,6 @@
         </div>
 
         <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
-
     </div>
 </template>
 
@@ -196,6 +195,7 @@
     import SystemCard from "./CurrentMap/SystemCard";
     import SystemAddDialog from "./CurrentMap/SystemAddDialog.vue";
     import copyToClipboard from "../../js/env/copyToClipboard.js";
+    import helper from "../../js/utils/helper.js";
 
     export default {
         name: "CurrentMap",
@@ -259,15 +259,19 @@
             this.initMapTid = -1;
             this._currentOpenSystem = null;
 
-            this.initialize().then(function() {
-                this.__tid = setTimeout(() => {
-                    delete this.__tid;
-                    this.selectMapOnStart();
-                }, 250);
-            }.bind(this),function() {
-                // eslint-disable-next-line no-debugger
-                debugger;
-            }.bind(this));
+            this.initialize()
+                .then(
+                    () => {
+                        this.__tid = setTimeout(() => {
+                            delete this.__tid;
+                            this.selectMapOnStart();
+                        }, 250);
+                    },
+                    err => {
+                        // todo may be we should show little bit more than notification
+                        helper.errorHandler(this, err)
+                    }
+                );
         },
         beforeDestroy: function ( ){
             this.initMapTid !== -1 && clearTimeout(this.initMapTid);
@@ -277,8 +281,13 @@
                 delete this.__tid;
             }
 
-            if(this.selectedMap !== null)
-                api.eve.map.updateWatchStatus({mapId: this.selectedMap, status: false});
+            if(this.selectedMap !== null) {
+                api.eve.map.updateWatchStatus({mapId: this.selectedMap, status: false})
+                    .then(
+                        helper.dummy,
+                        error => helper.errorHandler(this, error)
+                    )
+            }
 
             this._destroyMap();
 
@@ -303,12 +312,16 @@
                 let prarr = [];
                 prarr.push(api.eve.character.list());
                 prarr.push(this.subscribeOnMaps());
-                Promise.all(prarr).then((arr) => {
-                    this.characters = arr[0];
-                    this.isLoaded = true;
-                    this.showMapEmpty = this.allowedMaps.length === 0;
-                    pr.resolve();
-                }, pr.reject);
+                Promise.all(prarr)
+                    .then(
+                         arr => {
+                            this.characters = arr[0];
+                            this.isLoaded = true;
+                            this.showMapEmpty = this.allowedMaps.length === 0;
+                            pr.resolve();
+                        },
+                        pr.reject
+                    );
 
                 return pr.native;
             },
@@ -338,6 +351,7 @@
                     this.mapController.on("markerIn", this._onMapMarkerIn.bind(this));
                     this.mapController.on("markerOut", this._onMapMarkerOut.bind(this));
                     this.mapController.on("removed", this._onMapRemoved.bind(this));
+                    this.mapController.on("error", this._onMapError.bind(this));
 
                     let offset = cookie.get(`offset_${_mapId}`);
                     if(offset) {
@@ -350,7 +364,6 @@
                             this.loadingMap = false;
                             this.showMapLoader = false;
                         });
-
 
                 }, 2500);
 
@@ -446,6 +459,9 @@
                 this.allowedMaps.eraseByObjectKey("id", this.selectedMap);
                 this._destroyMap();
                 this.selectMapOnStart();
+            },
+            _onMapError (errData) {
+                helper.errorHandler(this, errData)
             },
             _onSystemChange (_data) {
                 switch (_data.type) {
@@ -611,15 +627,17 @@
                 this._mapsSubscriber = api.eve.map.subscribeAllowedMaps(this.mapId);
                 this._mapsSubscriber.one("change", (data) =>  {
                     if(data.type === "add" && data.maps.length > 0) {
-                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId))).then((arr) => {
-                            data.maps.map((mapId, index) => {
-                                arr[index].id = mapId
-                            });
+                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId)))
+                            .then(
+                                arr => {
+                                    data.maps.map((mapId, index) => arr[index].id = mapId);
 
-                            this.allowedMaps = arr;
-                            this._mapsSubscriber.on("change", this._onMapsListChanged.bind(this));
-                            pr.resolve();
-                        });
+                                    this.allowedMaps = arr;
+                                    this._mapsSubscriber.on("change", this._onMapsListChanged.bind(this));
+                                    pr.resolve();
+                                },
+                                err => pr.reject(err)
+                            );
                     } else {
                         this.allowedMaps = [];
                         this._mapsSubscriber.on("change", this._onMapsListChanged.bind(this));
@@ -634,18 +652,19 @@
             _onMapsListChanged (data) {
                 switch (data.type) {
                     case "added":
-                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId))).then((arr) => {
-                            data.maps.map((mapId, index) => {
-                                arr[index].id = mapId
-                            });
+                        Promise.all(data.maps.map(mapId => api.eve.map.info(mapId)))
+                            .then(
+                                arr => {
+                                    data.maps.map((mapId, index) => arr[index].id = mapId);
 
-                            let hasMapsBefore = this.allowedMaps.length > 0;
-                            arr.map(x => this.allowedMaps.push(x));
+                                    let hasMapsBefore = this.allowedMaps.length > 0;
+                                    arr.map(x => this.allowedMaps.push(x));
 
-                            if(!hasMapsBefore) {
-                                this.selectMapOnStart();
-                            }
-                        });
+                                    if(!hasMapsBefore) {
+                                        this.selectMapOnStart();
+                                    }
+                                }
+                            );
                         break;
                     case "removed":
                         var isUpdate = false;
@@ -673,11 +692,11 @@
                 this.$emit('change-page', 'maps')
             },
             onSystemAdd (solarSystemId) {
-                api.eve.map.solarSystem.addManual(this.mapController.mapId, solarSystemId, this.tempCoord.x, this.tempCoord.y).then(()=>{
-                    this.isActiveSystemAddDialog = false;
-                }, (errMsg) => {
-                    alert(errMsg);
-                });
+                api.eve.map.solarSystem.addManual(this.mapController.mapId, solarSystemId, this.tempCoord.x, this.tempCoord.y)
+                    .then(
+                        () => this.isActiveSystemAddDialog = false,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onSelectionCompleted: function (_event) {
                 this.mapController.setSelection(_event.leftTop, _event.rightBottom);
@@ -689,11 +708,17 @@
                 cookie.set("selectedMap", _mapId);
 
                 api.eve.map.updateWatchStatus({mapId: _mapId, status: true})
-                    .then(() => api.eve.map.routes.hubs(_mapId))
-                    .then(hubs => {
-                        this.hubs = hubs;
-                        this._initMap(_mapId);
-                    });
+                    .then(
+                        () => api.eve.map.routes.hubs(_mapId),
+                        error => helper.errorHandler(this, error)
+                    )
+                    .then(
+                        hubs => {
+                            this.hubs = hubs;
+                            this._initMap(_mapId);
+                        },
+                        error => helper.errorHandler(this, error)
+                    );
             },
             // this handler enable auto alignment
             onAAClick: function () {
@@ -704,7 +729,11 @@
             // this handler will save solar system positions
             onSaveClick: function () {
                 let positions = this.mapController.map.collectPositions();
-                api.eve.map.solarSystem.updatePositions(this.selectedMap, positions);
+                api.eve.map.solarSystem.updatePositions(this.selectedMap, positions)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onMapContainerContext: function (_event) {
                 _event.preventDefault();
@@ -715,7 +744,11 @@
                 this._currentSelectedSystems = [];
             },
             onSystemsContextMenuRemove: function () {
-                api.eve.map.solarSystem.remove(this.selectedMap, this._currentSelectedSystems);
+                api.eve.map.solarSystem.remove(this.selectedMap, this._currentSelectedSystems)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    )
             },
             /************ SOLAR SYSTEM CONTEXT MENU HANDLERS ************/
             /************ ********************************** ************/
@@ -723,25 +756,34 @@
                 this._currentContextSystem = null;
             },
             onClearTag: function () {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    tag: ""
-                });
                 let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
                 systemInfo.tag = "";
+
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: ""})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onLetterClick: function (_letter) {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    tag: _letter
-                });
                 let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
                 systemInfo.tag = _letter;
+
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: _letter})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onDigitClick: function (_digit) {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    tag: _digit
-                });
                 let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
                 systemInfo.tag = _digit;
+
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: _digit})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onStatusClick (status) {
                 api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
@@ -756,41 +798,63 @@
                 copyToClipboard(systemName);
             },
             onSetDestination: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 0, this._currentContextSystem);
+                api.eve.map.waypoint(_characterId, 0, this._currentContextSystem)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onAddWaypointFront: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 1, this._currentContextSystem);
+                api.eve.map.waypoint(_characterId, 1, this._currentContextSystem)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onAddWaypointBack: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 2, this._currentContextSystem);
+                api.eve.map.waypoint(_characterId, 2, this._currentContextSystem)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onMarkAsHub(bool) {
                 if(bool) {
-                    api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem).then(() => {
-                        this.$refs.systemPanel.addHub(this._currentContextSystem);
-                    }, errMsg => {
-                        alert(errMsg);
-                    });
                     this.hubs.push(this._currentContextSystem);
+                    api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem)
+                        .then(
+                            () => this.$refs.systemPanel.addHub(this._currentContextSystem),
+                            error => helper.errorHandler(this, error)
+                        );
                 } else {
-                    api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem).then (() => {
-                        this.$refs.systemPanel.removeHub(this._currentContextSystem);
-                    });
                     this.hubs.removeByValue(this._currentContextSystem);
+                    api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem)
+                        .then (
+                            () => this.$refs.systemPanel.removeHub(this._currentContextSystem),
+                            err => helper.errorHandler(this, err)
+                        );
                 }
             },
             onSystemContextMenuLock: function () {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    isLocked: true
-                });
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {isLocked: true})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onSystemContextMenuUnlock: function () {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    isLocked: false
-                });
+                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {isLocked: false})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onSystemContextMenuRemove: function() {
-                api.eve.map.solarSystem.remove(this.selectedMap, [this._currentContextSystem]);
+                api.eve.map.solarSystem.remove(this.selectedMap, [this._currentContextSystem])
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             /************ ********************************** ************/
             /************ SOLAR SYSTEM CONTEXT MENU HANDLERS ************/
@@ -802,9 +866,11 @@
                 this._currentContextLink = null;
             },
             onTimeStateChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
-                    timeStatus: _state
-                });
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {timeStatus: _state})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             /**
              * 0 - whole
@@ -813,9 +879,11 @@
              * @param {number} _state
              */
             onMassStateChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
-                    massStatus: _state
-                });
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {massStatus: _state})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             /**
              * 0 - frig
@@ -824,12 +892,18 @@
              * @param {number} _state
              */
             onShipSizeTypeChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {
-                    shipSizeType: _state
-                });
+                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {shipSizeType: _state})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onLinkContextMenuRemove: function () {
-                api.eve.map.link.remove(this.selectedMap, this._currentContextLink);
+                api.eve.map.link.remove(this.selectedMap, this._currentContextLink)
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
             },
             /************ *************************** ************/
             /************ CHAIN CONTEXT MENU HANDLERS ************/

@@ -53,6 +53,7 @@
     import Overview from "./systemPanel/Overview";
     import Signatures from "./systemPanel/Signatures";
     import api from "../../../js/api.js";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "SystemPanel",
@@ -120,7 +121,13 @@
                     }
                 }
 
-                isValid && api.eve.map.solarSystem.update(this.mapId, this.systemId, data);
+                if(isValid) {
+                    api.eve.map.solarSystem.update(this.mapId, this.systemId, data)
+                        .then(
+                            helper.dummy,
+                            err => helper.errorHandler(this, err)
+                        );
+                }
             },
 
             refresh: function () {

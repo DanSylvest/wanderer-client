@@ -2,16 +2,28 @@
     <div class="wd-corporations-search">
         <div class="wd relative flex flex-align-center box-sizing padding-vertical-primary">
             <md-autocomplete
-                    v-model="currentValue"
-                    :md-options="searchList"
-                    md-layout="box"
-                    @md-selected="currentValue = $event.name; onElementSelected($event)"
-                    @md-changed="onElementChanged"
-                    @md-opened="onACOpened"
-                    md-dense
+                v-model="currentValue"
+                :md-options="searchList"
+                md-layout="box"
+                @md-selected="currentValue = $event.name; onElementSelected($event)"
+                @md-changed="onElementChanged"
+                @md-opened="onACOpened"
+                md-dense
+                :disabled="!this.$store.state.eveServerStatus.online"
             >
 
-                <label><md-icon>search</md-icon>Search corporations</label>
+                <template v-if="this.$store.state.eveServerStatus.online">
+                    <label class="wd-search-placeholder">
+                        <md-icon>search</md-icon>
+                        <span>Search corporations</span>
+                    </label>
+                </template>
+                <template v-else>
+                    <label class="wd-search-placeholder">
+                        <md-icon class="wd-color-negative">wifi_tethering_off</md-icon>
+                        <span>TQ has been down and search not work</span>
+                    </label>
+                </template>
 
                 <template slot="md-autocomplete-item" slot-scope="{ item, term }">
                     <img class="md-icon" :src="'https://images.evetech.net/corporations/' + item.id + '/logo'" style="margin-right: 10px;" alt="Corporation image"/>
@@ -24,9 +36,9 @@
             </md-autocomplete>
 
             <md-button
-                    class="md-raised md-accent"
-                    :disabled="buttonDisabled"
-                    @click="onElementAddButtonClicked"
+                class="md-raised md-accent"
+                :disabled="buttonDisabled"
+                @click="onElementAddButtonClicked"
             >
                 <md-icon>add</md-icon>
             </md-button>
@@ -53,12 +65,11 @@
         </md-table>
 
         <md-empty-state
-                v-show="elements.length === 0"
-                md-icon="groups"
-                md-label="Add corporations"
-                md-description="In this group is not added any corporations. Here you can search corporations and attach them to group."
-        >
-        </md-empty-state>
+            v-show="elements.length === 0"
+            md-icon="groups"
+            md-label="Add corporations"
+            md-description="In this group is not added any corporations. Here you can search corporations and attach them to group."
+        />
     </div>
 </template>
 
@@ -66,6 +77,8 @@
     import CustomPromise from "../../../js/env/promise";
     import SpamFilter from "../../../js/env/spamFilter";
     import api from "../../../js/api";
+    import cache from "../../../js/cache/cache.js";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "CorporationsSearcher",
@@ -75,9 +88,15 @@
                 currentValue: "",
                 elements: [],
                 buttonDisabled: true,
-
                 searchList: []
             }
+        },
+        beforeDestroy() {
+            this.unsubscribeOnline && this.unsubscribeOnline();
+            this.unsubscribeOnline = null;
+        },
+        beforeMount() {
+            this.unsubscribeOnline = cache.serverStatus.subscribe();
         },
         mounted: function () {
             this._passChange = false;
@@ -127,12 +146,11 @@
                 this.elementsSelected = [];
             },
             _makeSearch: function (_match, _pr) {
-                api.eve.corporation.fastSearch({match: _match}).then(function (_result) {
-                    _pr.resolve(_result);
-                }.bind(this), function () {
-                    // eslint-disable-next-line no-debugger
-                    debugger
-                }.bind(this))
+                api.eve.corporation.fastSearch({match: _match})
+                    .then(
+                        _result => _pr.resolve(_result),
+                        err => helper.errorHandler(this, err)
+                    )
             },
             getElements: function () {
                 return this.elements;
@@ -148,6 +166,16 @@
     @import "./src/css/variables";
 
     .wd-corporations-search {
+        .wd-search-placeholder {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+
+            & > *:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+
         .md-autocomplete.md-field {
             margin: 0;
         }

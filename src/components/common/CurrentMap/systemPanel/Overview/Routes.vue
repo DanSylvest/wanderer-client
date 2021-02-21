@@ -91,6 +91,8 @@
     import "../../../../../js/env/tools/standardTypeExtend.js";
     import environment from "../../../../../js/core/map/environment.js";
     import SystemCard from "../../SystemCard.vue";
+    import helper from "../../../../../js/utils/helper.js";
+
 
     export default {
         name: "Routes",
@@ -147,17 +149,21 @@
                 this.isSystemAddDialogActivated = true;
             },
             onSystemSelected (solarSystemId) {
-                api.eve.map.routes.addHub(this.localMapId, solarSystemId).then(() => {
-                    this.isSystemAddDialogActivated  = false;
-                    this.loadRoutesData();
-                }, errMsg => {
-                    alert(errMsg);
-                });
+                api.eve.map.routes.addHub(this.localMapId, solarSystemId)
+                    .then(
+                        () => {
+                            this.isSystemAddDialogActivated  = false;
+                            this.loadRoutesData();
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onRemoveRoute(destinationSolarSystemId) {
-                api.eve.map.routes.removeHub(this.localMapId, destinationSolarSystemId).then (() => {
-                    this.loadRoutesData();
-                })
+                api.eve.map.routes.removeHub(this.localMapId, destinationSolarSystemId)
+                    .then (
+                        () => this.loadRoutesData(),
+                        err => helper.errorHandler(this, err)
+                    )
             },
             onHighlightRoute (route) {
                 this.$emit("highlight-route", route.systems.map(x => x.solarSystemId))

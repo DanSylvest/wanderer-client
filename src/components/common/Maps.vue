@@ -46,7 +46,6 @@
             <ContextMenuItem c-title="Edit" c-icon="edit" @click="onMapContextMenuEdit" />
             <ContextMenuItem c-title="Remove" c-icon="delete" @click="onMapContextMenuRemove" />
         </ContextMenu>
-
     </div>
 </template>
 
@@ -57,6 +56,7 @@
     import MapsEditDialogSimple from "./maps/MapsEditDialogSimple";
 
     import api from "../../js/api";
+    import helper from "../../js/utils/helper.js";
 
     export default {
         name: "Maps",
@@ -91,15 +91,15 @@
                 prarr.push(api.eve.group.list());
                 prarr.push(api.eve.map.list());
 
-                Promise.all(prarr).then(function(_arr){
-                    this.loaded = true;
-                    this.groups = _arr[0];
-                    this.maps = _arr[1];
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function(_err){
-                    // eslint-disable-next-line no-debugger
-                    debugger; // todo
-                }.bind(this));
+                Promise.all(prarr)
+                    .then(
+                        arr => {
+                            this.loaded = true;
+                            this.groups = arr[0];
+                            this.maps = arr[1];
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             },
             edit: function (_mapId) {
                 let mapItem = this.maps.searchByObjectKey("id", _mapId);
@@ -160,16 +160,14 @@
                 this.edit(this.mapContextMenuCurrentMap);
             },
             onMapContextMenuRemove: function () {
-                api.eve.map.remove(this.mapContextMenuCurrentMap).then(function(){
-                    this.maps.eraseByObjectKey("id", this.mapContextMenuCurrentMap);
-                    this.mapContextMenuCurrentMap = null;
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function(_err){
-                    // do nothing
-                    // TODO maybe need show small snackbar
-                    // eslint-disable-next-line no-debugger
-                    debugger;
-                }.bind(this));
+                api.eve.map.remove(this.mapContextMenuCurrentMap)
+                    .then(
+                        () => {
+                            this.maps.eraseByObjectKey("id", this.mapContextMenuCurrentMap);
+                            this.mapContextMenuCurrentMap = null;
+                        },
+                        error => helper.errorHandler(this, error)
+                    );
             }
         }
     }

@@ -54,9 +54,9 @@
             <md-dialog-actions>
                 <md-button class="md-primary md-accent" @click="showEditDialog = false">Close</md-button>
                 <md-button
-                        class="md-primary md-raised"
-                        @click="onEditSubmit"
-                        :disabled="formButtonDisabled">Confirm</md-button>
+                    class="md-primary md-raised"
+                    @click="onEditSubmit"
+                    :disabled="formButtonDisabled">Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
 
@@ -69,6 +69,7 @@
     import AlliancesSearcher from "../searchers/AlliancesSearcher";
     import CharactersSearcher from "../searchers/CharactersSearcher";
     import CorporationsSearcher from "../searchers/CorporationsSearcher";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "GroupEditDialog",
@@ -98,18 +99,14 @@
         },
         methods: {
             _loadData: function () {
-                let prarr = [];
-
-                prarr.push(api.eve.group.list());
-
-                Promise.all(prarr).then(function (_arr) {
-                    this.groups = _arr[0];
-
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function (_err) {
-                    // eslint-disable-next-line no-debugger
-                    debugger; // todo
-                }.bind(this))
+                api.eve.group.list()
+                    .then(
+                        data => {
+                            this.groups = data;
+                            this.loaded = true;
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             },
             show: function (_options) {
                 this._state = !_options ? "add" : "edit";
@@ -124,23 +121,24 @@
                     prarr.push(this._loadCorporations(_options.corporations));
                     prarr.push(this._loadAlliances(_options.alliances));
 
-                    Promise.all(prarr).then(function (_arr) {
-                        this.showEditDialog = true;
+                    Promise.all(prarr)
+                        .then(
+                            arr => {
+                                this.showEditDialog = true;
 
-                        this.itemId = _options.id;
-                        this.formName = _options.name;
-                        this.formDescription = _options.description;
+                                this.itemId = _options.id;
+                                this.formName = _options.name;
+                                this.formDescription = _options.description;
 
-                        this._loadTid = setTimeout(function () {
-                            this._loadTid = -1;
-                            this.$refs.charactersSearcherRef.setElements(_arr[0]);
-                            this.$refs.corporationsSearcherRef.setElements(_arr[1]);
-                            this.$refs.alliancesSearcherRef.setElements(_arr[2]);
-                        }.bind(this), 100)
-
-                    }.bind(this), function () {
-                        // do nothing
-                    }.bind(this));
+                                this._loadTid = setTimeout(function () {
+                                    this._loadTid = -1;
+                                    this.$refs.charactersSearcherRef.setElements(arr[0]);
+                                    this.$refs.corporationsSearcherRef.setElements(arr[1]);
+                                    this.$refs.alliancesSearcherRef.setElements(arr[2]);
+                                }.bind(this), 100);
+                            },
+                            err => helper.errorHandler(this, err)
+                        );
                 } else {
                     this.showEditDialog = true;
                 }
@@ -257,19 +255,19 @@
                         break;
                 }
 
-                pr.then(function (_event) {
-                    if (this._state === "add") {
-                        options.id = _event.groupId;
-                        options.owner = _event.owner;
-                    }
+                pr.then(
+                    data => {
+                        if (this._state === "add") {
+                            options.id = data.groupId;
+                            options.owner = data.owner;
+                        }
 
-                    this.clearForm();
-                    this.showEditDialog = false;
-                    this._showPromise.resolve(options);
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function (_errMsg) { // todo
-                    // do nothing
-                }.bind(this));
+                        this.clearForm();
+                        this.showEditDialog = false;
+                        this._showPromise.resolve(options);
+                    },
+                    err => helper.errorHandler(this, err)
+                );
             },
             onEditFormChange: function (/*_event*/) {
                 this.validateEditForm();

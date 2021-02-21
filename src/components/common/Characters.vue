@@ -59,28 +59,26 @@
     import api from "../../js/api";
     import authRequest from "../../js/utils/authRequest";
     import cookie from "../../js/env/cookie";
+    import helper from "../../js/utils/helper.js";
 
     export default {
         name: "Characters",
         data: function () {
             return {
-                characters: [],
-                btoa: function () {
-                    return btoa.call(null, arguments)
-                }
+                characters: []
             }
         },
         mounted: function () {
             this._subscribers = Object.create(null);
 
-            api.eve.character.list().then(function(_characters){
-                this.characters = _characters;
-                this._initSubscribes();
-                // eslint-disable-next-line no-unused-vars
-            }.bind(this), function(_err){
-                // eslint-disable-next-line no-debugger
-                debugger;
-            }.bind(this))
+            api.eve.character.list()
+                .then(
+                    data => {
+                        this.characters = data;
+                        this._initSubscribes();
+                    },
+                    err => helper.errorHandler(this, err)
+                )
         },
         beforeDestroy: function () {
             for (let characterId in this._subscribers) {
@@ -113,11 +111,13 @@
 
             },
             onRemoveClick: function (_characterId) {
-                api.eve.character.remove(_characterId).then(function () {
-                    this.characters.eraseByObjectKey("id", _characterId);
-                }.bind(this), function (_err) {
-                    alert(JSON.stringify(_err, null, 3));
-                }.bind(this));
+                api.eve.character.remove(_characterId)
+                    .then(
+                        () => {
+                            this.characters.eraseByObjectKey("id", _characterId);
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             }
         }
     }

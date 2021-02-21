@@ -21,7 +21,7 @@
                 <div class="wd-allowed-list" v-for="item in characters" :key="item.id">
                     <div class="wd-allowed-item wd flex flex-align-center relative">
                         <div>
-                            <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" style="margin-right: 10px;" alt="Char portrait"/>
+                            <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" style="margin-right: 10px;" alt=""/>
                         </div>
                         <div class="wd font-size-medium-large">{{item.name}}</div>
                         <div class="wd absolute right ">
@@ -34,8 +34,9 @@
             <md-dialog-actions>
                 <md-button class="md-primary md-accent" @click="showDialog = false">Close</md-button>
                 <md-button
-                        class="md-primary md-raised"
-                        @click="onEditSubmit">Confirm</md-button>
+                    class="md-primary md-raised"
+                    @click="onEditSubmit"
+                >Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
     </div>
@@ -44,9 +45,11 @@
 <script>
     import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "AllowedDialog",
+        components: {},
         props: [
 
         ],
@@ -62,18 +65,8 @@
         },
         methods: {
             show: function (_groupId) {
-                this._showPromise = new CustomPromise();
-
                 this._groupId = _groupId;
-                this._loadCharacters(_groupId).then(function() {
-                    this.showDialog = true;
-// eslint-disable-next-line no-debugger
-// debugger
-                }.bind(this), function() {
-                    this._showPromise.reject();
-                }.bind(this));
-
-                return this._showPromise.native;
+                this._loadCharacters(_groupId).then(() => this.showDialog = true);
             },
             close: function () {
 
@@ -81,12 +74,14 @@
             _loadCharacters: function (_groupId) {
                 let pr = new CustomPromise();
 
-                api.eve.group.getAllowedCharacters(_groupId).then(function(_characters) {
-                    this.characters = _characters;
-                    pr.resolve();
-                }.bind(this),function(_err) {
-                    pr.reject(_err);
-                }.bind(this));
+                api.eve.group.getAllowedCharacters(_groupId)
+                    .then(
+                        data => {
+                            this.characters = data;
+                            pr.resolve();
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
 
                 return pr.native;
             },
@@ -98,11 +93,11 @@
                 // this.clearForm();
             },
             onEditSubmit: function () {
-                api.eve.group.updateAllowedCharacters(this._groupId, this.characters).then(function() {
-                    this.showDialog = false;
-                }.bind(this),function(_err) {
-                    alert(_err);
-                }.bind(this))
+                api.eve.group.updateAllowedCharacters(this._groupId, this.characters)
+                    .then(
+                        () => this.showDialog = false,
+                        err => helper.errorHandler(this, err)
+                    )
             }
         }
     }

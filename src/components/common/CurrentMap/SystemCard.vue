@@ -35,6 +35,7 @@
     import environment from "../../../js/core/map/environment";
     import exists from "../../../js/env/tools/exists";
     import extend from "../../../js/env/tools/extend.js";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "SystemCard",
@@ -58,6 +59,7 @@
         },
         data: function () {
             return {
+
                 loaded: false,
                 solarSystemId: this.cSolarSystemId,
                 mapId: this.cMapId,
@@ -81,11 +83,11 @@
         },
         mounted: function () {
             if(!exists(this.localData)) {
-                api.eve.map.solarSystem.info(this.mapId, this.solarSystemId).then(data => {
-                    this.setData(data);
-                }, errMsg => {
-                    alert(errMsg);
-                });
+                api.eve.map.solarSystem.info(this.mapId, this.solarSystemId)
+                    .then(
+                        data => this.setData(data),
+                        err => helper.errorHandler(err)
+                    );
             } else {
                 this.setData(this.localData);
             }
@@ -130,13 +132,11 @@
                 this.typeNameClass = this.getTypeNameClasses();
 
                 if(this.localIsLoadCharData) {
-                    return Promise.all(_data.onlineCharacters.map(function (_characterId) {
-                        return api.eve.character.info(_characterId, "all")
-                    }.bind(this))).then(characters => {
-                        this.characters = characters;
-                    }, errMsg => {
-                        alert(errMsg);
-                    });
+                    Promise.all(_data.onlineCharacters.map(x => api.eve.character.info(x)))
+                        .then(
+                            data => this.characters = data,
+                            err => helper.errorHandler(this, err)
+                        );
                 }
             },
 

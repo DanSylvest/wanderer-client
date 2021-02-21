@@ -10,6 +10,7 @@
     import modules from "../conf/modules";
     import RouterController from "./../js/router";
     import api from "../js/api";
+    import cache from "../js/cache/cache.js";
 
     export default {
         name: "Router",
@@ -26,7 +27,6 @@
             }
         },
         mounted: function () {
-
             this.currentPage = this.page;
             this.update();
 
@@ -41,6 +41,8 @@
         },
         methods: {
             onReady: function () {
+                cache.init();
+
                 this.router = new RouterController({
                     query: location.search
                 });

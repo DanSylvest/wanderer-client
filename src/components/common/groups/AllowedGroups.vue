@@ -27,6 +27,7 @@
 <script>
     import api from "../../../js/api";
     import AllowedDialog from "./AllowedDialog";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "AllowedGroups",
@@ -41,18 +42,25 @@
             }
         },
         mounted: function () {
+            this._isMounted = true;
             this.$nextTick().then(this._loadData);
+        },
+        beforeDestroy() {
+            this._isMounted = false;
         },
         methods: {
             _loadData: function () {
-                api.eve.group.allowedGroups().then(function(_groups){
-                    this.groups = _groups;
-                    this.loaded = true;
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function(_err){
-                    // eslint-disable-next-line no-debugger
-                    debugger
-                }.bind(this))
+                if(!this._isMounted)
+                    return;
+
+                api.eve.group.allowedGroups()
+                    .then(
+                        data => {
+                            this.groups = data;
+                            this.loaded = true;
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             },
             close: function () {
 

@@ -44,8 +44,6 @@
                         :disabled="formButtonDisabled">Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
-
-
     </div>
 </template>
 
@@ -54,6 +52,7 @@
     import api from "../../../js/api";
     import SpamFilter from "../../../js/env/spamFilter.js";
     import environment from "../../../js/core/map/environment.js";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "MapsEditDialogSimple",
@@ -65,6 +64,7 @@
         },
         data: function () {
             return {
+
                 systems: [],
                 currentSystem: "",
                 selectedValue: "",
@@ -183,12 +183,11 @@
             // ========= EDITING DIALOG PART ===========
 
             _makeSearch: function (_match, _pr) {
-                api.eve.map.solarSystem.fastSearch({match: _match}).then(function (_result) {
-                    _pr.resolve(_result);
-                }.bind(this), function () {
-                    // eslint-disable-next-line no-debugger
-                    debugger
-                }.bind(this))
+                api.eve.map.solarSystem.fastSearch({match: _match})
+                    .then(
+                        data => _pr.resolve(data),
+                        err => helper.errorHandler(this, err)
+                    )
             }
         }
     }

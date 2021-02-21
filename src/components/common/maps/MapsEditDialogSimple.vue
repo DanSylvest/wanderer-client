@@ -31,7 +31,7 @@
 
                         <template slot="md-autocomplete-item" slot-scope="{ item, term }">
                             <div class="wd-char-item wd flex flex-align-center font-size-medium">
-                                <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" alt="Char portrait"/>
+                                <img class="md-icon" :src="'https://images.evetech.net/characters/' + item.id + '/portrait'" alt=""/>
                                 <md-highlight-text :md-fuzzy-search="false" :md-term="term">{{ item.name }}</md-highlight-text>
                             </div>
                         </template>
@@ -59,8 +59,6 @@
                     :disabled="formButtonDisabled">Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
-
-
     </div>
 </template>
 
@@ -68,6 +66,7 @@
     import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
     import exists from "../../../js/env/tools/exists";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "MapsEditDialogSimple",
@@ -97,13 +96,17 @@
             show: function () {
                 this._showPromise = new CustomPromise();
 
-                api.eve.character.list().then(x => {
-                    this.characters = x.sort((a, b) => +new Date(a.addDate) - +new Date(b.addDate));
-                    this.charactersValue = this.characters[0].name;
-                    this.charactersItem = this.characters[0];
-                    this.updateSwitchboxes();
-                    this.showEditDialog = true;
-                });
+                api.eve.character.list()
+                    .then(
+                        data => {
+                            this.characters = data.sort((a, b) => +new Date(a.addDate) - +new Date(b.addDate));
+                            this.charactersValue = this.characters[0].name;
+                            this.charactersItem = this.characters[0];
+                            this.updateSwitchboxes();
+                            this.showEditDialog = true;
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
 
                 return this._showPromise.native;
             },
@@ -159,19 +162,21 @@
                     characterId: this.charactersItem.id
                 };
 
-                api.eve.map.addFast(data).then(function(data){
-                    this.clearForm();
-                    this.showEditDialog = false;
-                    this._showPromise.resolve({
-                        id          : data.mapId,
-                        name        : data.name,
-                        owner       : data.owner,
-                        description : data.description,
-                        groups      : data.groups,
-                    });
-                }.bind(this), function(){
-
-                }.bind(this));
+                api.eve.map.addFast(data)
+                    .then(
+                        data => {
+                            this.clearForm();
+                            this.showEditDialog = false;
+                            this._showPromise.resolve({
+                                id          : data.mapId,
+                                name        : data.name,
+                                owner       : data.owner,
+                                description : data.description,
+                                groups      : data.groups,
+                            });
+                        },
+                        error => helper.errorHandler(this, error)
+                    );
             },
             onEditFormChange: function (/*_event*/) {
                 this.validateEditForm();

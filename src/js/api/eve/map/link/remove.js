@@ -8,7 +8,7 @@ export default function (_mapId, _linkId) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve() : p.reject(_e.message);
+        _e.success ? p.resolve() : p.reject(_e.error);
     }.bind(this));
 
     this.send(id, ["api", "eve", "map", "link", "remove"], {

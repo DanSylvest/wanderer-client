@@ -4,6 +4,7 @@ import Link from "./link";
 import System from "./system";
 import exists from "../../../../js/env/tools/exists";
 import CustomPromise from "../../../../js/env/promise.js";
+import helper from "../../../../js/utils/helper.js";
 
 class MapController extends Emitter {
     constructor (_map, _mapId) {
@@ -172,27 +173,38 @@ class MapController extends Emitter {
 
         switch (_data.type) {
             case "bulk":
-                api.eve.map.link.info(this.mapId, _data.list).then(function (_result) {
-                    for (let a = 0; a < _result.length; a++) {
-                        this.links[_result[a].id] = new Link(this, this.map, this.mapId, _result[a].id);
-                        this.links[_result[a].id].updateInfo(_result[a]);
-                        this.links[_result[a].id].init();
-                    }
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function (_err) {
-                    // eslint-disable-next-line no-debugger
-                    debugger;
-                }.bind(this));
+                api.eve.map.link.info(this.mapId, _data.list)
+                    .then(
+                        data => {
+                            for (let a = 0; a < data.length; a++) {
+                                this.links[data[a].id] = new Link(this, this.map, this.mapId, data[a].id);
+                                this.links[data[a].id].updateInfo(data[a]);
+                                this.links[data[a].id].init();
+                            }
+                        },
+                        err => {
+                            this.emit("error", {
+                                message: "Error on load links info",
+                                err: err
+                            });
+                        }
+                    );
                 break;
             case "add":
-                api.eve.map.link.info(this.mapId, [_data.linkId]).then(function (_result) {
-                    this.links[_data.linkId] = new Link(this, this.map, this.mapId, _data.linkId);
-                    this.links[_data.linkId].updateInfo(_result[0]);
-                    this.links[_data.linkId].init();
-                }.bind(this), function () {
-                    // eslint-disable-next-line no-debugger
-                    debugger;
-                }.bind(this));
+                api.eve.map.link.info(this.mapId, [_data.linkId])
+                    .then(
+                        data => {
+                            this.links[_data.linkId] = new Link(this, this.map, this.mapId, _data.linkId);
+                            this.links[_data.linkId].updateInfo(data[0]);
+                            this.links[_data.linkId].init();
+                        },
+                        err => {
+                            this.emit("error", {
+                                message: "Error on load links info",
+                                err: err
+                            });
+                        }
+                    );
                 break;
             case "removed":
                 if (this.links[_data.linkId]) {
@@ -236,7 +248,16 @@ class MapController extends Emitter {
         }
     }
     onNewChain (sourceSolarSystemId, targetSolarSystemId) {
-        api.eve.map.addChain(this.mapId, sourceSolarSystemId, targetSolarSystemId);
+        api.eve.map.addChain(this.mapId, sourceSolarSystemId, targetSolarSystemId)
+            .then(
+                helper.dummy,
+                err => {
+                    this.emit("error", {
+                        message: "Error on load links info",
+                        err: err
+                    });
+                }
+            )
     }
     setSystemActive (systemId) {
         if(this.systems[systemId]) {

@@ -38,7 +38,6 @@
             <ContextMenuItem c-title="Edit" c-icon="edit" @click="onGroupContextMenuEdit" />
             <ContextMenuItem c-title="Remove" c-icon="delete" @click="onGroupContextMenuRemove" />
         </ContextMenu>
-
     </div>
 </template>
 
@@ -48,6 +47,7 @@
     import GroupEditDialog from "./GroupEditDialog";
 
     import api from "../../../js/api";
+    import helper from "../../../js/utils/helper.js";
 
     export default {
         name: "OwnGroups",
@@ -74,15 +74,14 @@
         },
         methods: {
             _loadData: function () {
-                api.eve.group.list().then(function (_groups) {
-                    this.groups = _groups;
-                    this.loaded = true;
-
-                    // eslint-disable-next-line no-unused-vars
-                }.bind(this), function (_err) {
-                    // eslint-disable-next-line no-debugger
-                    debugger
-                }.bind(this))
+                api.eve.group.list()
+                    .then(
+                        data => {
+                            this.groups = data;
+                            this.loaded = true;
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             },
             onRowClick: function (_groupId/*, _event*/) {
                 this.edit(_groupId);
@@ -94,19 +93,23 @@
                 return this.groups.searchByObjectKey("id", _groupId);
             },
             add: function () {
-                this.$refs.groupsEditDialogRef.show().then(function (_options) {
-                    this.groups.push({
-                        id: _options.id,
-                        name: _options.name,
-                        owner: _options.owner,
-                        description: _options.description,
-                        characters: _options.characters,
-                        corporations: _options.corporations,
-                        alliances: _options.alliances,
-                    });
-                }.bind(this), function () {
-                    // do nothing
-                }.bind(this));
+                this.$refs.groupsEditDialogRef.show()
+                    .then(
+                        options => {
+                            this.groups.push({
+                                id: options.id,
+                                name: options.name,
+                                owner: options.owner,
+                                description: options.description,
+                                characters: options.characters,
+                                corporations: options.corporations,
+                                alliances: options.alliances,
+                            });
+                        },
+                        // err => {
+                        //
+                        // }
+                    );
             },
             edit: function (_groupId) {
                 let item = this.find(_groupId);
@@ -118,14 +121,18 @@
                     characters: item.characters,
                     corporations: item.corporations,
                     alliances: item.alliances,
-                }).then(function (_options) {
-                    item.name = _options.name;
-                    item.description = _options.description;
-                    item.characters = _options.characters;
-                    item.corporations = _options.corporations;
-                }.bind(this), function () {
-                    // do nothing
-                }.bind(this));
+                })
+                    .then(
+                        options => {
+                            item.name = options.name;
+                            item.description = options.description;
+                            item.characters = options.characters;
+                            item.corporations = options.corporations;
+                        },
+                        // err => {
+                        //
+                        // }
+                    );
             },
 
             onContextMenu: function (_groupId, _event) {
@@ -141,15 +148,14 @@
                 this.edit(this._currentContextGroup);
             },
             onGroupContextMenuRemove: function () {
-                api.eve.group.remove(this._currentContextGroup).then(function () {
-                    this.groups.eraseByObjectKey("id", this._currentContextGroup);
-                    this._currentContextGroup = null;
-                }.bind(this), function (_err) {
-                    // do nothing
-                    // TODO maybe need show small snackbar
-                    // debugger;
-                    alert(_err);
-                }.bind(this));
+                api.eve.group.remove(this._currentContextGroup)
+                    .then(
+                        () => {
+                            this.groups.eraseByObjectKey("id", this._currentContextGroup);
+                            this._currentContextGroup = null;
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
             }
         }
     }
