@@ -7,13 +7,13 @@
                 <md-field md-clearable>
                     <label>Name</label>
                     <md-input v-model="formName" @input="onEditFormChange" @change="onEditFormChange"></md-input>
-                    <span class="wd-hint md-helper-text">* Map name should contain at least 3 symbols and begins with a symbol</span>
+                    <span class="wd-hint md-helper-text" v-show="isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
                 </md-field>
 
                 <md-field md-clearable>
                     <label>Description</label>
                     <md-input v-model="formDescription" @input="onEditFormChange" @change="onEditFormChange"></md-input>
-                    <span class="wd-hint md-helper-text">You can leave this field empty</span>
+                    <span class="wd-hint-positive md-helper-text">You can leave this field empty</span>
                 </md-field>
 
                 <md-field md-clearable>
@@ -40,7 +40,7 @@
                             Such character not found "{{ term }}"!
                         </template>
                     </md-autocomplete>
-                    <span class="wd-hint md-helper-text">* Choose a character to create a map for</span>
+                    <span class="wd-hint md-helper-text" v-show="isValidCharacter">* Choose a character to create a map for</span>
                 </md-field>
 
                 <div>
@@ -87,6 +87,10 @@
                 formIsAllianceShare: false,
                 formButtonDisabled: true,
                 showEditDialog: false,
+
+                isValidName: false,
+                isValidDescr: true,
+                isValidCharacter: true,
             }
         },
         mounted: function () {
@@ -187,6 +191,10 @@
 
                 let isValidCharacter = exists(this.charactersItem);
 
+                this.isValidName = !isValidName;
+                this.isValidDescr = !isValidDescription;
+                this.isValidCharacter = !isValidCharacter;
+
                 this.formButtonDisabled = !(isValidName && isValidDescription && isValidCharacter);
             },
             // ========= EDITING DIALOG PART ===========
@@ -221,6 +229,10 @@
 
     .wd-hint {
         color: $hint-color !important;
+    }
+
+    .wd-hint-positive {
+        color: $hint-color-positive !important;
     }
 
     .wd-char-item {

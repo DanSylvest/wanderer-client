@@ -17,6 +17,7 @@
                     class="wd wd-app-menu-title font-size-small text-align-center"
                 >{{localTitle}}</div>
             </div>
+            <md-tooltip v-show="!$parent.expanded" md-direction="right">{{localTitle}}</md-tooltip>
         </md-ripple>
     </div>
 </template>

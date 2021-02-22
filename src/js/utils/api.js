@@ -37,6 +37,8 @@ class API extends Emitter {
             this.emit("ready");
         }.bind(this));
 
+        this.dispatcher.on("closed", this._onClosed.bind(this));
+
         this._upgradeHandlers(this.options.handlers)
     }
 
@@ -63,6 +65,10 @@ class API extends Emitter {
 
     status() {
         return this._status;
+    }
+
+    _onClosed (data) {
+        this.emit("closed", data);
     }
 }
 

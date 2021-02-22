@@ -89,13 +89,17 @@
         },
         methods: {
             onAddClick: function (/*_event*/) {
-                api.user.getAuthToken("attach").then(function(_token){
-                    cookie.set("authToken", _token);
+                api.user.getAuthToken("attach")
+                    .then(
+                        token => {
+                            cookie.set("authToken", token);
 
-                    authRequest(query.toString({
-                        page: "ssoAuth"
-                    }));
-                }.bind(this));
+                            authRequest(query.toString({
+                                page: "ssoAuth"
+                            }));
+                        },
+                        error => helper.errorHandler(this, error)
+                    )
             },
             _initSubscribes: function () {
                 this._subscribers = Object.create(null);

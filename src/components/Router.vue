@@ -32,6 +32,7 @@
 
             api.init();
             api.on("ready", this.onReady.bind(this));
+            api.on("closed", this.onClosed.bind(this));
         },
         watch: {
             cPage: function (_val) {
@@ -47,6 +48,18 @@
                     query: location.search
                 });
                 this.router.run().then(this.onRoute.bind(this));
+            },
+            // eslint-disable-next-line no-unused-vars
+            onClosed (event) {
+                setTimeout(() => {
+                    window.vueApp.showErrorModal({
+                        title: "Error",
+                        message: "Connection with server has lost or client can't establish connection.",
+                        callback : () => {
+                            window.location = window.location.origin + window.location.pathname;
+                        }
+                    });
+                }, 500);
             },
             onRoute: function (_data) {
                 this.currentPage = _data.page;

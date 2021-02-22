@@ -162,6 +162,11 @@ class Map extends Emitter {
         this.magnifier.setSize(this.width, this.height);
         this.magnifier.toCenter();
     }
+    resetOffset () {
+        this.setOffset(-this.width / 2, -this.height / 2);
+        this.render();
+        this.emit("offsetChanged", new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
+    }
     createMarker (customId, _options) {
         let base = extend({
             customId: customId,

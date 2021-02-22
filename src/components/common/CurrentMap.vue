@@ -40,13 +40,19 @@
                         </md-speed-dial-target>
 
                         <md-speed-dial-content>
-                            <md-button class="md-icon-button" @click="onSaveClick">
-                                <md-icon>save</md-icon>
+                            <md-button class="md-icon-button" @click="onResetCamera">
+                                <md-icon>search_off</md-icon>
+                                <md-tooltip md-direction="right">Reset camera</md-tooltip>
                             </md-button>
 
-                            <md-button class="md-icon-button" :class="{ 'md-accent': isAutoAlignment }" @click="onAAClick">
-                                <md-icon>scatter_plot</md-icon>
+                            <md-button class="md-icon-button" @click="onSaveClick">
+                                <md-icon>save</md-icon>
+                                <md-tooltip md-direction="right">Save systems position</md-tooltip>
                             </md-button>
+
+<!--                            <md-button class="md-icon-button" :class="{ 'md-accent': isAutoAlignment }" @click="onAAClick">-->
+<!--                                <md-icon>scatter_plot</md-icon>-->
+<!--                            </md-button>-->
                         </md-speed-dial-content>
                     </md-speed-dial>
                 </transition>
@@ -734,6 +740,9 @@
                         helper.dummy,
                         err => helper.errorHandler(this, err)
                     );
+            },
+            onResetCamera () {
+                this.mapController.map.resetOffset();
             },
             onMapContainerContext: function (_event) {
                 _event.preventDefault();

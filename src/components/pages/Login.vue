@@ -138,6 +138,7 @@
     import query from "../../js/env/query";
     import api from "../../js/api";
     import authRequest from "../../js/utils/authRequest";
+    import helper from "../../js/utils/helper.js";
 
     export default {
         name: "Login",
@@ -148,13 +149,17 @@
         mounted: function () {},
         methods: {
             onEveSSOLogin: function () {
-                api.user.getAuthToken("auth").then(function(_token){
-                    cookie.set("authToken", _token);
+                api.user.getAuthToken("auth")
+                    .then(
+                        token => {
+                            cookie.set("authToken", token);
 
-                    authRequest(query.toString({
-                        page: "ssoAuth"
-                    }));
-                }.bind(this));
+                            authRequest(query.toString({
+                                page: "ssoAuth"
+                            }));
+                        },
+                        error => helper.errorHandler(this, error)
+                    )
             }
         }
     }

@@ -14,7 +14,7 @@ export default function (_type) {
 
     let id = this.add(function (_e) {
         this.remove(id);
-        _e.success ? p.resolve(_e.token) : p.reject(_e.message);
+        _e.success ? p.resolve(_e.token) : p.reject(_e.error);
     }.bind(this));
 
     this.send(id, ["api", "user", "getAuthToken"], {type: _type});

@@ -17,6 +17,11 @@ Vue.config.productionTip = false
 globalThis.vueApp = new Vue({
     store: store,
     render: h => h(App),
+    methods: {
+        showErrorModal({title, message, callback}) {
+            window.vueApp.$children[0].showErrorModal({title, message, callback})
+        }
+    }
 }).$mount('#app')
 
 

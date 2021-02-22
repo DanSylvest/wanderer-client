@@ -89,13 +89,17 @@ class Router extends Emitter {
     _checkLogin() {
         let token = cookie.get("token");
         if(exists(token)) {
-            api.user.checkToken(token).then(function() {
-                this.isLogged = true;
-                this._nextState(ST_CHECK_PROTECT_PAGE);
-            }.bind(this), function() {
-                cookie.remove("token");
-                this._nextState(ST_CHECK_FIRST_TIME);
-            }.bind(this));
+            api.user.checkToken(token)
+                .then(
+                    () => {
+                        this.isLogged = true;
+                        this._nextState(ST_CHECK_PROTECT_PAGE);
+                    },
+                    () => {
+                        cookie.remove("token");
+                        this._nextState(ST_CHECK_FIRST_TIME);
+                    }
+                );
         } else {
             this._nextState(ST_CHECK_FIRST_TIME);
         }

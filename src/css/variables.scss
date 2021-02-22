@@ -1,6 +1,7 @@
 @import "eveVariables";
 @import "~vue-material/dist/theme/engine";
 $hint-color: md-get-palette-color(red, 300);
+$hint-color-positive: md-get-palette-color(green, 300);
 
 $bg-primary: #272727;
 $bg-secondary: #2f2f2f;

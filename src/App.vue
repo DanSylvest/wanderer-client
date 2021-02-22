@@ -13,6 +13,8 @@
         </transition>
 
         <notifications group="mainNotifications" position="bottom right"/>
+
+        <Dialog :show="globalDialog.show" :title="globalDialog.title" :message="globalDialog.message" :close-handler="globalDialog.callback" />
     </div>
 </template>
 
@@ -20,6 +22,7 @@
     import MainLoader from './components/ui/MainLoader.vue'
     import Copyright from "./components/ui/Copyright";
     import Router from "./components/Router";
+    import Dialog from "./components/ui/Dialog.vue";
 
     export default {
         name: 'App',
@@ -27,6 +30,7 @@
             Router,
             Copyright,
             MainLoader,
+            Dialog
         },
         mounted: function () {
 
@@ -36,13 +40,25 @@
                 setTimeout(() => {
                     this.isShowMainLoader = false;
                 }, 1000);
+            },
+            showErrorModal ({title, message, callback}) {
+                this.globalDialog.show = true;
+                this.globalDialog.title = title;
+                this.globalDialog.message = message;
+                this.globalDialog.callback = callback;
             }
         },
         data: function() {
             return {
                 // eslint-disable-next-line vue/require-prop-type-constructor
                 isShowMainLoader: true,
-                routerPage: ""
+                routerPage: "",
+
+                globalDialog: {
+                    show: false,
+                    message: "kek",
+                    callback: () => {}
+                }
             };
         }
     }
