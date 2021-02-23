@@ -49,10 +49,6 @@
                                 <md-icon>save</md-icon>
                                 <md-tooltip md-direction="right">Save systems position</md-tooltip>
                             </md-button>
-
-<!--                            <md-button class="md-icon-button" :class="{ 'md-accent': isAutoAlignment }" @click="onAAClick">-->
-<!--                                <md-icon>scatter_plot</md-icon>-->
-<!--                            </md-button>-->
                         </md-speed-dial-content>
                     </md-speed-dial>
                 </transition>
@@ -73,36 +69,10 @@
             <system-panel ref="systemPanel" @highlight-route="onHighlightRoute" @hubs-updated="onHubsUpdated" />
 
             <!-- CHAIN CONTEXT MENU -->
-            <context-menu :c-activated.sync="linkCMActive" :c-offset-x="linkCMOffsetX" :c-offset-y="linkCMOffsetY" @c-closed="onClosedLinkContext">
-                <context-menu-item c-title="Time state" c-icon="access_time" :c-is-submenu="true" >
-                    <context-menu-item
-                        :c-active="item.active"
-                        :c-title="item.title.toString()"
-                        v-for="item in timeStatuses"
-                        :key="item.uid"
-                        @click="onTimeStateChange(item.id)"
-                    />
-                </context-menu-item>
-                <context-menu-item c-title="Mass state" c-icon="slow_motion_video" :c-is-submenu="true">
-                    <context-menu-item
-                        :c-active="item.active"
-                        :c-title="item.title.toString()"
-                        v-for="item in massStatuses"
-                        :key="item.uid"
-                        @click="onMassStateChange(item.id)"
-                    />
-                </context-menu-item>
-                <context-menu-item c-title="Ship size" c-icon="slow_motion_video" :c-is-submenu="true">
-                    <context-menu-item
-                        :c-active="item.active"
-                        :c-title="item.title.toString()"
-                        v-for="item in shipSizeStatuses"
-                        :key="item.uid"
-                        @click="onShipSizeTypeChange(item.id)"
-                    />
-                </context-menu-item>
-                <context-menu-item c-title="Disconnect chain" c-icon="delete" @click="onLinkContextMenuRemove" />
-            </context-menu>
+            <chain-context-menu
+                :show.sync="linkCMActive"
+                :data="chainContextData"
+            />
 
             <!-- SOLAR SYSTEM CONTEXT MENU -->
             <solar-system-context-menu
@@ -159,6 +129,7 @@
     import SystemAddDialog from "./CurrentMap/SystemAddDialog.vue";
     import copyToClipboard from "../../js/env/copyToClipboard.js";
     import helper from "../../js/utils/helper.js";
+    import ChainContextMenu from "./CurrentMap/ContextMenu/ChainContextMenu.vue";
 
     export default {
         name: "CurrentMap",
@@ -170,7 +141,8 @@
             SystemPanel,
             SystemCard,
             SystemAddDialog,
-            SolarSystemContextMenu
+            SolarSystemContextMenu,
+            ChainContextMenu
         },
         props: [
 
@@ -186,6 +158,15 @@
                     isLocked: false,
                     mapId: "",
                     solarSystemId: ""
+                },
+
+                chainContextData : {
+                    offset: {x: 0, y: 0},
+                    timeStatus: "",
+                    massStatus: "",
+                    shipSizeType: "",
+                    mapId: "",
+                    chainId: ""
                 },
 
 
@@ -570,30 +551,20 @@
                 this.rootCMOffsetY = y + 10;
             },
             openLinkContextMenu (linkId, x, y) {
+                this._offContexts();
+
                 this._currentContextLink = linkId;
                 this.linkCMActive = true;
-                this.linkCMOffsetX = x + 10;
-                this.linkCMOffsetY = y + 10;
 
                 let chainInfo = this.mapController.getLink(this._currentContextLink).info;
-
-                this.timeStatuses = environment.timeStatuses.map(x => {
-                    x.active = x.id === chainInfo.timeStatus;
-                    x.uid = this.uidCounter++;
-                    return x;
-                });
-
-                this.massStatuses = environment.massStatuses.map(x => {
-                    x.active = x.id === chainInfo.massStatus;
-                    x.uid = this.uidCounter++;
-                    return x;
-                });
-
-                this.shipSizeStatuses = environment.shipSizeStatuses.map(x => {
-                    x.active = x.id === chainInfo.shipSizeType;
-                    x.uid = this.uidCounter++;
-                    return x;
-                });
+                this.chainContextData = {
+                    offset: {x: x + 10, y: y + 10},
+                    timeStatus: chainInfo.timeStatus,
+                    massStatus: chainInfo.massStatus,
+                    shipSizeType: chainInfo.shipSizeType,
+                    mapId: this.mapController.mapId,
+                    chainId: linkId
+                }
             },
             selectMapOnStart: function () {
                 this.showMapEmpty = this.allowedMaps.length === 0;
@@ -755,63 +726,6 @@
                         err => helper.errorHandler(this, err)
                     )
             },
-            /************ SOLAR SYSTEM CONTEXT MENU HANDLERS ************/
-            /************ ********************************** ************/
-            onClosedSystemContext: function () {
-                this._currentContextSystem = null;
-            },
-            /************ ********************************** ************/
-            /************ SOLAR SYSTEM CONTEXT MENU HANDLERS ************/
-
-
-            /************ CHAIN CONTEXT MENU HANDLERS ************/
-            /************ *************************** ************/
-            onClosedLinkContext: function () {
-                this._currentContextLink = null;
-            },
-            onTimeStateChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {timeStatus: _state})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            /**
-             * 0 - whole
-             * 1 - half
-             * 2 - verge
-             * @param {number} _state
-             */
-            onMassStateChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {massStatus: _state})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            /**
-             * 0 - frig
-             * 1 - M/L
-             * 2 - Capital
-             * @param {number} _state
-             */
-            onShipSizeTypeChange: function (_state) {
-                api.eve.map.link.update(this.selectedMap, this._currentContextLink, {shipSizeType: _state})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onLinkContextMenuRemove: function () {
-                api.eve.map.link.remove(this.selectedMap, this._currentContextLink)
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            /************ *************************** ************/
-            /************ CHAIN CONTEXT MENU HANDLERS ************/
-
             onHighlightRoute (route) {
                 this.mapController.highlightRoute(route);
             },
@@ -868,7 +782,4 @@
             opacity: 1;
         }
     }
-
-
-
 </style>
