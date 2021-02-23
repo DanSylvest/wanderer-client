@@ -105,55 +105,11 @@
             </context-menu>
 
             <!-- SOLAR SYSTEM CONTEXT MENU -->
-            <context-menu :c-activated.sync="systemCMActive" :c-offset-x="systemCMOffsetX" :c-offset-y="systemCMOffsetY" @c-closed="onClosedSystemContext">
-                <context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">
-                    <context-menu-item c-title="Clear" c-icon="block" @click="onClearTag"/>
-                    <context-menu-item c-title="Letter" c-icon="edit" :c-is-submenu="true">
-                        <context-menu-item
-                            :c-active="item.active"
-                            :c-title="item.tagName.toString()"
-                            v-for="item in letters"
-                            :key="item.uid"
-                            @click="onLetterClick(item.tagName)"
-                        />
-                    </context-menu-item>
-                    <context-menu-item c-title="Digit" c-icon="edit" :c-is-submenu="true">
-                        <context-menu-item
-                            :c-active="item.active"
-                            :c-title="item.tagName.toString()"
-                            v-for="item in digits"
-                            :key="item.uid"
-                            @click="onDigitClick(item.tagName)"
-                        />
-                    </context-menu-item>
-                </context-menu-item>
-                <context-menu-item c-title="Status" c-icon="report_problem" :c-is-submenu="true">
-                    <context-menu-item
-                        :c-active="item.active"
-                        :c-title="item.name"
-                        :c-icon="item.icon"
-                        :c-icon-class="'eve-system-status-color-' + item.id"
-                        v-for="(item, index) in statuses"
-                        :key="item.uid"
-                        @click="onStatusClick(index)"
-                    />
-                </context-menu-item>
-                <context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
-                <context-menu-item c-title="Waypoints" c-icon="call_split" :c-is-submenu="true" v-show="isSystemInKSpace">
-                    <context-menu-item :c-title="item.name" :c-is-submenu="true" v-for="item in characters" :key="item.id">
-                        <context-menu-item c-title="Set Destination" c-icon="near_me" @click="onSetDestination(item.id)"/>
-                        <context-menu-item c-title="Add Waypoint Front" c-icon="call_missed" @click="onAddWaypointFront(item.id)" />
-                        <context-menu-item c-title="Add Waypoint Back" c-icon="call_missed_outgoing" @click="onAddWaypointBack(item.id)" />
-                    </context-menu-item>
-                </context-menu-item>
-
-                <context-menu-item c-title="Mark as hub" c-icon="near_me" v-show="systemContextMenuMarkAsHub" @click="onMarkAsHub(true)" />
-                <context-menu-item c-title="Unmark as hub" c-icon="near_me_disabled" v-show="!systemContextMenuMarkAsHub" @click="onMarkAsHub(false)" />
-
-                <context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="systemContextMenuLockedItem" @click="onSystemContextMenuUnlock" />
-                <context-menu-item c-title="Lock system" c-icon="lock" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuLock" />
-                <context-menu-item c-title="Remove system" c-icon="delete" v-show="!systemContextMenuLockedItem" @click="onSystemContextMenuRemove" />
-            </context-menu>
+            <solar-system-context-menu
+                :show.sync="systemCMActive"
+                :data="solarSystemContextData"
+                @contextActivated="onSolarSystemContextActivated"
+            />
 
             <!-- SOLAR SYSTEMS CONTEXT MENU -->
             <context-menu :c-activated.sync="systemsCMActive" :c-offset-x="systemsCMOffsetX" :c-offset-y="systemsCMOffsetY" @c-closed="onClosedSystemsContext">
@@ -192,6 +148,7 @@
     import Map from "../../js/core/map/map";
     import exists from "../../js/env/tools/exists";
     import environment from "../../js/core/map/environment.js";
+    import SolarSystemContextMenu from "./CurrentMap/ContextMenu/SolarSystemContextMenu.vue";
 
     import ContextMenu from "../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
@@ -212,13 +169,26 @@
             AreaSelection,
             SystemPanel,
             SystemCard,
-            SystemAddDialog
+            SystemAddDialog,
+            SolarSystemContextMenu
         },
         props: [
 
         ],
         data: function () {
             return {
+                solarSystemContextData : {
+                    offset: {x: 0, y: 0},
+                    tag: "",
+                    status: -1,
+                    isSystemInKSpace: false,
+                    markAsHub: false,
+                    isLocked: false,
+                    mapId: "",
+                    solarSystemId: ""
+                },
+
+
                 digits: [],
                 letters: [],
                 statuses: [],
@@ -316,12 +286,12 @@
                 let pr = new CustomPromise();
 
                 let prarr = [];
-                prarr.push(api.eve.character.list());
+                // prarr.push(api.eve.character.list());
                 prarr.push(this.subscribeOnMaps());
                 Promise.all(prarr)
                     .then(
-                         arr => {
-                            this.characters = arr[0];
+                         () => {
+                            // this.characters = arr[0];
                             this.isLoaded = true;
                             this.showMapEmpty = this.allowedMaps.length === 0;
                             pr.resolve();
@@ -522,39 +492,65 @@
 
                 this._currentContextSystem = solarSystemId;
                 this.systemCMActive = true;
-                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                this.systemContextMenuLockedItem = systemInfo.isLocked;
-                this.systemCMOffsetX = x + 10;
-                this.systemCMOffsetY = y + 10;
+                let systemInfo = this.mapController.getSystem(solarSystemId).info;
 
-                this.statuses = environment.statuses.slice().map((x, i) => {
-                    x.active = i === systemInfo.status;
-                    x.uid = this.uidCounter++;
-                    return x;
-                });
-
-                this.digits = environment.digits.map(x => ({
-                    active: x.toString() === systemInfo.tag,
-                    uid: this.uidCounter++,
-                    tagName: x
-                }));
-
-                this.letters = environment.letters.map(x => ({
-                    active: x.toString() === systemInfo.tag,
-                    uid: this.uidCounter++,
-                    tagName: x
-                }));
-
-                this.systemContextMenuMarkAsHub = this.hubs.indexOf(this._currentContextSystem) === -1;
-
+                let isSystemInKSpace = false;
                 switch (systemInfo.systemType) {
                     case 0:
                     case 1:
                     case 2:
-                        this.isSystemInKSpace = true;
+                        isSystemInKSpace = true;
                         break;
                     default:
-                        this.isSystemInKSpace = false;
+                        isSystemInKSpace = false;
+                }
+
+                this.solarSystemContextData = {
+                    offset: {x: x + 10, y: y + 10},
+                    tag: systemInfo.tag,
+                    status: systemInfo.status,
+                    isSystemInKSpace: isSystemInKSpace,
+                    markAsHub: this.hubs.indexOf(this._currentContextSystem) === -1,
+                    isLocked: systemInfo.isLocked,
+                    mapId: this.mapController.mapId,
+                    solarSystemId: solarSystemId
+                }
+            },
+            onSolarSystemContextActivated (event) {
+                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
+                switch (event.type) {
+                    case "tag":
+                        systemInfo.tag = event.data;
+                        api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: event.data})
+                            .then(
+                                helper.dummy,
+                                err => helper.errorHandler(this, err)
+                            );
+                        break;
+                    case "status":
+                        api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {status: event.data});
+                        systemInfo.status = event.data;
+                        break;
+                    case "copyName":
+                        copyToClipboard(systemInfo.name);
+                        break;
+                    case "markAsHub":
+                        if (event.data) {
+                            this.hubs.push(this._currentContextSystem);
+                            api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem)
+                                .then(
+                                    () => this.$refs.systemPanel.addHub(this._currentContextSystem),
+                                    error => helper.errorHandler(this, error)
+                                );
+                        } else {
+                            this.hubs.removeByValue(this._currentContextSystem);
+                            api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem)
+                                .then(
+                                    () => this.$refs.systemPanel.removeHub(this._currentContextSystem),
+                                    err => helper.errorHandler(this, err)
+                                );
+                        }
+                        break;
                 }
             },
             openSolarSystemsContextMenu (solarSystemsId, x, y) {
@@ -763,107 +759,6 @@
             /************ ********************************** ************/
             onClosedSystemContext: function () {
                 this._currentContextSystem = null;
-            },
-            onClearTag: function () {
-                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                systemInfo.tag = "";
-
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: ""})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onLetterClick: function (_letter) {
-                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                systemInfo.tag = _letter;
-
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: _letter})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onDigitClick: function (_digit) {
-                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                systemInfo.tag = _digit;
-
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {tag: _digit})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onStatusClick (status) {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {
-                    status: status
-                });
-
-                let systemInfo = this.mapController.getSystem(this._currentContextSystem).info;
-                systemInfo.status = status;
-            },
-            onSystemCopyName: function () {
-                let systemName = this.mapController.systems[this._currentContextSystem].info.name;
-                copyToClipboard(systemName);
-            },
-            onSetDestination: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 0, this._currentContextSystem)
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onAddWaypointFront: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 1, this._currentContextSystem)
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onAddWaypointBack: function (_characterId) {
-                api.eve.map.waypoint(_characterId, 2, this._currentContextSystem)
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onMarkAsHub(bool) {
-                if(bool) {
-                    this.hubs.push(this._currentContextSystem);
-                    api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem)
-                        .then(
-                            () => this.$refs.systemPanel.addHub(this._currentContextSystem),
-                            error => helper.errorHandler(this, error)
-                        );
-                } else {
-                    this.hubs.removeByValue(this._currentContextSystem);
-                    api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem)
-                        .then (
-                            () => this.$refs.systemPanel.removeHub(this._currentContextSystem),
-                            err => helper.errorHandler(this, err)
-                        );
-                }
-            },
-            onSystemContextMenuLock: function () {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {isLocked: true})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onSystemContextMenuUnlock: function () {
-                api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, {isLocked: false})
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
-            },
-            onSystemContextMenuRemove: function() {
-                api.eve.map.solarSystem.remove(this.selectedMap, [this._currentContextSystem])
-                    .then(
-                        helper.dummy,
-                        err => helper.errorHandler(this, err)
-                    );
             },
             /************ ********************************** ************/
             /************ SOLAR SYSTEM CONTEXT MENU HANDLERS ************/

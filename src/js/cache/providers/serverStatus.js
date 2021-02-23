@@ -45,7 +45,7 @@ class ServerStatus extends Emitter {
 
     // eslint-disable-next-line no-unused-vars
     _onChange (data) {
-        if(data)
+        if(data.isOnline)
             store.dispatch("eveServerStatus/setOnline");
         else
             store.dispatch("eveServerStatus/setOffline");

@@ -9,6 +9,7 @@ import getName from "./getName";
 import fastSearch from "./fastSearch";
 import online from "./online";
 import remove from "./remove";
+import byUser from "./byUser";
 
 export default {
     add: add,
@@ -17,5 +18,6 @@ export default {
     getName: getName,
     fastSearch: fastSearch,
     online: online,
+    byUser: byUser,
     remove: remove
 }
