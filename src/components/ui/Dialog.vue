@@ -45,7 +45,8 @@
         },
         methods: {
             onDialogClose () {
-                this.showModal = false;
+                // this.showModal = false;
+                this.$emit("update:show", false)
                 this.onClose();
             }
         },

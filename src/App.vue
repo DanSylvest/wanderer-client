@@ -14,7 +14,7 @@
 
         <notifications group="mainNotifications" position="bottom right"/>
 
-        <Dialog :show="globalDialog.show" :title="globalDialog.title" :message="globalDialog.message" :close-handler="globalDialog.callback" />
+        <Dialog :show.sync="globalDialog.show" :title="globalDialog.title" :message="globalDialog.message" :close-handler="globalDialog.callback" />
     </div>
 </template>
 
@@ -42,10 +42,21 @@
                 }, 1000);
             },
             showErrorModal ({title, message, callback}) {
+                let base = {
+                    ...{
+                        title: "",
+                        message: "",
+                        callback: () => {}
+                    },
+                    title,
+                    message,
+                    callback
+                }
+
                 this.globalDialog.show = true;
-                this.globalDialog.title = title;
-                this.globalDialog.message = message;
-                this.globalDialog.callback = callback;
+                this.globalDialog.title = base.title;
+                this.globalDialog.message = base.message;
+                this.globalDialog.callback = base.callback;
             }
         },
         data: function() {

@@ -69,17 +69,10 @@
             <system-panel ref="systemPanel" @highlight-route="onHighlightRoute" @hubs-updated="onHubsUpdated" />
 
             <!-- CHAIN CONTEXT MENU -->
-            <chain-context-menu
-                :show.sync="linkCMActive"
-                :data="chainContextData"
-            />
+            <chain-context-menu :show.sync="linkCMActive" :data="chainContextData" />
 
             <!-- SOLAR SYSTEM CONTEXT MENU -->
-            <solar-system-context-menu
-                :show.sync="systemCMActive"
-                :data="solarSystemContextData"
-                @contextActivated="onSolarSystemContextActivated"
-            />
+            <solar-system-context-menu :show.sync="systemCMActive" :data="solarSystemContextData" @contextActivated="onSolarSystemContextActivated" />
 
             <!-- SOLAR SYSTEMS CONTEXT MENU -->
             <context-menu :c-activated.sync="systemsCMActive" :c-offset-x="systemsCMOffsetX" :c-offset-y="systemsCMOffsetY" @c-closed="onClosedSystemsContext">
@@ -169,14 +162,6 @@
                     chainId: ""
                 },
 
-
-                digits: [],
-                letters: [],
-                statuses: [],
-                timeStatuses: [],
-                massStatuses: [],
-                shipSizeStatuses: [],
-                uidCounter: 0, // this is need for correct updating statuses active item
                 selectedMap: null,
                 allowedMaps: [],
                 showMapEmpty: false,
@@ -190,14 +175,8 @@
                 rootCMOffsetX: 0,
                 rootCMOffsetY: 0,
 
-                linkCMOffsetX: 0,
-                linkCMOffsetY: 0,
                 linkCMActive: false,
-
-                systemCMOffsetX: 0,
-                systemCMOffsetY: 0,
                 systemCMActive: false,
-                isSystemInKSpace: false,
 
                 systemsCMActive: false,
                 systemsCMOffsetX: 0,

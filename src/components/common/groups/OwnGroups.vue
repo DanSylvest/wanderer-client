@@ -48,6 +48,7 @@
 
     import api from "../../../js/api";
     import helper from "../../../js/utils/helper.js";
+    import cache from "../../../js/cache/cache.js";
 
     export default {
         name: "OwnGroups",
@@ -64,13 +65,16 @@
                 contextOffsetY: 0
             }
         },
-        beforeMount() {
-        },
         mounted: function () {
             //todo this some bullshit but... i don't know how fix it
             this.$nextTick().then(this._loadData);
         },
         beforeDestroy() {
+            this.unsubscribeOnline && this.unsubscribeOnline();
+            this.unsubscribeOnline = null;
+        },
+        beforeMount() {
+            this.unsubscribeOnline = cache.serverStatus.subscribe();
         },
         methods: {
             _loadData: function () {
@@ -83,8 +87,16 @@
                         err => helper.errorHandler(this, err)
                     );
             },
-            onRowClick: function (_groupId/*, _event*/) {
-                this.edit(_groupId);
+            onRowClick: function (groupId) {
+                if(this.$store.state.eveServerStatus.online) {
+                    this.edit(groupId);
+                } else {
+                    let groupInfo = this.groups.searchByObjectKey("id", groupId);
+                    window.vueApp.showErrorModal({
+                        title: "Attention",
+                        message: `Group "${groupInfo.name}" is not available because TQ is offline (this functional depended by ESI).`,
+                    });
+                }
             },
             onShowCreateDialog: function () {
                 this.add();
