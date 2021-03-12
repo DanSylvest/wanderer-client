@@ -131,13 +131,27 @@ export default {
 
     statuses : [
         {id: "unknown", name: "unknown", icon: "block"},
+        {id: "home", name: "Home", icon: "invert_colors"},
         {id: "friendly", name: "friendly", icon: "invert_colors"},
+        {id: "lookingFor", name: "looking for", icon: "invert_colors"},
         {id: "warning", name: "warning", icon: "invert_colors"},
         {id: "targetPrimary", name: "target primary", icon: "invert_colors"},
         {id: "targetSecondary", name: "target secondary", icon: "invert_colors"},
         {id: "dangerousPrimary", name: "dangerous primary", icon: "invert_colors"},
         {id: "dangerousSecondary", name: "dangerous secondary", icon: "invert_colors"},
     ],
+
+    statusesNames : {
+        unknown: 0,
+        friendly: 1,
+        warning: 2,
+        targetPrimary: 3,
+        targetSecondary: 4,
+        dangerousPrimary: 5,
+        dangerousSecondary: 6,
+        lookingFor: 7,
+        home: 8,
+    },
 
     advices : [
         {type: "joke", name: "", description: "Sabre on DScan"},
@@ -151,7 +165,7 @@ export default {
     ],
 
     timeStatuses: [
-        {title: "Not yet begun", icon: "done_all", id: 0},
+        {title: "Whole", icon: "done_all", id: 0},
         {title: "End of life", icon: "error_outline", id: 1},
     ],
 

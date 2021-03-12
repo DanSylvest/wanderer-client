@@ -44,6 +44,55 @@ $active-color: #7be1ff;
                 box-shadow: 0 0 5px 1px $active-color;
             }
 
+            &.system-status-unknown {
+
+
+            }
+
+            &.system-status-friendly {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
+                }
+            }
+            &.system-status-warning {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);
+                }
+            }
+            &.system-status-targetPrimary {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);
+                }
+            }
+            &.system-status-targetSecondary {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);
+                }
+            }
+            &.system-status-dangerousPrimary {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);
+                }
+            }
+            &.system-status-dangerousSecondary {
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);
+                }
+            }
+            &.system-status-lookingFor {
+                background-image: linear-gradient(45deg, #45ff8f5c, #457fff);
+                & > .eve-marker-body {
+                    //background-image: linear-gradient(45deg, $eve-solar-system-status-lookingFor, transparent);
+                }
+            }
+            &.system-status-home {
+                background-image: linear-gradient(-52deg, #ffd22ed1, #8bff34);
+
+                & > .eve-marker-body {
+                    background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
+                }
+            }
+
             & > .eve-marker-body {
                 transition: background-color 200ms;
                 background-color: $bg-3;
@@ -55,14 +104,6 @@ $active-color: #7be1ff;
 
                 &.triglavian {background-image: linear-gradient(223deg, #a5000052, transparent);}
                 &.edencom {background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);}
-
-                &.system-status-unknown { }
-                &.system-status-friendly {background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);}
-                &.system-status-warning {background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);}
-                &.system-status-targetPrimary {background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);}
-                &.system-status-targetSecondary {background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);}
-                &.system-status-dangerousPrimary {background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);}
-                &.system-status-dangerousSecondary {background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);}
 
                 &:hover {
                     background-color: $bg-3-major;
@@ -213,6 +254,13 @@ $active-color: #7be1ff;
 .map-link.link-top.mass-state-2.time-state-1 { stroke: $eve-link-color-top-mass-2-time-1; }
 .map-link.link-top.temp-chain { stroke-width: 4px; stroke: $eve-link-color-temp; }
 
+.map-link.link-top.ship-size-0 {
+    //stroke: aliceblue;
+
+    &.time-state-1 {
+        stroke: $eve-link-color-middle-time-1;
+    }
+}
 
 .map-link.link-middle { pointer-events: none; }
 .map-link.link-middle.ship-size-0 { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7;}
@@ -224,6 +272,14 @@ $active-color: #7be1ff;
 .map-link.link-middle.time-state-0 { stroke: $eve-link-color-middle-time-0; }
 .map-link.link-middle.time-state-1 { stroke: $eve-link-color-middle-time-1; }
 .map-link.link-top.temp-chain { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7; }
+
+.map-link.link-middle.ship-size-0 {
+    stroke: $eve-link-color-middle-time-1-border;
+
+    &.time-state-1 {
+        stroke: $eve-link-color-middle-time-1-border;
+    }
+}
 
 .map-link.link-bottom { }
 .map-link.link-bottom.ship-size-0  { stroke-width: 5px; }
@@ -351,6 +407,8 @@ $active-color: #7be1ff;
 .eve-system-status-color-targetSecondary {color: $eve-solar-system-status-color-targetSecondary !important;}
 .eve-system-status-color-dangerousPrimary {color: $eve-solar-system-status-color-dangerousPrimary !important;}
 .eve-system-status-color-dangerousSecondary {color: $eve-solar-system-status-color-dangerousSecondary !important;}
+.eve-system-status-color-lookingFor {color: $eve-solar-system-status-color-lookingFor !important;}
+.eve-system-status-color-home {color: $eve-solar-system-status-color-home !important;}
 
 .wd-route-system-shape-triangle {
     clip-path: polygon(50% 0, 0 100%, 100% 100%);

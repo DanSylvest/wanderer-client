@@ -108,9 +108,8 @@ class Marker extends Emitter{
         }
 
         if(exists(_data.status)) {
-            let bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
-            bodyEl.classRemove.apply(bodyEl, environment.statuses.map(x => `system-status-${x.id}`));
-            bodyEl.classAdd(`system-status-${environment.statuses[_data.status].id}`);
+            markerEl.classRemove.apply(markerEl, environment.statuses.map(x => `system-status-${x.id}`));
+            markerEl.classAdd(`system-status-${environment.statuses[_data.status].id}`);
         }
 
         if(exists(_data.systemData) && exists(_data.systemData.effectType)) {

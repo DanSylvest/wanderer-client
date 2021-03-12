@@ -9,6 +9,7 @@ $eve-link-color-middle-mass-1: #333;
 $eve-link-color-middle-mass-2: #333;
 $eve-link-color-middle-time-0: #5c5c5c;
 $eve-link-color-middle-time-1: #ff00cd;
+$eve-link-color-middle-time-1-border: #99f3ff;
 
 $eve-link-color-top-mass-1-time-1: #796300;
 $eve-link-color-top-mass-2-time-1: #8c1717;
@@ -68,6 +69,8 @@ $eve-solar-system-status-targetPrimary: #b439ff6b;
 $eve-solar-system-status-targetSecondary: rgba(255, 57, 249, 0.35);
 $eve-solar-system-status-dangerousPrimary: #d54040;
 $eve-solar-system-status-dangerousSecondary: #fd54437a;
+$eve-solar-system-status-lookingFor: rgba(67, 176, 253, 0.48);
+$eve-solar-system-status-home: rgb(197, 253, 67);
 
 $eve-solar-system-status-color-unknown: transparent;
 $eve-solar-system-status-color-friendly: #3bbd39;
@@ -76,3 +79,5 @@ $eve-solar-system-status-color-targetPrimary: #b439ff;
 $eve-solar-system-status-color-targetSecondary: rgba(255, 57, 249, 1);
 $eve-solar-system-status-color-dangerousPrimary: #d54040;
 $eve-solar-system-status-color-dangerousSecondary: #fd5443;
+$eve-solar-system-status-color-lookingFor: #43c2fd;
+$eve-solar-system-status-color-home: rgb(197, 253, 67);
