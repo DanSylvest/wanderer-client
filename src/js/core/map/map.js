@@ -17,6 +17,10 @@ const w = 120;
 const h = 30;
 const strength  = -10;
 const linkDistance = w * 1.2;
+const BOUNDS = {
+    HORIZONTAL: 3000,
+    VERTICAL: 2000
+}
 
 let counter = 0;
 
@@ -127,8 +131,24 @@ class Map extends Emitter {
             let rDelta = curReal["-"](rlStarted);
             let v = this.magnifier.in(rDelta);
 
-            this.magnifier.hAxis.min = savedAxis.x - v.x;
-            this.magnifier.vAxis.min = savedAxis.y - v.y;
+            let hAxis_min = savedAxis.x - v.x;
+            let vAxis_min = savedAxis.y - v.y;
+
+            if(hAxis_min + this.magnifier.hAxis.range > BOUNDS.HORIZONTAL)
+                hAxis_min = BOUNDS.HORIZONTAL - this.magnifier.hAxis.range;
+
+            if(hAxis_min < -BOUNDS.HORIZONTAL)
+                hAxis_min = -BOUNDS.HORIZONTAL;
+
+            if(vAxis_min + this.magnifier.vAxis.range > BOUNDS.VERTICAL)
+                vAxis_min = BOUNDS.VERTICAL - this.magnifier.vAxis.range;
+
+            if(vAxis_min < -BOUNDS.VERTICAL)
+                vAxis_min = -BOUNDS.VERTICAL;
+
+
+            this.magnifier.hAxis.min = /*savedAxis.x - v.x*/hAxis_min;
+            this.magnifier.vAxis.min = /*savedAxis.y - v.y*/vAxis_min;
 
             this.emit("offsetChanged", new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
             this.render();
