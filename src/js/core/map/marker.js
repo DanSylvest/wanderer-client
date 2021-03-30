@@ -75,10 +75,9 @@ class Marker extends Emitter{
      * @param _data.security {string}
      * @param _data.systemType {number}
      * @param _data.onlineCount {number}
-     * @param _data.systemData {Object}
-     * @param _data.systemData.effectType {number}
-     * @param _data.systemData.typeName {number}
-     * @param _data.systemData.statics {Array}
+     * @param _data.effectType {number}
+     * @param _data.typeName {number}
+     * @param _data.statics {Array}
      */
     update (_data) {
         let markerData = this.data;
@@ -112,15 +111,15 @@ class Marker extends Emitter{
             markerEl.classAdd(`system-status-${environment.statuses[_data.status].id}`);
         }
 
-        if(exists(_data.systemData) && exists(_data.systemData.effectType)) {
+        if(_data.effectType !== "") {
             if (exists(_data.systemType) && _data.systemType === 3) {
                 let effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
-                effectEl.el.classList.add(printf("eve-wh-effect-color-%s", _data.systemData.effectType));
+                effectEl.el.classList.add(printf("eve-wh-effect-color-%s", _data.effectType));
                 effectEl.el.classList.remove("hidden");
             }
 
             let bodyEl;
-            switch(_data.systemData.effectType) {
+            switch(_data.effectType) {
                 case "dazhLiminalityLocus":
                     bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
                     bodyEl.el.classList.remove("edencom");
@@ -156,8 +155,8 @@ class Marker extends Emitter{
                     break;
                 case 3:
                 case 4:
-                    colorClass = environment.typeClasses[_data.systemData.typeName];
-                    _data.systemData && _data.systemData.statics && this._createStatics(_data.systemData.statics)
+                    colorClass = environment.typeClasses[_data.typeName];
+                    _data.statics && this._createStatics(_data.statics)
                     break;
                 case 5:
                 case 6:
@@ -167,7 +166,7 @@ class Marker extends Emitter{
             }
 
             systemTypeEl.el.classList.add(colorClass);
-            systemTypeEl.text(_data.systemData.typeName);
+            systemTypeEl.text(_data.typeName);
         }
 
         extend(this.data, _data);

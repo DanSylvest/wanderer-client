@@ -3,6 +3,8 @@
  */
 
 import ServerStatus from "./providers/serverStatus.js";
+import SolarSystems from "./providers/solarSystems.js";
+import Maps from "./providers/maps/maps.js";
  
 class Cache {
     constructor() {
@@ -11,6 +13,8 @@ class Cache {
 
     init () {
         this.serverStatus = new ServerStatus();
+        this.solarSystems = new SolarSystems();
+        this.maps = new Maps();
     }
 }
 

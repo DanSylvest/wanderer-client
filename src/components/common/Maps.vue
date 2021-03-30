@@ -1,5 +1,5 @@
 <template>
-    <div class="wd-maps">
+    <div class="wd-maps wd padding-primary">
         <div class="maps-toolbar" v-show="maps.length > 0">
             <md-button class="md-dense md-accent md-raised" @click="addSimple">
                 <md-icon>add</md-icon>

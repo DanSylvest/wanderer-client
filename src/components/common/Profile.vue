@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="wd padding-primary">
         <md-empty-state
             md-icon="biotech"
             md-label="Unfortunately its not work!"

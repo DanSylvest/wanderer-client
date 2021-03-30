@@ -9,7 +9,7 @@ import store from "./js/store";
 
 
 Vue.use(VueMaterial);
-Vue.use(Notifications)
+Vue.use(Notifications);
 
 Vue.config.productionTip = false
 
@@ -23,5 +23,3 @@ globalThis.vueApp = new Vue({
         }
     }
 }).$mount('#app')
-
-

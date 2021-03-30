@@ -9,6 +9,7 @@ import remove from "./remove.js";
 import update from "./update.js";
 import updatePositions from "./updatePositions.js";
 import subscribeSolarSystems from "./subscribeSolarSystems.js";
+import subscribeData from "./subscribeData.js";
 
 export default {
     addManual: addManual,
@@ -17,5 +18,6 @@ export default {
     remove: remove,
     update: update,
     updatePositions: updatePositions,
-    subscribeSolarSystems: subscribeSolarSystems
+    subscribeSolarSystems: subscribeSolarSystems,
+    subscribeData: subscribeData,
 }

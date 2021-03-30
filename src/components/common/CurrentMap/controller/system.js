@@ -1,48 +1,79 @@
 import Emitter from "../../../../js/env/tools/emitter";
-import extend from "../../../../js/env/tools/extend";
+import cache from "../../../../js/cache/cache.js";
 import exists from "../../../../js/env/tools/exists";
+import extend from "../../../../js/env/tools/extend.js";
 
 class System extends Emitter {
-    constructor (_controller, _map, _mapId, _systemId) {
+    constructor (_controller, _map, _mapId, id) {
         super();
 
         this.controller = _controller;
         this.map = _map;
         this.mapId = _mapId;
-        this.systemId = _systemId;
+        this.id = id;
         this._inited = false;
         this.position = null;
-        this.info = Object.create(null);
+        // this.markerId = null;
+        this.markerId = this.map.createMarker(this.id, {});
+        this._data = Object.create(null);
     }
     init () {
-        this._inited = true;
-
-        this.info.x = this.info.position.x;
-        this.info.y = this.info.position.y;
-
-        this.markerId = this.map.createMarker(this.systemId, this.info);
+        this.initProviders();
     }
     deinit () {
+        this._data = Object.create(null);
         if(exists(this.markerId)) {
             this.map.removeMarker(this.markerId);
         }
 
+        this.markerId = null;
         this._inited = false;
         this.map = null;
         this.controller = null;
+        this.deinitProviders();
     }
-    setPosition (_position) {
-        this.position = _position;
+
+    initProviders () {
+        this._staticSolarSystem = cache.solarSystems.touch(this.id);
+        this._staticSolarSystem.item.on("changed", this._onStaticDataChanged.bind(this));
+
+        this._map = cache.maps.touch(this.mapId);
+        this._mapSolarSystem = this._map.item.solarSystems.touch(this.id);
+
+        this._mapSolarSystem.item.on("changed", this._onDynamicDataChanged.bind(this));
+
+        let data = this._mapSolarSystem.item.data();
+        data = extend(data, this._staticSolarSystem.item.data());
+
+        this.map.updateMarker(this.markerId, data);
     }
-    updateInfo (_info) {
-        this.info = extend(this.info, _info);
-        this._inited && this.map.updateMarker(this.markerId, _info);
+
+    deinitProviders () {
+        this._staticSolarSystem && this._staticSolarSystem.unsubscribe();
+        this._staticSolarSystem = null;
+
+        this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+        delete this._mapSolarSystem;
+
+        this._map && this._map.unsubscribe();
+        delete this._map;
     }
-    updatePosition (_position) {
-        this.position = _position;
-        this.map.updateMarker(this.markerId, {
-            position: _position
-        })
+
+    _onDynamicDataChanged (data) {
+        this._data = extend(this._data, data);
+
+        if(exists(this.markerId))
+            this.map.updateMarker(this.markerId, this._data);
+    }
+
+    _onStaticDataChanged (data) {
+        this._data = extend(this._data, data);
+
+        if(exists(this.markerId))
+            this.map.updateMarker(this.markerId, this._data);
+    }
+    data () {
+        return this._data;
     }
 }
 

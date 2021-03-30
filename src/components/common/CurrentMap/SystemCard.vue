@@ -5,26 +5,20 @@
         </div>
         <div v-show="loaded">
             <div class="wd-system-card__header">
-                <div :class="typeNameClass">{{typeName}}</div>
-                <div class="solar-system-name">{{solarSystemName}}</div>
-                <div class="solar-system-effect wd-color-primary-2" v-if="showEffect">
-                    [<span :class="effectClass">{{effectName}}</span>]
+                <div :class="getTypeNameClasses()">{{getTypeName()}}</div>
+                <div class="solar-system-name">{{info().solarSystemName}}</div>
+                <div class="solar-system-effect wd-color-primary-2" v-if="hasEffect()">
+                    [<span :class="getEffectClass()">{{info().effectName}}</span>]
                 </div>
-                <div class="constellation-name">{{constellationName}}</div>
-                <div class="region-name">{{regionName}}</div>
+                <div class="constellation-name">{{info().constellationName}}</div>
+                <div class="region-name">{{info().regionName}}</div>
                 <div class="solar-system-effect wd-color-primary-2" v-if="status !== 0">
                     (<span :class="statusClass">{{statusName}}</span>)
                 </div>
             </div>
-            <div class="wd-system-card__divider" v-show="characters.length > 0"></div>
-            <div class="wd-system-card__content" v-show="characters.length > 0">
-                <div class="solar-system-local">
-                    <div class="solar-system-local-character" v-for="item in characters" :key="item.name">
-                        <span :class="{'solar-system-local-name':true, 'solar-system-local-name-own': item.isOwn}">{{item.name}}</span>
-                        -
-                        (<span class="eve-card-local-ship">{{item.ship}}</span>)
-                    </div>
-                </div>
+            <div class="wd-system-card__divider" v-show="onlineCount > 0"></div>
+            <div class="wd-system-card__content" v-show="onlineCount > 0">
+                <local :map-id="mapId" :solar-system-id="solarSystemId" />
             </div>
         </div>
     </div>
@@ -33,12 +27,14 @@
 <script>
     import api from "../../../js/api";
     import environment from "../../../js/core/map/environment";
-    import exists from "../../../js/env/tools/exists";
     import extend from "../../../js/env/tools/extend.js";
     import helper from "../../../js/utils/helper.js";
+    import cache from "../../../js/cache/cache.js";
+    import Local from "./SolarSystem/Local.vue";
 
     export default {
         name: "SystemCard",
+        components: {Local},
         props: {
             cSolarSystemId: {
                 type: String,
@@ -59,77 +55,69 @@
         },
         data: function () {
             return {
-
                 loaded: false,
                 solarSystemId: this.cSolarSystemId,
                 mapId: this.cMapId,
-                solarSystemName: "",
-                constellationName: "",
-                regionName: "",
-                securityStatus: "",
                 characters: [],
-                securityClass: "",
-                showEffect: false,
-                effectClass: "",
-                effectName: "",
-                status: 0,
-                statusName: "",
-                statusClass: "",
-                typeName: "",
-                typeNameClass: "",
                 localData: this.data,
                 localIsLoadCharData: this.isLoadCharData,
             }
         },
         mounted: function () {
-            if(!exists(this.localData)) {
-                api.eve.map.solarSystem.info(this.mapId, this.solarSystemId)
-                    .then(
-                        data => this.setData(data),
-                        err => helper.errorHandler(err)
-                    );
-            } else {
-                this.setData(this.localData);
+
+        },
+        beforeDestroy() {
+            this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
+            this.solarSystemInfo = null;
+
+            this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+            delete this._mapSolarSystem;
+
+            this._map && this._map.unsubscribe();
+            delete this._map;
+        },
+        beforeMount() {
+            this.solarSystemInfo = cache.solarSystems.touch(this.solarSystemId);
+
+            this._map = cache.maps.touch(this.mapId);
+            this._mapSolarSystem = this._map.item.solarSystems.touch(this.solarSystemId);
+
+            Promise.all([
+                this.solarSystemInfo.item.readyPromise(),
+                this._mapSolarSystem.item.readyPromise(),
+            ])
+                .then(this._onLoaded.bind(this));
+        },
+        computed : {
+            statusClass () {
+                let status = this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].status;
+                return `eve-system-status-color-${environment.statuses[status].id}`
+            },
+            statusName () {
+                let status = this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].status;
+                return environment.statuses[status].name;
+            },
+            status () {
+                return this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].status;
+            },
+            onlineCount () {
+                return this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].onlineCount;
             }
         },
-        beforeDestroy: function () {
-
-
-        },
         methods: {
+            _onLoaded () {
+                this.loaded = true;
+
+                // eslint-disable-next-line no-unused-vars
+                // let dynamicData = this._mapSolarSystem.item.data()
+                // eslint-disable-next-line no-debugger
+              // debugger
+            },
             setData (_data) {
                 _data.systemData && extend(_data, _data.systemData)
                 this.systemData = _data;
 
                 this.loaded = true;
-                this.solarSystemName = _data.solarSystemName;
-                this.constellationName = _data.constellationName;
-                this.regionName = _data.regionName;
-
-                if(exists(_data.status)) {
-                    this.status = _data.status;
-                    this.statusName = environment.statuses[_data.status].name;
-                    this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
-                }
-
-                let data = _data.systemData;
-                if(!exists(data)) {
-                    data = {
-                        effectType: _data.effectType !== "" ? _data.effectType : undefined,
-                        effectName: _data.effectName !== "" ? _data.effectName : undefined,
-                    }
-                }
-
-                if(exists(data.effectType)) {
-                    this.showEffect = true;
-                    this.effectClass = environment.effects[data.effectType];
-                    this.effectName = data.effectName;
-                } else {
-                    this.showEffect = false;
-                }
-
-                this.typeName = this.getTypeName();
-                this.typeNameClass = this.getTypeNameClasses();
 
                 if(this.localIsLoadCharData) {
                     Promise.all(_data.onlineCharacters.map(x => api.eve.character.info(x)))
@@ -145,36 +133,46 @@
 
             },
 
+            info () {
+                return this.$store.state.solarSystems[this.solarSystemId];
+            },
+
             getTypeName () {
-                switch (this.systemData.systemType) {
+                switch (this.info().systemType) {
                     case 0: // high-sec
                     case 1: // low-sec
                     case 2: // null-sec
-                        return this.systemData.security;
+                        return this.info().security;
                     case 3: // WH
                     case 4: // Thera
-                        return this.systemData.typeName;
+                        return this.info().typeName;
                     case 5: // abyss
                     case 6: // penalty?
                     case 7: // Pochven?
-                        return this.systemData.security;
+                        return this.info().security;
                 }
             },
             getTypeNameClasses () {
-                switch (this.systemData.systemType) {
+                switch (this.info().systemType) {
                     case 0: // high-sec
                     case 1: // low-sec
                     case 2: // null-sec
-                        return environment.securityForegroundClasses[this.systemData.security];
+                        return environment.securityForegroundClasses[this.info().security];
                     case 3: // WH
                     case 4: // Thera
-                        return environment.typeClasses[this.systemData.typeName];
+                        return environment.typeClasses[this.info().typeName];
                     case 5: // abyss
                     case 6: // penalty?
                     case 7: // Pochven?
-                        return environment.kindClassed[this.systemData.systemType];
+                        return environment.kindClassed[this.info().systemType];
                 }
-            }
+            },
+            getEffectClass () {
+                return environment.effects[this.info().effectType];
+            },
+            hasEffect() {
+                return this.info().effectName !== "";
+            },
 
         }
     }

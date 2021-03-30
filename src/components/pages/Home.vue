@@ -2,18 +2,18 @@
     <div class="page-container wd fs">
         <App>
 
-            <template v-slot:AppToolbar>
-                <AppToolbar>
-                    <div class="wd-app-toolbar-content">
-                        <div>
-                            TQ status is
-                            <span :class="classColor">
-                                {{$store.state.eveServerStatus.online ? "online" : "offline"}}
-                            </span>
-                        </div>
-                    </div>
-                </AppToolbar>
-            </template>
+<!--            <template v-slot:AppToolbar>-->
+<!--                <AppToolbar>-->
+<!--                    <div class="wd-app-toolbar-content">-->
+<!--                        <div>-->
+<!--                            TQ status is-->
+<!--                            <span :class="classColor">-->
+<!--                                {{$store.state.eveServerStatus.online ? "online" : "offline"}}-->
+<!--                            </span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </AppToolbar>-->
+<!--            </template>-->
 
             <template v-slot:AppLeftMenu>
                 <AppMenu>
@@ -24,6 +24,13 @@
                     <AppMenuItem icon="person_add" title="Characters" @click="onCharClick" :active="charactersButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="build" title="Profile" @click="onProfileClick" :active="profileButtonIsActive"></AppMenuItem>
                     <AppMenuItem icon="system_update_alt" title="Log out" @click="onLogOut"></AppMenuItem>
+
+                    <div class="wd-bottom-bar">
+                        <div class="wd-server-status">
+                            <md-icon :class="classColor">public</md-icon>
+                            <span>Tranquility</span>
+                        </div>
+                    </div>
                 </AppMenu>
             </template>
 
@@ -72,6 +79,8 @@
         },
         beforeMount() {
             this.unsubscribeOnline = cache.serverStatus.subscribe();
+
+
         },
         mounted: function () {
 
@@ -180,22 +189,35 @@
 
 <style lang="scss">
     @import "src/css/variables";
-    .wd-app-toolbar-content {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 5px 20px;
-        box-sizing: border-box;
-        color: $fg-primary;
 
-        .wd-online {
-            color: $fg-positive;
+
+    .wd-online {
+        color: $color-online !important;
+    }
+
+    .wd-offline {
+        color: $fg-negative2 !important;
+    }
+
+    .wd-bottom-bar {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        align-items: flex-end;
+    }
+
+    .wd-server-status {
+        display: flex;
+        flex-direction: column;
+
+        & > i {
+            font-size: 27px !important;
         }
 
-        .wd-offline {
-            color: $fg-negative2;
+        & > span {
+            color: #8a8a8a;
+            font-size: 11px;
         }
     }
 </style>

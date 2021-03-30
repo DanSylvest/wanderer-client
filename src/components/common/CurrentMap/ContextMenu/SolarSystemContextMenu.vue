@@ -46,7 +46,7 @@
 
         <context-menu-item c-title="Unlock system" c-icon="lock_open" v-show="isLocked" @click="onSystemContextMenuUnlock" />
         <context-menu-item c-title="Lock system" c-icon="lock" v-show="!isLocked" @click="onSystemContextMenuLock" />
-        <context-menu-item c-title="Remove system" c-icon="delete" v-show="!isLocked" @click="onSystemContextMenuRemove" />
+        <context-menu-item c-title="Remove system" c-icon="delete" c-icon-class="fg-negative" v-show="!isLocked" @click="onSystemContextMenuRemove" />
     </context-menu>
 </template>
 

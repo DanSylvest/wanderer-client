@@ -15,6 +15,7 @@ import remove from "./remove";
 import info from "./info";
 import subscribeMapExistence from "./subscribeMapExistence";
 import subscribeAllowedMaps from "./subscribeAllowedMaps";
+import subscribeAllowedCharacters from "./subscribeAllowedCharacters";
 import waypoint from "./waypoint";
 import updateWatchStatus from "./updateWatchStatus";
 
@@ -32,6 +33,7 @@ export default {
     info: info,
     subscribeMapExistence: subscribeMapExistence,
     subscribeAllowedMaps: subscribeAllowedMaps,
+    subscribeAllowedCharacters: subscribeAllowedCharacters,
     waypoint: waypoint,
     updateWatchStatus: updateWatchStatus,
 }

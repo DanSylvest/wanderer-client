@@ -7,7 +7,7 @@
             <div class="dsc-toolbar">
                 <slot name="AppToolbar"></slot>
             </div>
-            <div class="wd fs overflow-hidden app-content padding-primary">
+            <div class="wd fs overflow-hidden app-content">
                 <slot></slot>
             </div>
         </div>

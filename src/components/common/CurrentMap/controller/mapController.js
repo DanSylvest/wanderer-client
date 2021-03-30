@@ -5,6 +5,7 @@ import System from "./system";
 import exists from "../../../../js/env/tools/exists";
 import CustomPromise from "../../../../js/env/promise.js";
 import helper from "../../../../js/utils/helper.js";
+import cache from "../../../../js/cache/cache.js";
 
 class MapController extends Emitter {
     constructor (_map, _mapId) {
@@ -16,20 +17,30 @@ class MapController extends Emitter {
         this.systems = Object.create(null);
         this.links = Object.create(null);
 
-        this._inited = false;
+        this.allowedCharacters = [];
+        this._unsubscribeMSSId = null;
+
+        // this._inited = false;
     }
     init () {
         // we must subscribe on map systems and links
-        this._systemsSubscription = api.eve.map.solarSystem.subscribeSolarSystems(this.mapId);
-        this._systemsSubscription.on("change", this._onSystemSubscriptionChange.bind(this));
+        // this._systemsSubscription = api.eve.map.solarSystem.subscribeSolarSystems(this.mapId);
+        // this._systemsSubscription.on("change", this._onSystemSubscriptionChange.bind(this));
+        this._mapProvider = cache.maps.touch(this.mapId);
+        this._mapSolarSystems = this._mapProvider.item.solarSystems.subscribe();
+        this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
 
         // we must subscribe on map systems and links
         this._linksSubscription = api.eve.map.link.subscribeLinks(this.mapId);
         this._linksSubscription.on("change", this._onLinksSubscriptionChange.bind(this));
 
-        // we must subscribe on map systems and links
+        // subscribe on map existence
         this._existenceSubscription = api.eve.map.subscribeMapExistence(this.mapId);
         this._existenceSubscription.on("change", this._onExistenceSubscriptionChange.bind(this));
+
+        // we must subscribe on map systems and links
+        this._charactersSubscription = api.eve.map.subscribeAllowedCharacters(this.mapId);
+        this._charactersSubscription.on("change", this._onAllowedCharactersSubscriptionChange.bind(this));
 
         this.map.on("linkContextMenu", this._onLinkContextMenu.bind(this));
         this.map.on("systemContextMenu", this._onSystemContextMenu.bind(this));
@@ -45,21 +56,34 @@ class MapController extends Emitter {
         let initPromise = new CustomPromise();
 
         this._existenceSubscription.subscribe()
-            .then(() => this._systemsSubscription.subscribe())
+            .then(() => this._mapSolarSystems.item.readyPromise())
             .then(() => this._linksSubscription.subscribe())
-            .then(() => {initPromise.resolve();})
+            .then(() => this._charactersSubscription.subscribe())
+            .then(() => initPromise.resolve())
             .catch(() => initPromise.reject());
 
-        this._inited = true;
+        // this._inited = true;
         return initPromise.native;
     }
     deinit () {
-        this._inited = false;
+        // this._inited = false;
         this.map = null;
 
-        this._systemsSubscription.unsubscribe();
+        if(exists(this._unsubscribeMSSId)) {
+            this._mapSolarSystems.item.off(this._unsubscribeMSSId);
+            this._unsubscribeMSSId = null;
+        }
+
+        this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+        delete this._mapSolarSystem;
+
+        this._mapProvider && this._mapProvider.unsubscribe();
+        delete this._mapProvider;
+
+        // this._systemsSubscription.unsubscribe();
         this._linksSubscription.unsubscribe();
         this._existenceSubscription.unsubscribe();
+        this._charactersSubscription.unsubscribe();
 
         for (let systemId in this.systems)
             this.systems[systemId].deinit();
@@ -85,39 +109,46 @@ class MapController extends Emitter {
     setOffset (x,y) {
         this.map.setOffset(x,y);
     }
-    // eslint-disable-next-line no-unused-vars
     _onExistenceSubscriptionChange (data) {
-
         if(!data) {
-            // eslint-disable-next-line no-debugger
-            // debugger;
             this.emit("removed");
         }
+    }
+    _onAllowedCharactersSubscriptionChange (event) {
+        switch (event.type) {
+            case "bulk":
+                this.allowedCharacters = event.data;
+                break;
+            case "addedToAvailable":
+                this.allowedCharacters.push(event.data);
+                break;
+            case "removedFromAvailable":
+                this.allowedCharacters.eraseByObjectKey("charId", event.data);
+                break;
+            case "onlineChanged":
+                var obj = this.allowedCharacters.searchByObjectKey("charId", event.data.charId);
+                obj.online = event.data.online;
+                break;
+        }
 
+        this.allowedCharacters = this.allowedCharacters.sort(sortAllowedCharacters);
+
+        this.emit("allowedCharactersUpdated", this.allowedCharacters);
     }
     _onSystemSubscriptionChange (_data) {
-        let onlineCharacters;
-
-        if(!this._inited)
-            return;
+        // if(!this._inited)
+        //     return;
 
         switch (_data.type) {
-            case "systemUpdatedList":
-                _data.list.map(function (_event) {
-                    this._onSystemSubscriptionChange(_event)
-                }.bind(this));
-                break;
             case "bulk":
                 for (let a = 0; a < _data.list.length; a++) {
-                    this.systems[_data.list[a].id] = new System(this, this.map, this.mapId, _data.list[a].id);
-                    this.systems[_data.list[a].id].updateInfo(_data.list[a]);
-                    this.systems[_data.list[a].id].init();
+                    this.systems[_data.list[a]] = new System(this, this.map, this.mapId, _data.list[a]);
+                    this.systems[_data.list[a]].init();
                 }
                 break;
             case "add":
-                this.systems[_data.systemInfo.id] = new System(this, this.map, this.mapId, _data.systemInfo.id);
-                this.systems[_data.systemInfo.id].updateInfo(_data.systemInfo);
-                this.systems[_data.systemInfo.id].init();
+                this.systems[_data.solarSystemId] = new System(this, this.map, this.mapId, _data.solarSystemId);
+                this.systems[_data.solarSystemId].init();
                 break;
             case "removed":
                 if(this.systems[_data.systemId]) {
@@ -125,51 +156,13 @@ class MapController extends Emitter {
                     delete this.systems[_data.systemId];
                 }
                 break;
-            case "updatedSystemsPosition":
-                for (let a = 0; a < _data.systemsPosition.length; a++) {
-                    let systemPosition = _data.systemsPosition[a];
-                    if(this.systems[systemPosition.id]) {
-                        this.systems[systemPosition.id].updatePosition(systemPosition);
-                    }
-                }
-                break;
-            case "systemUpdated":
-                if(this.systems[_data.systemId]) {
-                    this.systems[_data.systemId].updateInfo(_data.data);
-                }
-                break;
-            case "onlineUpdate":
-                if(this.systems[_data.systemId]) {
-                    this.systems[_data.systemId].updateInfo({
-                        onlineCount: _data.onlineCount
-                    });
-                }
-                break;
-            case "userJoin":
-                onlineCharacters = this.systems[_data.systemId].info.onlineCharacters;
-                if(onlineCharacters) {
-                    this.systems[_data.systemId].info.onlineCharacters.push(_data.characterId);
-                    this.systems[_data.systemId].updateInfo({
-                        onlineCharacters: this.systems[_data.systemId].info.onlineCharacters
-                    });
-                }
-                break;
-            case "userLeave":
-                onlineCharacters = this.systems[_data.systemId].info.onlineCharacters;
-                if(onlineCharacters) {
-                    onlineCharacters.removeByIndex(onlineCharacters.indexOf(_data.characterId));
-                    this.systems[_data.systemId].updateInfo({
-                        onlineCharacters: onlineCharacters
-                    });
-                }
-                break;
         }
 
         this.emit("systemChange", _data);
     }
     _onLinksSubscriptionChange (_data) {
-        if (!this._inited)
-            return;
+        // if (!this._inited)
+        //     return;
 
         switch (_data.type) {
             case "bulk":
@@ -314,6 +307,21 @@ class MapController extends Emitter {
                 return link.uiLinkId;
             }
         }
+    }
+}
+
+const sortAllowedCharacters = (a, b) => {
+    if (a.online > b.online)
+        return -1;
+    else if (a.online < b.online)
+        return 1;
+    else {
+        if (a.charId > b.charId)
+            return -1;
+        else if (a.charId < b.charId)
+            return 1;
+        else
+            return 0;
     }
 }
 

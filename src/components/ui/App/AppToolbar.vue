@@ -15,7 +15,7 @@
 
     .wd {
         &.app-toolbar {
-            height: 40px;
+            height: 45px;
             background-color: $bg-secondary;
             border-bottom: 1px solid $bg-3;
         }

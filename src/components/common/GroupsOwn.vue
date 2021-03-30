@@ -1,5 +1,5 @@
 <template>
-    <div class="wd-groups">
+    <div class="wd-groups wd padding-primary">
         <OwnGroups ref="ownGroupsRef" ></OwnGroups>
     </div>
 </template>

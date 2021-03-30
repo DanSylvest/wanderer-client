@@ -164,6 +164,7 @@ class Map extends Emitter {
             xmlns: "http://www.w3.org/2000/svg"
         });
         this.container.appendChild(this.svg.el);
+        this.svg.classAdd("wd", "fs");
 
         this.htmlContainer = new _ui("div");
         this.htmlContainer.el.classList.add("eve-marker-container")
@@ -174,8 +175,6 @@ class Map extends Emitter {
         this.linksLayer = new _ui("g");
 
         this.svg.append(this.linksLayer);
-        this.svg.attr("width", this.width);
-        this.svg.attr("height", this.height);
     }
     _createMap () {
         this.magnifier = new Magnifier();
@@ -191,8 +190,10 @@ class Map extends Emitter {
         let base = extend({
             customId: customId,
             isLocked: false,
-            x: Number.randomFloat(this.width / 2 * -1, this.width / 2),
-            y: Number.randomFloat(this.height / 2 * -1, this.height / 2),
+            position: {
+                x: /*Number.randomFloat(this.width / 2 * -1, this.width / 2)*/0,
+                y: /*Number.randomFloat(this.height / 2 * -1, this.height / 2)*/0,
+            }
         }, _options);
 
         let mid = counter++;
@@ -244,6 +245,14 @@ class Map extends Emitter {
             let obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
             obj.x = _data.position.x;
             obj.y = _data.position.y;
+
+            if(exists(_data.isLocked) && _data.isLocked) {
+                obj.fx = obj.x;
+                obj.fy = obj.y;
+            }
+
+            // let source = this.magnifier.convertToReal(new Vector2(obj.x, obj.y));
+            // marker.wrapper.css("transform", printf("translate(%spx,%spx)", source.x, source.y));
             this._sfForce.call();
         }
 
@@ -280,7 +289,7 @@ class Map extends Emitter {
         this._aoConnecting.on("dragStart", function (_event) {
             this._state = ST_CONNECTING;
             source = this.magnifier.convertToReal(new Vector2(_event.subject.x, _event.subject.y));
-            sourceMarkerId = this._markers[_event.subject.id].data.id;
+            sourceMarkerId = this._markers[_event.subject.id].data.customId;
             this.createTempChain();
             this.tempChain.setPosition(source.x, source.y, _event.mouse.x, _event.mouse.y);
             this.disableMarkersActions(true);
@@ -693,8 +702,6 @@ class Map extends Emitter {
     setSize (_w, _h) {
         this.width = _w;
         this.height = _h;
-        this.svg.attr("width", this.width);
-        this.svg.attr("height", this.height);
         this.magnifier.setSize(this.width, this.height);
         this.render();
     }

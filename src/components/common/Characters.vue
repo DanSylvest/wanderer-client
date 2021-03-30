@@ -1,5 +1,5 @@
 <template>
-    <div class="wd-characters-layout">
+    <div class="wd-characters-layout wd padding-primary">
 
         <md-card class="md-elevation-4" v-for="item in characters" :key="item.id" md-with-hover>
             <md-ripple>

@@ -8,7 +8,7 @@
             :c-height="panelHeight"
             :c-title="panelTitle"
             :c-offset-x="10"
-            :c-offset-y="45"
+            :c-offset-y="55"
             c-horizontal-alignment="right"
             @c-closed="onPopupClosed"
             @mounted="onPopupMounted"
@@ -248,7 +248,7 @@
 
         let bounds = document.body.getBoundingClientRect();
         this.panelWidth = bounds.width * 0.4 < 400 ? 400 : bounds.width * 0.45;
-        this.panelHeight = bounds.height - 55;
+        this.panelHeight = bounds.height - 69;
 
         this.isCompact = bounds.width <= 1400;
 

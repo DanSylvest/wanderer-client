@@ -1,5 +1,5 @@
 <template>
-    <div class="wd-groups">
+    <div class="wd-groups wd padding-primary" >
         <AllowedGroups ref="allowedGroupsRef"></AllowedGroups>
     </div>
 </template>
