@@ -2,7 +2,7 @@ import log from "./log.js";
 import exists from "../env/tools/exists.js";
 
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 2/20/21.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 2/20/21.
  */
  
 const helper = {

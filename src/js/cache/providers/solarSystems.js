@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 3/21/21.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 3/21/21.
  */
 
 import Emitter from "../../env/tools/emitter.js";

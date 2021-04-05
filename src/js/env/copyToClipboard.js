@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 1/5/21.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 1/5/21.
  */
 
 const copyToClipboard = str => {
