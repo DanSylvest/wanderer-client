@@ -44,7 +44,7 @@ class SolarSystem extends Emitter{
                 api.eve.universe.solarSystemInfo(this._solarSystemId)
                     .then(
                         this._onGetData.bind(this),
-                        (err) => {
+                        err => {
                             this._readyPromise.reject();
 
                             window.vueApp.showErrorModal({
@@ -111,6 +111,15 @@ class SolarSystem extends Emitter{
     }
     readyPromise () {
         return this._readyPromise.native;
+    }
+    on(_type, _func, isOne) {
+        let id = super.on(_type, _func, isOne);
+
+        if(!this._needLoadData && this._data !== null && _type === "changed") {
+            _func.call(null, this._data);
+        }
+
+        return id;
     }
 }
 

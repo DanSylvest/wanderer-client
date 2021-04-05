@@ -15,8 +15,8 @@ const d3 = require("d3-force");
 
 const w = 120;
 const h = 30;
-const strength  = -10;
-const linkDistance = w * 1.2;
+// const strength  = -10;
+// const linkDistance = w * 1.2;
 const BOUNDS = {
     HORIZONTAL: 3000,
     VERTICAL: 2000
@@ -190,10 +190,6 @@ class Map extends Emitter {
         let base = extend({
             customId: customId,
             isLocked: false,
-            position: {
-                x: /*Number.randomFloat(this.width / 2 * -1, this.width / 2)*/0,
-                y: /*Number.randomFloat(this.height / 2 * -1, this.height / 2)*/0,
-            }
         }, _options);
 
         let mid = counter++;
@@ -212,14 +208,15 @@ class Map extends Emitter {
 
         this._markers[mid] = marker;
 
-        this.magnifier.addObject({
-            id: mid,
-            fx: base.isLocked ? base.position.x : null,
-            fy: base.isLocked ? base.position.y : null,
-            x: base.position.x,
-            y: base.position.y,
-
-        });
+        if(_options.position) {
+            this.magnifier.addObject({
+                id: mid,
+                fx: base.isLocked ? base.position.x : null,
+                fy: base.isLocked ? base.position.y : null,
+                x: base.position.x,
+                y: base.position.y,
+            });
+        }
 
         this.updateMarker(mid, base);
 
@@ -228,7 +225,10 @@ class Map extends Emitter {
     updateMarker (_markerId, _data) {
         let marker = this._markers[_markerId];
 
-        if (exists(_data.isLocked) && _data.isLocked !== marker.data.isLocked) {
+        let hasPositionOld = exists(marker.data.position);
+        let hasPositionNew = exists(_data.position);
+
+        if (hasPositionOld && exists(_data.isLocked) && _data.isLocked !== marker.data.isLocked) {
             let obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
             obj.lock = _data.isLocked;
             if(_data.isLocked) {
@@ -241,7 +241,17 @@ class Map extends Emitter {
             this._sfForce.call();
         }
 
-        if (exists(_data.position) && marker.data.position && (_data.position.x !== marker.data.position.x || _data.position.y !== marker.data.position.y)) {
+        if(!hasPositionOld && hasPositionNew) {
+            this.magnifier.addObject({
+                id: _markerId,
+                fx: marker.data.isLocked ? _data.position.x : null,
+                fy: marker.data.isLocked ? _data.position.y : null,
+                x: _data.position.x,
+                y: _data.position.y,
+            });
+            this._sfForce.call();
+        }
+        else if (hasPositionNew && hasPositionOld && (_data.position.x !== marker.data.position.x || _data.position.y !== marker.data.position.y)) {
             let obj = this.magnifier.objects().searchByObjectKey("id", _markerId);
             obj.x = _data.position.x;
             obj.y = _data.position.y;
@@ -251,15 +261,12 @@ class Map extends Emitter {
                 obj.fy = obj.y;
             }
 
-            // let source = this.magnifier.convertToReal(new Vector2(obj.x, obj.y));
-            // marker.wrapper.css("transform", printf("translate(%spx,%spx)", source.x, source.y));
             this._sfForce.call();
         }
 
         marker.update(_data);
     }
     _onMarkerDown (_markerId, _event) {
-        // var marker = this.findMarker(_event.mouse);
         if(_event.shiftKey) {
             this._onMarkerClick(_markerId, _event);
             return;
@@ -547,30 +554,33 @@ class Map extends Emitter {
     }
     startForce () {
         this.simulation && this.simulation.stop();
-        this.simulation = d3.forceSimulation(this.magnifier.objects());
-        this.simulation.force("kek2", collideRect(w, h));
+        this.simulation = null;
 
         if(this._forceEnable) {
-            let linkForce = d3.forceLink(this._forceLinks).id(function (d) {
-                return d.id;
-            });
-            linkForce.strength(0.17);
-            linkForce.distance(function (d) {
-                let src = this.countLinksForNode(d.source.id);
-                let trg = this.countLinksForNode(d.target.id);
-                let log = Math.log(Math.min(src, trg));
-                if (log < 1) log = 0.8;
-                return log * linkDistance;
-            }.bind(this));
+            this.simulation = d3.forceSimulation(this.magnifier.objects());
+            this.simulation.force("kek2", collideRect(w, h));
 
-            this.simulation.force("link", linkForce);
 
-            this.simulation.force("charge", d3.forceManyBody().strength(function (d) {
-                return 10 / (this.countLinksForNode(d.id) || 1) * strength
-            }.bind(this)));
+            // let linkForce = d3.forceLink(this._forceLinks).id(function (d) {
+            //     return d.id;
+            // });
+            // linkForce.strength(0.17);
+            // linkForce.distance(function (d) {
+            //     let src = this.countLinksForNode(d.source.id);
+            //     let trg = this.countLinksForNode(d.target.id);
+            //     let log = Math.log(Math.min(src, trg));
+            //     if (log < 1) log = 0.8;
+            //     return log * linkDistance;
+            // }.bind(this));
+            //
+            // this.simulation.force("link", linkForce);
+            //
+            // this.simulation.force("charge", d3.forceManyBody().strength(function (d) {
+            //     return 10 / (this.countLinksForNode(d.id) || 1) * strength
+            // }.bind(this)));
+            this.simulation.on("tick", this._onSimulationTick.bind(this));
         }
 
-        this.simulation.on("tick", this._onSimulationTick.bind(this));
     }
     countLinksForNode (_nodeId) {
         let count = 0;

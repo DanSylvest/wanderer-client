@@ -1,6 +1,6 @@
 import Emitter from "../../../../js/env/tools/emitter";
 import api from "../../../../js/api";
-import Link from "./link";
+import Chain from "./chain";
 import System from "./system";
 import exists from "../../../../js/env/tools/exists";
 import CustomPromise from "../../../../js/env/promise.js";
@@ -19,20 +19,12 @@ class MapController extends Emitter {
 
         this.allowedCharacters = [];
         this._unsubscribeMSSId = null;
-
-        // this._inited = false;
     }
     init () {
         // we must subscribe on map systems and links
-        // this._systemsSubscription = api.eve.map.solarSystem.subscribeSolarSystems(this.mapId);
-        // this._systemsSubscription.on("change", this._onSystemSubscriptionChange.bind(this));
         this._mapProvider = cache.maps.touch(this.mapId);
         this._mapSolarSystems = this._mapProvider.item.solarSystems.subscribe();
-        this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
-
-        // we must subscribe on map systems and links
-        this._linksSubscription = api.eve.map.link.subscribeLinks(this.mapId);
-        this._linksSubscription.on("change", this._onLinksSubscriptionChange.bind(this));
+        this._mapChains = this._mapProvider.item.chains.subscribe();
 
         // subscribe on map existence
         this._existenceSubscription = api.eve.map.subscribeMapExistence(this.mapId);
@@ -57,16 +49,14 @@ class MapController extends Emitter {
 
         this._existenceSubscription.subscribe()
             .then(() => this._mapSolarSystems.item.readyPromise())
-            .then(() => this._linksSubscription.subscribe())
+            .then(() => this._mapChains.item.readyPromise())
             .then(() => this._charactersSubscription.subscribe())
-            .then(() => initPromise.resolve())
+            .then(() => {this._loaded(); initPromise.resolve()})
             .catch(() => initPromise.reject());
 
-        // this._inited = true;
         return initPromise.native;
     }
     deinit () {
-        // this._inited = false;
         this.map = null;
 
         if(exists(this._unsubscribeMSSId)) {
@@ -74,14 +64,20 @@ class MapController extends Emitter {
             this._unsubscribeMSSId = null;
         }
 
+        if(exists(this._unsubscribeMChainsId)) {
+            this._mapChains.item.off(this._unsubscribeMChainsId);
+            this._unsubscribeMChainsId = null;
+        }
+
+        this._mapChains && this._mapChains.unsubscribe();
+        delete this._mapChains;
+
         this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
         delete this._mapSolarSystem;
 
         this._mapProvider && this._mapProvider.unsubscribe();
         delete this._mapProvider;
 
-        // this._systemsSubscription.unsubscribe();
-        this._linksSubscription.unsubscribe();
         this._existenceSubscription.unsubscribe();
         this._charactersSubscription.unsubscribe();
 
@@ -103,16 +99,20 @@ class MapController extends Emitter {
             this.map.setSelectMarker(result[a], true);
         }
     }
-    convertPosition (x,y) {
-        return this.map.getVirtualBy({x:x,y:y})
+    convertPosition (x, y) {
+        return this.map.getVirtualBy({x, y})
     }
-    setOffset (x,y) {
-        this.map.setOffset(x,y);
+    setOffset (x, y) {
+        this.map.setOffset(x, y);
     }
     _onExistenceSubscriptionChange (data) {
         if(!data) {
             this.emit("removed");
         }
+    }
+    _loaded () {
+        this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
+        this._unsubscribeMChainsId = this._mapChains.item.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
     }
     _onAllowedCharactersSubscriptionChange (event) {
         switch (event.type) {
@@ -136,83 +136,53 @@ class MapController extends Emitter {
         this.emit("allowedCharactersUpdated", this.allowedCharacters);
     }
     _onSystemSubscriptionChange (_data) {
-        // if(!this._inited)
-        //     return;
-
         switch (_data.type) {
-            case "bulk":
+            case "bulk": {
+                this.map.enableForce(false);
+                let prarr = [];
                 for (let a = 0; a < _data.list.length; a++) {
-                    this.systems[_data.list[a]] = new System(this, this.map, this.mapId, _data.list[a]);
-                    this.systems[_data.list[a]].init();
+                    this.systems[_data.list[a]] = new System(this.map, this.mapId, _data.list[a]);
+                    prarr.push(this.systems[_data.list[a]].init());
                 }
+                Promise.all(prarr).then(() => this.map.enableForce(true));
                 break;
+            }
             case "add":
-                this.systems[_data.solarSystemId] = new System(this, this.map, this.mapId, _data.solarSystemId);
+                this.systems[_data.solarSystemId] = new System(this.map, this.mapId, _data.solarSystemId);
                 this.systems[_data.solarSystemId].init();
                 break;
             case "removed":
-                if(this.systems[_data.systemId]) {
-                    this.systems[_data.systemId].deinit();
-                    delete this.systems[_data.systemId];
+                if(this.systems[_data.solarSystemId]) {
+                    this.systems[_data.solarSystemId].deinit();
+                    delete this.systems[_data.solarSystemId];
                 }
                 break;
         }
 
         this.emit("systemChange", _data);
     }
-    _onLinksSubscriptionChange (_data) {
-        // if (!this._inited)
-        //     return;
 
-        switch (_data.type) {
+    _onChainsSubscriptionChange (data) {
+        switch (data.type) {
             case "bulk":
-                api.eve.map.link.info(this.mapId, _data.list)
-                    .then(
-                        data => {
-                            for (let a = 0; a < data.length; a++) {
-                                this.links[data[a].id] = new Link(this, this.map, this.mapId, data[a].id);
-                                this.links[data[a].id].updateInfo(data[a]);
-                                this.links[data[a].id].init();
-                            }
-                        },
-                        err => {
-                            this.emit("error", {
-                                message: "Error on load links info",
-                                err: err
-                            });
-                        }
-                    );
-                break;
-            case "add":
-                api.eve.map.link.info(this.mapId, [_data.linkId])
-                    .then(
-                        data => {
-                            this.links[_data.linkId] = new Link(this, this.map, this.mapId, _data.linkId);
-                            this.links[_data.linkId].updateInfo(data[0]);
-                            this.links[_data.linkId].init();
-                        },
-                        err => {
-                            this.emit("error", {
-                                message: "Error on load links info",
-                                err: err
-                            });
-                        }
-                    );
-                break;
-            case "removed":
-                if (this.links[_data.linkId]) {
-                    this.links[_data.linkId].deinit();
-                    delete this.links[_data.linkId];
+                for (let a = 0; a < data.list.length; a++) {
+                    this.links[data.list[a]] = new Chain(this, this.map, this.mapId, data.list[a]);
+                    this.links[data.list[a]].init();
                 }
                 break;
-            case "linkUpdated":
-                if(this.links[_data.linkId]) {
-                    this.links[_data.linkId].updateInfo(_data.data);
+            case "add":
+                this.links[data.chainId] = new Chain(this, this.map, this.mapId, data.chainId);
+                this.links[data.chainId].init();
+                break;
+            case "removed":
+                if(this.links[data.chainId]) {
+                    this.links[data.chainId].deinit();
+                    delete this.links[data.chainId];
                 }
                 break;
         }
 
-        this.emit("linkChanged", _data);
+        this.emit("linkChanged", data);
     }
     _onLinkContextMenu (_linkId, _event) {
         this.emit("linkContextMenu", _linkId, _event)

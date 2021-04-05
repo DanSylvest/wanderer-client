@@ -87,10 +87,10 @@
             </div>
 
             <div style="height: 0">
-                <system-panel ref="systemPanel" @highlight-route="onHighlightRoute" @hubs-updated="onHubsUpdated" />
+
 
                 <!-- CHAIN CONTEXT MENU -->
-                <chain-context-menu :show.sync="linkCMActive" :data="chainContextData" />
+                <chain-context-menu :show.sync="linkCMActive" :map-id="selectedMap" :chain-id="currentChainId" :offset="currentChainOffset"/>
 
                 <!-- SOLAR SYSTEM CONTEXT MENU -->
                 <solar-system-context-menu :show.sync="systemCMActive" :data="solarSystemContextData" @contextActivated="onSolarSystemContextActivated" />
@@ -106,19 +106,26 @@
                 </context-menu>
 
                 <tooltip
-                        :c-offset-x="item.x"
-                        :c-offset-y="item.y"
-                        :c-activated="true"
-                        :key="item.systemId"
-                        v-for="item in systemsTooltipDisplayed"
-                        class="wd-layout-secondary"
+                    :offset-x="item.x"
+                    :offset-y="item.y"
+                    :activated="true"
+                    :key="item.systemId"
+                    v-for="item in systemsTooltipDisplayed"
+                    class="wd-layout-secondary"
                 >
-                    <system-card :c-solar-system-id="item.systemId" :c-map-id="item.mapId" />
+                    <system-card :c-solar-system-id="item.systemId" :c-map-id="item.mapId" :exists-on-map="true"/>
                 </tooltip>
 
                 <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
             </div>
-
+            <system-panel
+                :show.sync="systemPanelShow"
+                :map-id="systemPanelMapId"
+                :solar-system-id="systemPanelSolarSystemId"
+                @highlight-route="onHighlightRoute"
+                @hubs-updated="onHubsUpdated"
+                @closed="onSystemInfoPanelClosed"
+            />
             <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
         </div>
     </div>
@@ -170,6 +177,13 @@
         ],
         data: function () {
             return {
+                systemPanelShow: false,
+                systemPanelMapId: "",
+                systemPanelSolarSystemId: "",
+
+                currentChainId: null,
+                currentChainOffset: {x:0, y: 0},
+
                 solarSystemContextData : {
                     offset: {x: 0, y: 0},
                     tag: "",
@@ -179,15 +193,6 @@
                     isLocked: false,
                     mapId: "",
                     solarSystemId: ""
-                },
-
-                chainContextData : {
-                    offset: {x: 0, y: 0},
-                    timeStatus: "",
-                    massStatus: "",
-                    shipSizeType: "",
-                    mapId: "",
-                    chainId: ""
                 },
 
                 selectedMap: null,
@@ -219,8 +224,6 @@
             }
         },
         mounted: function () {
-            this.$refs.systemPanel.$on("closed", this.onSystemInfoPanelClosed.bind(this));
-
             this.initMapTid = -1;
             this._currentOpenSystem = null;
 
@@ -262,7 +265,6 @@
                 this._mapsSubscriber = null;
             }
 
-            // this.$refs.systemPanel.hide();
             this.hideSystemPanel();
         },
         methods: {
@@ -336,7 +338,6 @@
 
                 this.showMapLoader = true;
 
-                // this.$refs.systemPanel.hide();
                 this.hideSystemPanel();
 
                 this.loadingMap = true;
@@ -372,13 +373,12 @@
                 this._currentOpenSystem = null;
                 this.mapController.offSystemActive();
             },
-            _onSystemOpenInfo: function (_systemId, _event) {
+            _onSystemOpenInfo: function (_systemId) {
                 this._offContexts();
                 this.mapController.map.deselectAll();
                 this.mapController.offSystemActive();
 
                 if(this._currentOpenSystem === _systemId) {
-                    // this.$refs.systemPanel.hide();
                     this.hideSystemPanel();
 
                     this._currentOpenSystem = null;
@@ -386,32 +386,8 @@
                 }
 
                 this.mapController.setSystemActive(_systemId);
-                // todo
-                // Я полагаю что надо не закрывтаь, а потом открывать, а показывать загрузчик
-                // а потом перезагружать... Но только после того как разберус, какого хрена ничего не обновляется...
-                if(this._currentOpenSystem !== null) {
-                    // this.$refs.systemPanel.hide();
-                    this.hideSystemPanel();
-
-                    this.$nextTick(function () {
-                        this._currentOpenSystem = _systemId;
-                        this.showSystemPanel();
-                        // this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
-
-                        this.$nextTick(function () {
-                            this.$refs.systemPanel.reload(_event);
-                        }.bind(this));
-                    }.bind(this))
-                } else {
-                    this._currentOpenSystem = _systemId;
-                    this.showSystemPanel();
-                    // this.$refs.systemPanel.show(this.mapController.mapId, _systemId);
-
-                    this.$nextTick(function () {
-                        this.$refs.systemPanel.reload(_event);
-                    }.bind(this));
-                }
-
+                this._currentOpenSystem = _systemId;
+                this.showSystemPanel();
             },
             _onDragStarted: function () {
                 this._offContexts();
@@ -449,23 +425,22 @@
                 switch (_data.type) {
                     case "removed":
                         if(_data.systemId === this._currentOpenSystem) {
-                            // this.$refs.systemPanel.hide();
                             this.hideSystemPanel();
                         }
 
                         this.mapController.offAllShade();
-                        this.$refs.systemPanel.systemRemoved(_data.data);
+                        // this.$refs.systemPanel.systemRemoved(_data.data);
                         break;
                     case "systemUpdated":
-                        if(_data.systemId === this._currentOpenSystem)
-                            this.$refs.systemPanel.update(_data.data);
+                        // if(_data.systemId === this._currentOpenSystem)
+                            // this.$refs.systemPanel.update(_data.data);
                         break;
                     case "bulk":
                     case "updatedSystemsPosition":
                         break;
                     case "add":
                         this.mapController.offAllShade();
-                        this.$refs.systemPanel.systemAdded(_data.data);
+                        // this.$refs.systemPanel.systemAdded(_data.data);
                         break;
                 }
             },
@@ -473,17 +448,17 @@
                 switch (_data.type) {
                     case "removed":
                         this.mapController.offAllShade();
-                        this.$refs.systemPanel.linkRemoved(_data.data);
+                        // this.$refs.systemPanel.linkRemoved(_data.data);
                         break;
                     case "bulk":
                         break;
                     case "linkUpdated":
                         this.mapController.offAllShade();
-                        this.$refs.systemPanel.linkUpdated(_data.data);
+                        // this.$refs.systemPanel.linkUpdated(_data.data);
                         break;
                     case "add":
                         this.mapController.offAllShade();
-                        this.$refs.systemPanel.linkAdded(_data.data);
+                        // this.$refs.systemPanel.linkAdded(_data.data);
                         break;
                 }
             },
@@ -580,18 +555,9 @@
             openLinkContextMenu (linkId, x, y) {
                 this._offContexts();
 
-                this._currentContextLink = linkId;
+                this.currentChainId = linkId;
+                this.currentChainOffset = {x: x + 10, y: y + 10};
                 this.linkCMActive = true;
-
-                let chainInfo = this.mapController.getLink(this._currentContextLink).info;
-                this.chainContextData = {
-                    offset: {x: x + 10, y: y + 10},
-                    timeStatus: chainInfo.timeStatus,
-                    massStatus: chainInfo.massStatus,
-                    shipSizeType: chainInfo.shipSizeType,
-                    mapId: this.mapController.mapId,
-                    chainId: linkId
-                }
             },
             selectMapOnStart: function () {
                 this.showMapEmpty = this.allowedMaps.length === 0;
@@ -775,11 +741,12 @@
                 return {"background-image": `url("https://images.evetech.net/characters/${characterId}/portrait")`};
             },
             showSystemPanel() {
-                this.$refs.systemPanel.show(this.mapController.mapId, this._currentOpenSystem);
-
+                this.systemPanelShow = true;
+                this.systemPanelMapId = this.mapController.mapId;
+                this.systemPanelSolarSystemId = this._currentOpenSystem;
             },
             hideSystemPanel() {
-                this.$refs.systemPanel.hide();
+                this.systemPanelShow = false;
             }
         }
     }
@@ -815,19 +782,7 @@
         }
     }
 
-    .fade, .fade2 {
-        &-enter-active, &-leave-active {
-            transition: opacity 300ms;
-        }
 
-        &-enter, &-leave-to {
-            opacity: 0;
-        }
-
-        &-enter-to, &-leave {
-            opacity: 1;
-        }
-    }
 
     .wd-map-toolbar {
         width: 100%;

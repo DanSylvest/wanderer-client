@@ -1,40 +1,33 @@
 <template>
-    <div>
-        <div v-if="enable === true">
-            <div v-if="signatures.length > 0" class="wd flex flex-justify-end">
-                <md-button class="md-icon-button" @click="showFilterDialog = true">
-                    <md-icon>tune</md-icon>
-                </md-button>
-            </div>
-            <md-content v-if="filteredSignatures.length > 0">
-                <md-table
-                    class="wd-small-table-cell"
-                    ref="signaturesTable"
-                    v-model="filteredSignatures"
-                    md-sort="email"
-                    md-sort-order="asc"
-                    md-card
-                    md-fixed-header
-                    md-height="600px"
-                    @md-selected="onSelect"
-                >
-                    <md-table-row
-                        ref="tableRows"
-                        slot="md-table-row"
-                        slot-scope="{ item }"
-                        md-auto-select
-                        md-selectable="multiple"
-                    >
-                        <md-table-cell md-label="id" md-sort-by="id" width="40" style="white-space: nowrap">{{ item.id }}</md-table-cell>
-                        <md-table-cell md-label="group" md-sort-by="group">{{ item.group }}</md-table-cell>
-                        <md-table-cell md-label="name" md-sort-by="name">{{ item.name }}</md-table-cell>
-                        <md-table-cell md-label="created" md-sort-by="created" width="120">
-                            <time-left :c-date="new Date(item.created)"></time-left>
-                        </md-table-cell>
-                    </md-table-row>
-                </md-table>
-                <transition name="c-fade">
-                    <md-toolbar v-if="selected.length > 0" md-elevation="0" class="wd-table-toolbar">
+    <div class="wd fs wd-signatures">
+        <div v-if="enable === true && loaded" class="wd fs">
+            <div v-if="signatures.length > 0" class="wd fs">
+                <wd-table :rows="filteredSignatures" selectable @selected="onSelect">
+                    <template v-slot:toolbar>
+                        <div class="md-toolbar-section-end">
+                            <md-button class="md-icon-button" @click="showFilterDialog = true">
+                                <md-icon>tune</md-icon>
+                            </md-button>
+                        </div>
+                    </template>
+
+                    <template v-slot:header>
+                        <table-header-cell sortable id="id" widthPolicy="80px">id</table-header-cell>
+                        <table-header-cell sortable id="group">group</table-header-cell>
+                        <table-header-cell sortable id="name">name</table-header-cell>
+                        <table-header-cell sortable id="created">created</table-header-cell>
+                    </template>
+
+                    <template v-slot:row="{row}">
+                        <table-cell id="id">{{row.id}}</table-cell>
+                        <table-cell id="group">{{row.group}}</table-cell>
+                        <table-cell id="name">{{row.name}}</table-cell>
+                        <table-cell id="created">
+                            <time-left :c-date="new Date(row.created)"></time-left>
+                        </table-cell>
+                    </template>
+
+                    <template v-slot:alternate-toolbar>
                         <div class="md-toolbar-section-start">Signatures selected - {{selected.length}}</div>
 
                         <div class="md-toolbar-section-end">
@@ -42,23 +35,23 @@
                                 <md-icon>delete</md-icon>
                             </md-button>
                         </div>
-                    </md-toolbar>
-                </transition>
+                    </template>
 
-            </md-content>
+                    <template v-slot:empty-state v-if="signatures.length !== 0 && filteredSignatures.length === 0">
+                        <md-empty-state
+                            md-icon="announcement"
+                            md-label="All existing signatures were filtered"
+                            md-description="">
+                        </md-empty-state>
+                    </template>
+                </wd-table>
+            </div>
 
             <md-empty-state
                 v-if="signatures.length === 0"
                 md-icon="announcement"
                 md-label="No signatures"
                 md-description="Just paste (ctrl + v) for update signatures.">
-            </md-empty-state>
-
-            <md-empty-state
-                v-if="signatures.length !== 0 && filteredSignatures.length === 0"
-                md-icon="announcement"
-                md-label="All existing signatures were filtered"
-                md-description="">
             </md-empty-state>
 
             <div style="width: 1000px;">
@@ -73,7 +66,6 @@
                     </md-dialog-actions>
                 </md-dialog>
             </div>
-
             <input type="text" class="c-hidden-input">
         </div>
 
@@ -87,8 +79,7 @@
             </div>
 
             <md-dialog-actions>
-                <md-button class="md-primary" @click="showFilterDialog = false;">Close</md-button>
-                <md-button class="md-primary" @click="showFilterDialog = false; _saveFilter()">Save</md-button>
+                <md-button class="md-primary" @click="showFilterDialog = false;">OK</md-button>
             </md-dialog-actions>
         </md-dialog>
     </div>
@@ -103,66 +94,82 @@
     import exists from "../../../../js/env/tools/exists.js";
     import cookie from "../../../../js/env/cookie.js";
     import helper from "../../../../js/utils/helper.js";
+    import cache from "../../../../js/cache/cache.js";
+    import SpamFilter from "../../../../js/env/spamFilter.js";
+    import WdTable from "../../../ui/Table/WdTable.vue";
+    import TableHeaderCell from "../../../ui/Table/TableHeaderCell.vue";
+    import TableCell from "../../../ui/Table/TableCell.vue";
+
 
     export default {
         name: "Signatures",
-        props: [
-
-        ],
-        components: {
-            TimeLeft
+        props: {
+            solarSystemId: {
+                type: String,
+                default: ""
+            },
+            mapId: {
+                type: String,
+                default: ""
+            }
         },
+        components: { TimeLeft, WdTable, TableHeaderCell, TableCell },
         data: function () {
             return {
+                loaded: false,
+                lSolarSystemId: this.solarSystemId,
+                lMapId: this.mapId,
+
                 showFilterDialog: false,
                 filterTypes: [],
 
                 saveSigsDialogActive: false,
-                signatures: [],
-                filteredSignatures: [],
                 selected: [],
                 enable: true
             }
         },
         mounted: function () {
+            this._pasteHandler = this.onPaste.bind(this);
+
+            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
+            this.isValidAttrs() && this._attrUpdatedSF.call();
+
+            this._tidHI = -1;
+
             this._rtid = -1;
             this._so = new SizeObserver(null, this.refresh.bind(this));
             this._to = new TabObserver();
             this._to.on("out", this._onTabOut.bind(this));
             this._to.on("in", this._onTabIn.bind(this));
 
-            this._hiddenInput = this.$el.querySelector(".c-hidden-input");
-            this._pasteHandler = this.onPaste.bind(this);
-            this._hiddenInput.addEventListener("paste", this._pasteHandler);
-
             this._loadFilterData();
         },
         beforeDestroy: function () {
-            this._hiddenInput.removeEventListener("paste", this._pasteHandler);
 
             this._rtid !== -1 && clearTimeout(this._rtid);
             this._rtid = -1;
-            this.mapId = null;
             this.systemId = null;
             this._so.destructor();
-            this._to.destructor();
+            this._to.destructor()
+
+            this._attrUpdatedSF.stop();
+            this.unsubscribeSolarSystem();
         },
-        methods: {
-            _loadFilterData () {
-                let savedFilter = cookie.get("filteredAnomalies");
-                if(!savedFilter) {
-                    this.filterTypes = environment.signaturesTypes.slice();
-                } else {
-                    this.filterTypes = JSON.parse(savedFilter);
-                }
+        watch : {
+            solarSystemId (val) {
+                this.lSolarSystemId = val;
+                this._attrUpdatedSF.call();
             },
-            _saveFilter () {
+            mapId (val) {
+                this.lMapId = val;
+                this._attrUpdatedSF.call();
+            }
+        },
+        computed: {
+            filteredSignatures () {
                 cookie.set("filteredAnomalies", JSON.stringify(this.filterTypes),{expires: 60 * 60 * 24 * 365 * 1000});
-                this.filteredSignatures = this._applyFilter(this.signatures);
-                this.refresh();
-            },
-            _applyFilter (signatures) {
-                let filtered = signatures;
+
+                let filtered = this.signatures.slice(0);
                 this.filterTypes.map(filter => {
                     if(!filter.value) {
                         let title = environment.dScan.kindNames[filter.id];
@@ -172,13 +179,86 @@
 
                 return filtered;
             },
-            updateHiddenInput: function () {
-                this._hiddenInput.removeEventListener("paste", this._pasteHandler);
+            signatures () {
+                return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].signatures
+            }
+        },
+        methods: {
+            createHiddenInput () {
+                this._hiddenInput = this.$el.querySelector(".c-hidden-input");
+                this._hiddenInput.addEventListener("paste", this._pasteHandler);
+            },
+            destroyHiddenInput () {
+                this._tidHI !== -1 && clearTimeout(this._tidHI);
+                this._tidHI = -1;
 
-                this.$nextTick(function () {
-                    this._hiddenInput = this.$el.querySelector(".c-hidden-input");
-                    this._hiddenInput.addEventListener("paste", this._pasteHandler);
-                }.bind(this));
+                this._hiddenInput && this._hiddenInput.removeEventListener("paste", this._pasteHandler);
+                delete this._hiddenInput;
+            },
+            // },
+            updateHiddenInput: function () {
+                if(this._hiddenInput) {
+                    this.destroyHiddenInput();
+                    this.$nextTick(() => this.createHiddenInput());
+                }
+            },
+            hasHiddenInput () {
+                return !!this.$el.querySelector(".c-hidden-input");
+            },
+            _watchAttrsUpdated () {
+                this.destroyHiddenInput();
+                if(this.isValidAttrs()) {
+                    this.unsubscribeSolarSystem();
+                    this.subscribeSolarSystem();
+                }
+            },
+            isValidAttrs () {
+                return this.lSolarSystemId !== "" && this.lMapId !== "";
+            },
+            subscribeSolarSystem() {
+                this.loaded = false;
+                this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
+
+                this._map = cache.maps.touch(this.lMapId);
+                this._mapSolarSystem = this._map.item.solarSystems.touch(this.lSolarSystemId);
+
+                Promise.all([
+                    this.solarSystemInfo.item.readyPromise(),
+                    this._mapSolarSystem.item.readyPromise(),
+                ])
+                    .then(this._onLoaded.bind(this));
+            },
+            unsubscribeSolarSystem() {
+                this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
+                this.solarSystemInfo && delete this.solarSystemInfo;
+
+                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+                this._mapSolarSystem && delete this._mapSolarSystem;
+
+                this._map && this._map.unsubscribe();
+                this._map && delete this._map;
+            },
+            _onLoaded () {
+                this.loaded = true;
+                this._hiddenInputLoop();
+            },
+            _hiddenInputLoop () {
+                this._tidHI = -1;
+
+                if(this.hasHiddenInput()) {
+                    this.createHiddenInput();
+                    this.focus();
+                } else {
+                    this._tidHI = setTimeout(this._onLoaded.bind(this), 10);
+                }
+            },
+            _loadFilterData () {
+                let savedFilter = cookie.get("filteredAnomalies");
+                if(!savedFilter) {
+                    this.filterTypes = environment.signaturesTypes.slice();
+                } else {
+                    this.filterTypes = JSON.parse(savedFilter);
+                }
             },
             refresh: function () {
                 this._rtid !== -1 && clearTimeout(this._rtid);
@@ -204,7 +284,7 @@
                         out.push(oldSig);
                     }
                 }
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: out})
+                api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, {signatures: out})
                     .then(
                         helper.dummy,
                         err => helper.errorHandler(this, err)
@@ -221,7 +301,7 @@
                     signatures: this.currentWaitSaveData.actualSigs.concat(this.currentWaitSaveData.forRemoveSigs)
                 }
 
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, data)
+                api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, data)
                     .then(
                         helper.dummy,
                         err => helper.errorHandler(this, err)
@@ -233,21 +313,11 @@
             onUpdateNonExists: function () {
                 this.saveSigsDialogActive = false;
 
-                api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: this.currentWaitSaveData.actualSigs})
+                api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, {signatures: this.currentWaitSaveData.actualSigs})
                     .then(
                         helper.dummy,
                         err => helper.errorHandler(this, err)
                     );
-            },
-            load: function (_mapId, _systemId) {
-                this.mapId = _mapId;
-                this.systemId = _systemId;
-                this.focus();
-            },
-            update: function (_signatures) {
-                this.selected = [];
-                this.signatures = _signatures;
-                this.filteredSignatures = this._applyFilter(_signatures);
             },
             focus: function () {
                 this._hiddenInput.focus();
@@ -267,7 +337,7 @@
                     this.saveSigsDialogActive = true;
                     this.currentWaitSaveData = result;
                 } else {
-                    api.eve.map.solarSystem.update(this.mapId, this.systemId, {signatures: result.actualSigs})
+                    api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, {signatures: result.actualSigs})
                         .then(
                             helper.dummy,
                             err => helper.errorHandler(this, err)
@@ -429,16 +499,8 @@
 <style lang="scss">
     @import "./src/css/variables";
 
-    .wd-table-toolbar {
-        padding: 0 10px;
-        min-height: 17px;
-        background-color: $fg-negative !important;
-        border-radius: 3px;
-        margin-top: 5px;
-    }
-
-    .wd-small-table-cell .md-table-cell {
-        height: 35px;
+    .wd-signatures {
+        height: calc(100% - 60px) !important;
     }
 
     .wd-filter-content {

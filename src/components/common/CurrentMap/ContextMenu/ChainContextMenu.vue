@@ -1,6 +1,6 @@
 <template>
     <div>
-        <context-menu :c-activated.sync="localShow" :c-offset-x="offset.x" :c-offset-y="offset.y" @c-closed="onClosedLinkContext">
+        <context-menu :c-activated.sync="lShow" :c-offset-x="lOffset.x" :c-offset-y="lOffset.y" @c-closed="onClosedLinkContext">
             <context-menu-item c-title="Time state" c-icon="access_time" :c-is-submenu="true" >
                 <context-menu-item
                     :c-active="item.active"
@@ -39,6 +39,8 @@
     import api from "../../../../js/api.js";
     import helper from "../../../../js/utils/helper.js";
     import environment from "../../../../js/core/map/environment.js";
+    import cache from "../../../../js/cache/cache.js";
+    import SpamFilter from "../../../../js/env/spamFilter.js";
 
     let uuidCounter = 0;
     export default {
@@ -48,18 +50,17 @@
             ContextMenuItem,
         },
         props: {
-            data: {
+            mapId: {
+                type: String,
+                default: null
+            },
+            chainId: {
+                type: String,
+                default: null
+            },
+            offset: {
                 type: Object,
-                default: function () {
-                    return {
-                        offset: {x: 0, y: 0},
-                        timeStatus: "",
-                        massStatus: "",
-                        shipSizeType: "",
-                        mapId: "",
-                        chainId: ""
-                    }
-                }
+                default: () => ({x: 0, y: 0})
             },
             show: {
                 type: Boolean,
@@ -68,53 +69,98 @@
         },
         data: function () {
             return {
-                timeStatuses: [],
-                massStatuses: [],
-                shipSizeStatuses: [],
-
-                localShow: false,
-
-                offset: {x: 0, y: 0},
-                timeStatus: "",
-                massStatus: "",
-                shipSizeType: "",
-                mapId: "",
-                chainId: ""
+                lShow: this.show,
+                lOffset: this.offset,
+                lMapId: this.mapId,
+                lChainId: this.chainId,
+                loaded: false
             }
         },
         watch: {
             show (val) {
-                this.localShow = val;
+                this.lShow = val;
             },
-            data (val) {
-                this.offset = val.offset;
-                this.timeStatus = val.timeStatus;
-                this.massStatus = val.massStatus;
-                this.shipSizeType = val.shipSizeType;
-                this.mapId = val.mapId;
-                this.chainId = val.chainId;
-                this.reload();
+            mapId (val) {
+                this.lMapId = val;
+                this._attrUpdatedSF.call();
+            },
+            chainId (val) {
+                this.lChainId = val;
+                this._attrUpdatedSF.call();
+            },
+            offset (val) {
+                this.lOffset = val;
+            }
+        },
+        beforeMount() {
+        },
+        beforeDestroy() {
+            this._attrUpdatedSF.stop();
+            this.unsubscribeSolarSystem();
+        },
+        mounted() {
+            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
+            this.isValidAttrs() && this._attrUpdatedSF.call();
+        },
+        computed : {
+            chainInfo () {
+                return this.$store.state.maps[this.lMapId].chains[this.lChainId];
+            },
+            timeStatuses  () {
+                if(!this.loaded) return [];
+
+                return environment.timeStatuses.map(x => {
+                    x.active = x.id === this.chainInfo.timeStatus;
+                    x.uid = uuidCounter++;
+                    return x;
+                });
+            },
+            massStatuses () {
+                if(!this.loaded) return [];
+
+                return environment.massStatuses.map(x => {
+                    x.active = x.id === this.chainInfo.massStatus;
+                    x.uid = uuidCounter++;
+                    return x;
+                });
+            },
+            shipSizeStatuses () {
+                if(!this.loaded) return [];
+
+                return environment.shipSizeStatuses.map(x => {
+                    x.active = x.id === this.chainInfo.shipSizeType;
+                    x.uid = uuidCounter++;
+                    return x;
+                });
             }
         },
         methods: {
-            reload () {
-                this.timeStatuses = environment.timeStatuses.map(x => {
-                    x.active = x.id === this.timeStatus;
-                    x.uid = uuidCounter++;
-                    return x;
-                });
+            _watchAttrsUpdated () {
+                this.loaded = false;
 
-                this.massStatuses = environment.massStatuses.map(x => {
-                    x.active = x.id === this.massStatus;
-                    x.uid = uuidCounter++;
-                    return x;
-                });
+                if(this.isValidAttrs()) {
+                    this.unsubscribeChain();
+                    this.subscribeChain();
+                }
+            },
+            _onLoaded () {
+                this.loaded = true;
+            },
+            subscribeChain () {
+                this._map = cache.maps.touch(this.lMapId);
+                this._mapChains = this._map.item.chains.touch(this.lChainId);
 
-                this.shipSizeStatuses = environment.shipSizeStatuses.map(x => {
-                    x.active = x.id === this.shipSizeType;
-                    x.uid = uuidCounter++;
-                    return x;
-                });
+                Promise.all([
+                    this._mapChains.item.readyPromise(),
+                ])
+                    .then(this._onLoaded.bind(this));
+            },
+            unsubscribeChain () {
+                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+                delete this._mapSolarSystem;
+
+                this._map && this._map.unsubscribe();
+                delete this._map;
             },
             onTimeStateChange(state) {
                 api.eve.map.link.update(this.mapId, this.chainId, {timeStatus: state})
@@ -158,7 +204,10 @@
             },
             onClosedLinkContext () {
                 this.$emit("update:show", false);
-            }
+            },
+            isValidAttrs () {
+                return !!this.lChainId && !!this.lMapId;
+            },
         }
     }
 </script>

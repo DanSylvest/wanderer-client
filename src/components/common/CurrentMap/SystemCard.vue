@@ -12,14 +12,16 @@
                 </div>
                 <div class="constellation-name">{{info().constellationName}}</div>
                 <div class="region-name">{{info().regionName}}</div>
-                <div class="solar-system-effect wd-color-primary-2" v-if="status !== 0">
+                <div class="solar-system-effect wd-color-primary-2" v-if="localExistsOnMap && status !== 0">
                     (<span :class="statusClass">{{statusName}}</span>)
                 </div>
             </div>
-            <div class="wd-system-card__divider" v-show="onlineCount > 0"></div>
-            <div class="wd-system-card__content" v-show="onlineCount > 0">
-                <local :map-id="mapId" :solar-system-id="solarSystemId" />
-            </div>
+            <template v-if="localExistsOnMap">
+                <div class="wd-system-card__divider" v-show="onlineCount > 0"></div>
+                <div class="wd-system-card__content" v-show="onlineCount > 0">
+                    <local :map-id="mapId" :solar-system-id="solarSystemId" />
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -44,13 +46,13 @@
                 type: String,
                 default: null
             },
-            data: {
-                type: Object,
-                default: null
-            },
             isLoadCharData: {
                 type: Boolean,
                 default: true
+            },
+            existsOnMap: {
+                type: Boolean,
+                default: false
             }
         },
         data: function () {
@@ -58,6 +60,7 @@
                 loaded: false,
                 solarSystemId: this.cSolarSystemId,
                 mapId: this.cMapId,
+                localExistsOnMap: this.existsOnMap,
                 characters: [],
                 localData: this.data,
                 localIsLoadCharData: this.isLoadCharData,
@@ -70,31 +73,39 @@
             this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
             this.solarSystemInfo = null;
 
-            this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-            delete this._mapSolarSystem;
+            if(this.localExistsOnMap) {
+                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+                delete this._mapSolarSystem;
 
-            this._map && this._map.unsubscribe();
-            delete this._map;
+                this._map && this._map.unsubscribe();
+                delete this._map;
+            }
         },
         beforeMount() {
+            let prarr = [];
             this.solarSystemInfo = cache.solarSystems.touch(this.solarSystemId);
+            prarr.push(this.solarSystemInfo.item.readyPromise());
 
-            this._map = cache.maps.touch(this.mapId);
-            this._mapSolarSystem = this._map.item.solarSystems.touch(this.solarSystemId);
+            if(this.localExistsOnMap) {
+                this._map = cache.maps.touch(this.mapId);
+                this._mapSolarSystem = this._map.item.solarSystems.touch(this.solarSystemId);
+                prarr.push(this._mapSolarSystem.item.readyPromise());
+            }
 
-            Promise.all([
-                this.solarSystemInfo.item.readyPromise(),
-                this._mapSolarSystem.item.readyPromise(),
-            ])
-                .then(this._onLoaded.bind(this));
+            Promise.all(prarr).then(this._onLoaded.bind(this));
         },
         computed : {
             statusClass () {
                 let status = this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].status;
+                if(!status)
+                    return "";
+
                 return `eve-system-status-color-${environment.statuses[status].id}`
             },
             statusName () {
                 let status = this.$store.state.maps[this.mapId].solarSystems[this.solarSystemId].status;
+                if(!status)
+                    return "";
                 return environment.statuses[status].name;
             },
             status () {
@@ -106,6 +117,7 @@
         },
         methods: {
             _onLoaded () {
+                // setTimeout(() => this.loaded = true, 500)
                 this.loaded = true;
 
                 // eslint-disable-next-line no-unused-vars

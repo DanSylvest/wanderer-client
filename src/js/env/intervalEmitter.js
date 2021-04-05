@@ -14,9 +14,7 @@ class IntervalEmitter extends Emitter {
     }
 
     destructor() {
-        this._tid !== -1 && clearTimeout(this._tid);
-        this._tid = setTimeout(this.__tick.bind(this), this._interval);
-        this._tid = -1;
+        this.stop();
         super.destructor();
     }
 
@@ -41,6 +39,11 @@ class IntervalEmitter extends Emitter {
         this._startTime = +new Date;
 
         this.__interval();
+    }
+
+    stop () {
+        this._tid !== -1 && clearTimeout(this._tid);
+        this._tid = -1;
     }
 }
 

@@ -24,7 +24,7 @@
                         </md-empty-state>
                     </template>
                     <div class="wd-route" v-show="routes.length > 0 && !loading">
-                        <template v-for="item in routes" @mouseover="onMouseOver">
+                        <template v-for="item in routes">
                             <div class="wd-route__destination-type" :class="getSystemTypeClass(item.systems.last())" :key="item.id">
                                 {{item.systems.last().typeName}}
                             </div>
@@ -42,17 +42,16 @@
                                         class="wd-route-system"
                                         :class="getBackgroundClass(routeSystem) + ' ' + getShapeClass(routeSystem)"
                                         v-for="routeSystem in item.systems"
-                                        v-bind:key="routeSystem.id"
+                                        v-bind:key="routeSystem.solarSystemId"
                                     >
-                                        <md-tooltip md-direction="top" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
+                                        <tooltip placement="top" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
                                             <system-card
-                                                :c-map-id="localMapId"
-                                                :c-solar-system-id="routeSystem.id"
+                                                :c-map-id="lMapId"
+                                                :c-solar-system-id="routeSystem.solarSystemId.toString()"
                                                 :is-load-char-data="false"
-                                                :data="routeSystem"
                                                 class="wd-layout-secondary"
                                             ></system-card>
-                                        </md-tooltip>
+                                        </tooltip>
                                     </div>
                                 </template>
                                 <template class="wd-route__systems" v-if="!item.hasConnection">
@@ -92,11 +91,14 @@
     import environment from "../../../../../js/core/map/environment.js";
     import SystemCard from "../../SystemCard.vue";
     import helper from "../../../../../js/utils/helper.js";
-
+    import SpamFilter from "../../../../../js/env/spamFilter.js";
+    import Tooltip from "../../../../ui/Tooltip.vue";
+    import cache from "../../../../../js/cache/cache.js";
 
     export default {
         name: "Routes",
         components: {
+            Tooltip,
             SystemAddDialog,
             SystemCard
         },
@@ -113,43 +115,96 @@
         data: function () {
             return {
                 isSystemAddDialogActivated: false,
-                localMapId: this.mapId,
-                localSolarSystemId: this.solarSystemId,
-                localData: this.data,
+                lMapId: this.mapId,
+                lSolarSystemId: this.solarSystemId,
                 routes: [],
-                loading: true
+                loading: true,
+                subscribed: false
             }
         },
         mounted() {
-            this.isMounted = true;
+            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
+            this.isValidAttrs() && this._attrUpdatedSF.call();
+        },
+        beforeDestroy() {
+            this._attrUpdatedSF.stop();
+            this._attrUpdatedSF = null;
 
-            if(this.waitMount) {
-                this.waitMount = false;
-                this.$nextTick().then(this.loadRoutesData);
-            } else {
-                this.$nextTick().then(this.loadRoutesData);
-            }
+            this.unsubscribeAll();
         },
         watch: {
             mapId (val) {
-                this.localMapId = val;
-                this.loadRoutesData();
+                this.lMapId = val;
+                this._attrUpdatedSF.call();
             },
             solarSystemId (val) {
-                this.localSolarSystemId = val;
-                this.loadRoutesData();
+                this.lSolarSystemId = val;
+                this._attrUpdatedSF.call();
             }
         },
         methods : {
-            onMouseOver () {
-                // eslint-disable-next-line no-debugger
-                debugger
+            _watchAttrsUpdated () {
+                if(this.isValidAttrs()) {
+                    this.unsubscribeAll();
+                    this.subscribeAll();
+                    this.loadRoutesData();
+                }
+            },
+            subscribeAll() {
+                this.subscribed = false;
+
+                this._mapProvider = cache.maps.touch(this.lMapId);
+                this._mapSolarSystems = this._mapProvider.item.solarSystems.subscribe();
+                this._mapChains = this._mapProvider.item.chains.subscribe();
+
+                Promise.all([
+                    this._mapSolarSystems.item.readyPromise(),
+                    this._mapChains.item.readyPromise(),
+                ])
+                    .then(this._onSubscribedAll.bind(this))
+            },
+            unsubscribeAll() {
+                this.subscribed = false;
+
+                if(exists(this._unsubscribeMSSId)) {
+                    this._mapSolarSystems.item.off(this._unsubscribeMSSId);
+                    this._unsubscribeMSSId = null;
+                }
+
+                if(exists(this._unsubscribeMChainsId)) {
+                    this._mapChains.item.off(this._unsubscribeMChainsId);
+                    this._unsubscribeMChainsId = null;
+                }
+
+                this._mapChains && this._mapChains.unsubscribe();
+                delete this._mapChains;
+
+                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+                delete this._mapSolarSystem;
+
+                this._mapProvider && this._mapProvider.unsubscribe();
+                delete this._mapProvider;
+            },
+            _onSubscribedAll () {
+                this.subscribed = true;
+                this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
+                this._unsubscribeMChainsId = this._mapChains.item.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
+                this.loadRoutesData();
+            },
+            _onSystemSubscriptionChange () {
+                this.loadRoutesData();
+            },
+            _onChainsSubscriptionChange () {
+                this.loadRoutesData();
+            },
+            isValidAttrs () {
+                return exists(this.lMapId) && exists(this.lSolarSystemId);
             },
             onClickAddHubSystem () {
                 this.isSystemAddDialogActivated = true;
             },
             onSystemSelected (solarSystemId) {
-                api.eve.map.routes.addHub(this.localMapId, solarSystemId)
+                api.eve.map.routes.addHub(this.lMapId, solarSystemId)
                     .then(
                         () => {
                             this.isSystemAddDialogActivated  = false;
@@ -159,7 +214,7 @@
                     );
             },
             onRemoveRoute(destinationSolarSystemId) {
-                api.eve.map.routes.removeHub(this.localMapId, destinationSolarSystemId)
+                api.eve.map.routes.removeHub(this.lMapId, destinationSolarSystemId)
                     .then (
                         () => this.loadRoutesData(),
                         err => helper.errorHandler(this, err)
@@ -173,25 +228,16 @@
                 this.$emit("hubs-updated", routes.map(x => x.destination));
             },
             loadRoutesData() {
-                this.loading = true;
-                if(exists(this.localMapId) && exists(this.localSolarSystemId)) {
-                    if(!this.isMounted) {
-                        this.waitMount = true;
-                        return;
-                    }
-
-                    api.eve.map.routes.list(this.localMapId, this.localSolarSystemId).then((routes) => {
+                if(this.subscribed) {
+                    this.loading = true;
+                    api.eve.map.routes.list(this.lMapId, this.lSolarSystemId).then((routes) => {
                         this.loading = false;
                         this.updateRoutes(routes);
                     }, (errMsg) => {
                         alert(errMsg);
                     });
-
                 }
             },
-            // getSecurityClass (security){
-            //     return environment.securityBackgroundClasses[security];
-            // },
             //typeName systemType, security
             getSystemTypeClass (data){
                 switch (data.systemType) {

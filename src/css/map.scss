@@ -29,8 +29,13 @@ $active-color: #7be1ff;
             border-radius: 7px;
             border: 1px solid $border-color-primary-5;
             background-color: $bg-secondary;
-            transition: opacity 200ms;
+            transition: opacity 400ms;
             opacity: 1;
+
+            &.hidden {
+                display: initial !important;
+                opacity: 0 !important;
+            }
 
             &.shaded {
                 opacity: 0.4;

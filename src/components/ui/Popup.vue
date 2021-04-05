@@ -7,7 +7,9 @@
             </div>
         </div>
         <div class="wd-popup__content wd f-height">
-            <slot></slot>
+            <template>
+                <slot></slot>
+            </template>
         </div>
     </div>
 </template>
@@ -122,17 +124,17 @@
                 this.$emit('c-closed');
             },
             show: function () {
-                if (this.popupBody.parentElement === null)
+                if (this.popupBody.parentElement === null) {
                     this.getPopupsContainer().appendChild(this.popupBody);
+                    this.popupBody.classList.add("wd-popup-animate");
 
-                this.popupBody.classList.add("wd-popup-animate");
+                    let handler = function () {
+                        this.popupBody.classList.remove("wd-popup-animate");
+                        this.popupBody.removeEventListener('animationend', handler);
+                    }.bind(this);
 
-                let handler = function () {
-                    this.popupBody.classList.remove("wd-popup-animate");
-                    this.popupBody.removeEventListener('animationend', handler);
-                }.bind(this);
-
-                this.popupBody.addEventListener('animationend', handler);
+                    this.popupBody.addEventListener('animationend', handler);
+                }
             },
             hide: function () {
                 if (this.popupBody.parentElement !== null)

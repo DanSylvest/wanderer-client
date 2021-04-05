@@ -8,6 +8,7 @@ import MouseObserver from "../../env/mouseObserver";
 import exists from "../../env/tools/exists";
 import printf from "../../env/tools/printf";
 import environment from "./environment";
+import ActionObserver from "../../env/actionObserver.js";
 
 class Marker extends Emitter{
     constructor (_options) {
@@ -19,6 +20,7 @@ class Marker extends Emitter{
 
         this._enableActions = true;
 
+        this.markerTouchStartHandler = this._onMarkerTouchStart.bind(this);
         this.markerDownHandler = this._onMarkerDown.bind(this);
         this.markerContextHandler = this._onMarkerContext.bind(this);
         this.createMarker();
@@ -52,7 +54,7 @@ class Marker extends Emitter{
             </div>
         `);
 
-
+        this.wrapper.el.addEventListener("touchstart", this.markerTouchStartHandler);
         this.wrapper.el.addEventListener("mousedown", this.markerDownHandler);
         this.wrapper.el.addEventListener("contextmenu", this.markerContextHandler);
     }
@@ -82,6 +84,15 @@ class Marker extends Emitter{
     update (_data) {
         let markerData = this.data;
         let markerEl = this.wrapper;
+
+        if(!exists(_data.position) && !exists(markerData.position)) {
+            markerEl.classAdd("hidden");
+        }
+
+        if(exists(_data.position)) {
+            // setTimeout(() => markerEl.classRemove("hidden"), 400);
+            markerEl.classRemove("hidden")
+        }
 
         if (exists(_data.name) && _data.name !== markerData.name) {
             let systemNameEl = _ui.fromElement(markerEl.el.querySelector(".system-name"));
@@ -207,6 +218,12 @@ class Marker extends Emitter{
             this.wrapper.el.classList.add("active");
         else
             this.wrapper.el.classList.remove("active");
+    }
+    _onMarkerTouchStart (event) {
+        if (!this._enableActions)
+            return;
+
+        this.emit("mousedown", extend(ActionObserver.copyTouchEvent(event), ActionObserver.copyTouch(event.touches[0])));
     }
     _onMarkerDown (_event) {
         if(!this._enableActions)

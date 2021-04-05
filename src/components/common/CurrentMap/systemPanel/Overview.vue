@@ -1,25 +1,21 @@
 <template>
     <div
+        v-if="loaded"
         class="wd-system-overview wd off-user-select"
-        :class="{
-            'wd-show-effect': showEffect,
-            'wd-system-panel-size-compact': localIsCompact,
-            'wd-system-panel-size-full': !localIsCompact
-        }"
     >
-        <div class="wd-content" :class="{'is-compact':localIsCompact, 'without-effect': !showEffect}">
-            <div class="wd-content__module">
-                <!--       solar system info         -->
+        <div class="wd-content" :class="gridClass">
+            <!--       solar system info         -->
+            <div class="wd-content__module wd-module-solar-system">
                 <md-card class="wd-module-card" >
                     <md-card-header>
                         <div class="wd-system-overview__card-header wd-system-overview__header">
-                            <div :class="securityClass + ' solar-system-security'">{{security}}</div>
+                            <div :class="securityClass + ' solar-system-security'">{{info.security}}</div>
                             <div class="solar-system-name">
-                                <a v-if="solarSystemLink !== ''" target="_blank" :href="solarSystemLink + systemName" >{{systemName}}</a>
-                                <span v-if="solarSystemLink === ''">{{systemName}}</span>
+                                <a v-if="solarSystemLink !== ''" target="_blank" :href="solarSystemLink" >{{info.solarSystemName}}</a>
+                                <span v-if="solarSystemLink === ''">{{info.solarSystemName}}</span>
                             </div>
-                            <div class="constellation-name">{{constellationName}}</div>
-                            <div class="region-name">{{regionName}}</div>
+                            <div class="constellation-name">{{info.constellationName}}</div>
+                            <div class="region-name">{{info.regionName}}</div>
                         </div>
                     </md-card-header>
 
@@ -29,7 +25,7 @@
                                 <div class="wd-system-info__system-item" >
                                     <span class="wd fg-contrast" >Type</span>
                                     <div class="wd fg-contrast" >
-                                        <span :class="kindClass">{{kind}}</span> <span v-if="type != null">(<span :class="typeClass">{{type}}</span>)</span>
+                                        <span :class="typeDescriptionClass">{{info.typeDescription}}</span> <span v-if="hasType">(<span :class="typeClass">{{typeName}}</span>)</span>
                                     </div>
                                 </div>
                                 <div class="wd-system-info__system-item" v-if="status !== 0" >
@@ -38,10 +34,10 @@
                                         <span :class="statusClass">{{statusName}}</span>
                                     </div>
                                 </div>
-                                <div class="wd-system-info__system-item" v-if="statics.length > 0">
+                                <div class="wd-system-info__system-item" v-if="info.statics.length > 0">
                                     <span class="wd fg-contrast">Statics</span>
                                     <div class="text-right wd fg-contrast">
-                                        <div v-for="item in statics" :key="item.id">
+                                        <div v-for="item in info.statics" :key="item.id">
                                             <span>{{item.id}}</span>
                                             (<span :class="getStaticClassColor(item.type)">{{item.fullName}}</span>)
                                         </div>
@@ -52,62 +48,37 @@
                     </md-card-content>
                 </md-card>
             </div>
-            <div class="wd-content__module" v-if="localIsCompact || showEffect">
-                <!--       Effect   (when full)      -->
-                <md-card class="wd-module-card" v-if="!localIsCompact && showEffect">
-                    <md-card-header>
-                        <div class="wd-system-overview__card-header">
-                            <div :class="' ' + effectColor">{{effectName}}</div>
-                        </div>
-                    </md-card-header>
 
-                    <md-card-content>
-                        <div class="effect-bonuses-list">
-                            <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
-                        </div>
-                    </md-card-content>
-                </md-card>
+            <!--       Effect   -->
+            <div class="wd-content__module wd-module-effect">
+                <md-card class="wd-module-card" v-if="hasEffect">
+                <md-card-header>
+                    <div class="wd-system-overview__card-header">
+                        <div :class="effectClass">{{info.effectName}}</div>
+                    </div>
+                </md-card-header>
 
-                <!--       routes  (when compact)      -->
+                <md-card-content>
+                    <div class="effect-bonuses-list">
+                        <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            </div>
+
+            <!--       routes      -->
+            <div class="wd-content__module wd-module-routes">
                 <routes
-                    :key="routesUpdater"
                     class="wd-module-card"
-                    :map-id="mapId"
-                    :solar-system-id="solarSystemId"
-                    v-if="localIsCompact"
+                    :map-id="lMapId"
+                    :solar-system-id="lSolarSystemId"
                     @highlight-route="onHighlightRoute"
                     @hubs-updated="onHubsUpdated"
                 />
             </div>
-            <div class="wd-content__module" v-if="!localIsCompact || showEffect">
-                <!--       Effect   (when compact)      -->
-                <md-card class="wd-module-card" v-if="localIsCompact && showEffect">
-                    <md-card-header>
-                        <div class="wd-system-overview__card-header">
-                            <div :class="' ' + effectColor">{{effectName}}</div>
-                        </div>
-                    </md-card-header>
 
-                    <md-card-content>
-                        <div class="effect-bonuses-list">
-                            <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
-                        </div>
-                    </md-card-content>
-                </md-card>
-
-                <!--       routes  (when full)      -->
-                <routes
-                    :key="routesUpdater"
-                    class="wd-module-card"
-                    :map-id="mapId"
-                    :solar-system-id="solarSystemId"
-                    v-if="!localIsCompact"
-                    @highlight-route="onHighlightRoute"
-                    @hubs-updated="onHubsUpdated"
-                />
-            </div>
-            <div class="wd-content__module">
-                <!--       description      -->
+            <!--       description      -->
+            <div class="wd-content__module wd-module-description">
                 <md-card class="wd-module-card">
                     <md-card-content>
                         <md-field class="wd-overview-description">
@@ -118,16 +89,19 @@
                     </md-card-content>
                 </md-card>
             </div>
+
         </div>
     </div>
 </template>
 
 <script>
-    import exists from "../../../../js/env/tools/exists";
     import environment from "../../../../js/core/map/environment";
     import SpamFilter from "../../../../js/env/spamFilter.js";
     import Routes from "./Overview/Routes.vue";
     import IntervalEmitter from "../../../../js/env/intervalEmitter.js";
+    import cache from "../../../../js/cache/cache.js";
+    import api from "../../../../js/api.js";
+    import helper from "../../../../js/utils/helper.js";
 
     export default {
         name: "Overview",
@@ -138,51 +112,53 @@
             isCompact: {
                 type: Boolean,
                 default: false
+            },
+            solarSystemId: {
+                type: String,
+                default: ""
+            },
+            mapId: {
+                type: String,
+                default: ""
             }
         },
         data: function () {
             return {
-                saveSigsDialogActive: false,
-                signatures: [],
-                selected: [],
+                loaded: false,
+                lSolarSystemId: this.solarSystemId,
+                lMapId: this.mapId,
 
-                regionName: "",
-                constellationName: "",
-                systemName: "",
-                kind: "",
-                kindClass: "",
-                type: null,
-                typeClass: "",
-                security: "",
-                securityClass: "",
-                statics: [],
-
-                showEffect: false,
-                effectColor: "",
-                effectName: "",
-                effectData: [],
-                solarSystemLink: "",
-                status: 0,
-                statusName: "",
-                statusClass: "",
                 savingDescription: false,
-
                 description: "",
-                localIsCompact: this.isCompact,
-                mapId: null,
-                solarSystemId: null,
-
-                savingDelay: 3,
-
-                routesUpdater: 0
+                lIsCompact: this.isCompact,
+                savingDelay: 3
             }
         },
         watch: {
             isCompact: function (_newVal) {
-                this.localIsCompact = _newVal;
-            }
+                this.lIsCompact = _newVal;
+            },
+            solarSystemId (val) {
+                this.lSolarSystemId = val;
+                this._attrUpdatedSF.call();
+            },
+            mapId (val) {
+                this.lMapId = val;
+                this._attrUpdatedSF.call();
+            },
+        },
+        beforeDestroy() {
+            this._descIE.stop();
+            this._attrUpdatedSF.stop();
+            this.unsubscribeSolarSystem();
+        },
+        beforeMount() {
+
         },
         mounted: function () {
+            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
+            this.isValidAttrs() && this._attrUpdatedSF.call();
+
             this._descIE = new IntervalEmitter(3000, 100);
             this._descIE.on("interval", delta => this.savingDelay = (delta / 1000).toFixed(1));
 
@@ -190,24 +166,160 @@
             this._descriptionIsNotSetted = true;
             this.needToSave = true;
         },
-        beforeDestroy: function () {
-
-        },
         updated() {
             this.$emit("cupdated")
         },
+        computed : {
+            statusClass () {
+                let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+                return `eve-system-status-color-${environment.statuses[status].id}`
+            },
+            statusName () {
+                let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+                return environment.statuses[status].name;
+            },
+            status () {
+                return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+            },
+            info () {
+                return this.$store.state.solarSystems[this.lSolarSystemId];
+            },
+            hasEffect() {
+                return this.info.effectName !== "";
+            },
+            effectClass () {
+                return environment.effects[this.info.effectType];
+            },
+            typeDescriptionClass () {
+                return environment.kindClassed[this.info.systemType];
+            },
+            effectData () {
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+                return this.info.effectData.sort((x, y) => {
+                    return (x.positive === y.positive) ? 0 : x.positive ? -1 : 1;
+                });
+            },
+            securityClass () {
+                return environment.securityForegroundClasses[this.info.security];
+            },
+
+            solarSystemLink () {
+                switch (this.info.systemType) {
+                    case 0: // high-sec
+                    case 1: // low-sec
+                    case 2: // null-sec
+                        return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
+                    case 3: // WH
+                    case 4: // Thera
+                        return "http://anoik.is/systems/" + this.info.solarSystemName;
+                    default:
+                        return "";
+                }
+            },
+            hasType () {
+                switch (this.info.systemType) {
+                    case 3: // WH
+                    case 4: // Thera
+                    case 5: // abyss
+                        return true;
+                    default:
+                        return false;
+                }
+            },
+            typeName () {
+                switch (this.info.systemType) {
+                    case 3: // WH
+                    case 4: // Thera
+                    case 5: // abyss
+                        return this.info.typeName;
+                    default:
+                        return "";
+                }
+            },
+            typeClass () {
+                switch (this.info.systemType) {
+                    case 3: // WH
+                    case 4: // Thera
+                        return environment.typeClasses[this.info.typeName];
+                    default:
+                        return "";
+                }
+            },
+
+            gridClass () {
+                let full = !this.lIsCompact;
+                let effect = this.hasEffect;
+
+                if(full && effect) {
+                    return "wd-grid-1";
+                } else if(!full && effect) {
+                    return "wd-grid-2";
+                } else if(full && !effect || !full && !effect) {
+                    return "wd-grid-3";
+                }
+
+                return  "";
+            }
+        },
         methods: {
+            _watchAttrsUpdated () {
+                this._sfInput.stop();
+                this._descIE.stop();
+                this._descriptionIsNotSetted = false;
+                this.savingDescription = false;
+                this.needToSave = true;
+
+                if(this.isValidAttrs()) {
+                    this.unsubscribeSolarSystem();
+                    this.subscribeSolarSystem();
+                }
+            },
+            unsubscribeSolarSystem() {
+                this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
+                this.solarSystemInfo && delete this.solarSystemInfo;
+
+                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
+                this._mapSolarSystem && delete this._mapSolarSystem;
+
+                this._map && this._map.unsubscribe();
+                this._map && delete this._map;
+            },
+            subscribeSolarSystem() {
+                this.loaded = false;
+                this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
+
+                this._map = cache.maps.touch(this.mapId);
+                this._mapSolarSystem = this._map.item.solarSystems.touch(this.lSolarSystemId);
+
+                Promise.all([
+                    this.solarSystemInfo.item.readyPromise(),
+                    this._mapSolarSystem.item.readyPromise(),
+                ])
+                    .then(this._onLoaded.bind(this));
+            },
+            _onLoaded () {
+                this.loaded = true;
+                this._mapSolarSystem.item.on("changed", this._onSSDynamicChanged.bind(this));
+            },
+            _onSSDynamicChanged (data) {
+                if(data.description !== this.description) {
+                    this.description = data.description;
+                }
+
+                if(this._descriptionIsNotSetted) {
+                    this._descriptionIsNotSetted = false;
+                    this.needToSave = true;
+                }
+            },
+            getStaticClassColor: function (_staticClass) {
+                return environment.typeClasses[_staticClass];
+            },
+
             onHighlightRoute (route) {
                 this.$emit("highlight-route", route);
             },
             onHubsUpdated (hubs) {
                 this.$emit("hubs-updated", hubs);
-            },
-            getStaticClassColor: function (_staticClass) {
-                return environment.typeClasses[_staticClass];
-            },
-            refresh: function () {
-
             },
             onDescriptionChange (event) {
                 if(!this.needToSave) {
@@ -220,106 +332,28 @@
                 this.savingDescription = true;
                 this._sfInput.call(event);
             },
-            _inputChanged (event) {
+            _inputChanged (description) {
                 this.savingDescription = false;
-                this.$emit("changed", {
-                    description: event
-                });
-            },
-            update: function (mapId, _data) {
-                this.mapId = mapId;
-                this.solarSystemId = _data.id;
-                this.systemName = _data.name;
-                this.regionName = _data.regionName;
-                this.constellationName = _data.constellationName;
-                this.security = _data.security;
-                this.statics = _data.systemData.statics || [];
-                this.securityClass = environment.securityForegroundClasses[_data.security];
-                this.kind = _data.systemData.typeDescription;
-                this.kindClass = environment.kindClassed[_data.systemType];
-                this.status = _data.status;
-                this.statusName = environment.statuses[_data.status].name;
-                this.statusClass = `eve-system-status-color-${environment.statuses[_data.status].id}`;
-                this.updateDescription(_data.description, true);
 
-                switch (_data.systemType) {
-                    case 0: // high-sec
-                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
-                        this.type = null;
-                        break;
-                    case 1: // low-sec
-                        this.type = null;
-                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
-                        break;
-                    case 2: // null-sec
-                        this.type = null;
-                        this.solarSystemLink = "https://evemaps.dotlan.net/system/";
-                        break;
-                    case 3: // WH
-                    case 4: // Thera
-                        this.type = _data.systemData.typeName;
-                        this.typeClass = environment.typeClasses[_data.systemData.typeName];
-                        this.solarSystemLink = "http://anoik.is/systems/";
-                        break;
-                    case 5: // abyss
-                        this.type = _data.systemData.typeName;
-                        this.solarSystemLink = "";
-                        break;
-                    case 6: // penalty?
-                    case 7: // Pochven?
-                        this.type = null;
-                        this.solarSystemLink = "";
-                        break;
-                }
+                api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, {description})
+                    .then(
+                        helper.dummy,
+                        err => helper.errorHandler(this, err)
+                    );
+            },
+            isValidAttrs () {
+                return this.lSolarSystemId !== "" && this.lMapId !== "";
+            },
+            refresh: function () {
 
-                if(exists(_data.systemData.effectType)) {
-                    this.showEffect = true;
-                    this.effectColor = environment.effects[_data.systemData.effectType];
-                    this.effectName = _data.systemData.effectName;
+            },
+            // addHub (/*solarSystemId*/) {
+            //     this.routesUpdater += 1;
+            // },
+            // removeHub (/*solarSystemId*/) {
+            //     this.routesUpdater += 1;
+            // },
 
-                    let sorted = _data.systemData.effectData.sort(function (x, y) {
-                        return (x.positive === y.positive) ? 0 : x.positive ? -1 : 1;
-                    });
-
-                    this.effectData = sorted;
-                } else {
-                    this.showEffect = false;
-                }
-            },
-            updateDescription (description, isUpdateModel) {
-                if(isUpdateModel && !exists(description) || description.length === 0 || description === this.description) {
-                    return;
-                }
-
-                if(isUpdateModel)
-                    this.description = description;
-
-                if(this._descriptionIsNotSetted) {
-                    this._descriptionIsNotSetted = false;
-                    this.needToSave = false;
-                }
-            },
-            systemRemoved (/*data*/) {
-                this.routesUpdater += 1;
-            },
-            systemAdded (/*data*/) {
-                this.routesUpdater += 1;
-            },
-            linkRemoved (/*data*/) {
-                this.routesUpdater += 1;
-            },
-            linkUpdated (/*data*/) {
-                this.routesUpdater += 1;
-            },
-            linkAdded (/*data*/) {
-                this.routesUpdater += 1;
-            },
-            addHub (/*solarSystemId*/) {
-                this.routesUpdater += 1;
-            },
-            removeHub (/*solarSystemId*/) {
-                this.routesUpdater += 1;
-            },
         }
     }
 
@@ -338,29 +372,108 @@
         grid-row-gap: 5px;
 
         & > .wd-content__module {
+            transition: height 200ms;
+            height: auto;
             width: 100%;
-            grid-column-start: 1;
-            grid-column-end: 3;
         }
 
-        & > .wd-content__module:nth-child(1) {
-            grid-column-start: 1;
-            grid-column-end: 2;
-        }
+        &.wd-grid-1 {
+            & > .wd-content__module {
+                transition: height 200ms;
+                height: auto;
+                width: 100%;
 
-        & > .wd-content__module:nth-child(2) {
-            grid-column-start: 2;
-            grid-column-end: 3;
-        }
-
-        &.without-effect,
-        &.is-compact {
-            & > .wd-content__module:nth-child(1),
-            & > .wd-content__module:nth-child(2) {
-                grid-column-start: 1;
-                grid-column-end: 3;
+                &.wd-module-solar-system {
+                    grid-column-start: 1;
+                    grid-column-end: 3;
+                    grid-row-start: 1;
+                    grid-row-end: 2;
+                }
+                &.wd-module-effect {
+                    grid-column-start: 3;
+                    grid-column-end: 6;
+                    grid-row-start: 1;
+                    grid-row-end: 2;
+                }
+                &.wd-module-routes {
+                    grid-column-start: 1;
+                    grid-column-end: 6;
+                    grid-row-start: 2;
+                    grid-row-end: 3;
+                }
+                &.wd-module-description {
+                    grid-column-start: 1;
+                    grid-column-end: 6;
+                    grid-row-start: 3;
+                    grid-row-end: 4;
+                }
             }
         }
+
+        &.wd-grid-2 {
+            & > .wd-content__module {
+                transition: height 200ms;
+                height: auto;
+                width: 100%;
+
+                &.wd-module-solar-system {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 1;
+                    grid-row-end: 2;
+                }
+                &.wd-module-effect {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 3;
+                    grid-row-end: 4;
+                }
+                &.wd-module-routes {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 2;
+                    grid-row-end: 3;
+                }
+                &.wd-module-description {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 4;
+                    grid-row-end: 5;
+                }
+            }
+        }
+
+        &.wd-grid-3 {
+            & > .wd-content__module {
+                transition: height 200ms;
+                height: auto;
+                width: 100%;
+
+                &.wd-module-solar-system {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 1;
+                    grid-row-end: 2;
+                }
+                &.wd-module-effect {
+                    display: none;
+                }
+                &.wd-module-routes {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 2;
+                    grid-row-end: 3;
+                }
+                &.wd-module-description {
+                    grid-column-start: 1;
+                    grid-column-end: 2;
+                    grid-row-start: 3;
+                    grid-row-end: 4;
+                }
+            }
+        }
+
+
     }
 
     .wd-system-overview {
@@ -455,6 +568,34 @@
             & > .wd-effect-negative {
                 color: $fg-negative;
             }
+        }
+
+
+        height: 100%;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar:hover {
+
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.0);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            transition: background-color 200ms;
+            width: 6px;
+            border-radius: 3px;
+            background-color: rgba(158, 140, 140, 0.5);
+            cursor: pointer;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(205, 166, 87, 0.5);
         }
     }
 </style>

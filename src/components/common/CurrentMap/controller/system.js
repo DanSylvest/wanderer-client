@@ -4,21 +4,25 @@ import exists from "../../../../js/env/tools/exists";
 import extend from "../../../../js/env/tools/extend.js";
 
 class System extends Emitter {
-    constructor (_controller, _map, _mapId, id) {
+    constructor (_map, _mapId, id) {
         super();
 
-        this.controller = _controller;
         this.map = _map;
         this.mapId = _mapId;
         this.id = id;
-        this._inited = false;
         this.position = null;
-        // this.markerId = null;
         this.markerId = this.map.createMarker(this.id, {});
         this._data = Object.create(null);
+        this._handlerStaticDataChanged = null;
+        this._handlerDynamicDataChanged = null;
     }
     init () {
         this.initProviders();
+
+        return Promise.all([
+            this._staticSolarSystem.item.readyPromise(),
+            this._mapSolarSystem.item.readyPromise(),
+        ])
     }
     deinit () {
         this._data = Object.create(null);
@@ -27,33 +31,32 @@ class System extends Emitter {
         }
 
         this.markerId = null;
-        this._inited = false;
         this.map = null;
-        this.controller = null;
         this.deinitProviders();
     }
 
     initProviders () {
         this._staticSolarSystem = cache.solarSystems.touch(this.id);
-        this._staticSolarSystem.item.on("changed", this._onStaticDataChanged.bind(this));
+        this._handlerStaticDataChanged = this._staticSolarSystem.item.on("changed", this._onStaticDataChanged.bind(this));
 
         this._map = cache.maps.touch(this.mapId);
         this._mapSolarSystem = this._map.item.solarSystems.touch(this.id);
 
-        this._mapSolarSystem.item.on("changed", this._onDynamicDataChanged.bind(this));
-
-        let data = this._mapSolarSystem.item.data();
-        data = extend(data, this._staticSolarSystem.item.data());
-
-        this.map.updateMarker(this.markerId, data);
+        this._handlerDynamicDataChanged = this._mapSolarSystem.item.on("changed", this._onDynamicDataChanged.bind(this));
     }
 
     deinitProviders () {
-        this._staticSolarSystem && this._staticSolarSystem.unsubscribe();
-        this._staticSolarSystem = null;
+        if(this._staticSolarSystem)  {
+            this._mapSolarSystem.item.off(this._handlerStaticDataChanged);
+            this._staticSolarSystem.unsubscribe();
+            this._staticSolarSystem = null;
+        }
 
-        this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-        delete this._mapSolarSystem;
+        if(this._mapSolarSystem) {
+            this._mapSolarSystem.item.off(this._handlerDynamicDataChanged);
+            this._mapSolarSystem.unsubscribe();
+            delete this._mapSolarSystem;
+        }
 
         this._map && this._map.unsubscribe();
         delete this._map;

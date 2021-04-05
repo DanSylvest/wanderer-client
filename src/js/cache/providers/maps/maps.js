@@ -6,6 +6,7 @@ import Emitter from "../../../env/tools/emitter.js";
 import store from "../../../store";
 import SolarSystems from "./solarSystems.js";
 import Observer from "../../../env/observer.js";
+import Chains from "./chains.js";
 
 const LIFE_TIME = 1000 * 60 * 20;
 class Map extends Emitter{
@@ -18,7 +19,12 @@ class Map extends Emitter{
         this.solarSystems = new SolarSystems(this._id);
         this.solarSystems.on("unregistered", this._onSSUnregistered.bind(this));
         this.solarSystems.on("registered", this._onSSRegistered.bind(this));
-        this.solarSystemsUnsubscriber = -1;
+        this.solarSystemsUnsubscriber = null;
+
+        this.chains = new Chains(this._id);
+        this.chains.on("unregistered", this._onChainsUnregistered.bind(this));
+        this.chains.on("registered", this._onChainsRegistered.bind(this));
+        this.chainsUnsubscriber = null;
 
         this.observer = new Observer(LIFE_TIME);
         this.observer.on("started", this._registerModule.bind(this));
@@ -33,6 +39,12 @@ class Map extends Emitter{
     }
     _onSSUnregistered () {
         this.solarSystemsUnsubscriber();
+    }
+    _onChainsRegistered () {
+        this.chainsUnsubscriber = this.subscribe();
+    }
+    _onChainsUnregistered () {
+        this.chainsUnsubscriber();
     }
     subscribe () {
         let sid = this.observer.subscribe();
