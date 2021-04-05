@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 6/19/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 6/19/20.
  */
 var SpamFilter = function (_method, _delay, _delayForce) {
     this._method = _method;

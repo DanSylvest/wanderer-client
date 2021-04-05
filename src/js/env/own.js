@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 10/24/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 10/24/20.
  */
  
 const isOwn = function (_object, _element) {

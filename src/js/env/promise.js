@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 1/28/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 1/28/20.
  */
 
 class CustomPromise {

@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 8/30/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 8/30/20.
  */
 import Emitter from "./tools/emitter";
 import exists from "./tools/exists";

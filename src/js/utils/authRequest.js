@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 10/30/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 10/30/20.
  */
 
 import config from "../compiled.config";

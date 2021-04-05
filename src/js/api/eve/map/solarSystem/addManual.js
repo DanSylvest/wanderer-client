@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <rolahd@yandex.ru> on 12/9/20.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 12/9/20.
  */
 
 import CustomPromise from "../../../../env/promise";
