@@ -3,7 +3,9 @@
  */
 
 import solarSystemInfo from "./solarSystemInfo.js";
+import shipInfo from "./shipInfo.js";
 
 export default {
-    solarSystemInfo: solarSystemInfo
+    solarSystemInfo: solarSystemInfo,
+    shipInfo: shipInfo,
 }

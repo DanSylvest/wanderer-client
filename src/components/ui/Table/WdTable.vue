@@ -12,8 +12,8 @@
                     <slot name="toolbar"></slot>
                 </div>
             </div>
-            <div class="wd fs relative wd-table-content-wrapper" >
-                <div class="wd-table-content" :class="{'wd-table-borders': lEnableBorders}">
+            <div class="wd fs relative wd-table-content-wrapper">
+                <div class="wd-table-content" :class="{'wd-table-borders': lEnableBorders}" v-show="!isEmptyStateActive">
                     <table-header-cell v-if="selectable" width-policy="40px" >
                         <md-checkbox v-model="globalSelect" @change="onGlobalCheckboxChanged" />
                     </table-header-cell>
@@ -30,8 +30,9 @@
             <div>
                 <transition name="fade">
                     <template v-if="isEmptyStateActive">
-                        <div class="wd fs absolute top"/>
-                        <slot name="empty-state"></slot>
+                        <div class="wd fs" >
+                            <slot name="empty-state"></slot>
+                        </div>
                     </template>
                 </transition>
             </div>
@@ -62,6 +63,14 @@
             selectable : {
                 type: Boolean,
                 default: false
+            },
+            sortCol : {
+                type: String,
+                default: null
+            },
+            sortOrder : {
+                type: String,
+                default: "none"
             }
         },
         data: function () {
@@ -73,8 +82,8 @@
                 globalSelect: false,
                 selected: Object.create(null),
                 lastSortedHeader: null,
-                currentSortHeader: null,
-                currentSortOrder: "none"
+                currentSortHeader: this.sortCol,
+                currentSortOrder: this.sortOrder
             }
         },
         watch: {
@@ -87,6 +96,12 @@
             },
             enableBorders (val) {
                 this.lEnableBorders = val;
+            },
+            sortCol (val) {
+                this.currentSortHeader = val;
+            },
+            sortOrder (val) {
+                this.currentSortOrder = val;
             }
         },
         mounted() {
@@ -106,7 +121,7 @@
                 return !!this.$slots['empty-state'];
             },
             isEmptyStateActive () {
-                return this.rows.length === 0 && this.hasEmptyState
+                return this.hasEmptyState && this.rows.length === 0;
             },
             isShortToolbar () {
                 return this.selectable && !this.hasToolbar;
@@ -266,6 +281,13 @@
         & > div {
             background-color: $bg-transparent;
         }
+
+        .fade {
+            &-enter-active, &-leave-active {
+                position: absolute;
+                top: 40px;
+            }
+        }
     }
 
     .wd-table-content-wrapper {
@@ -302,7 +324,7 @@
         line-height: initial;
         align-items: center;
         position: relative;
-        background-color: $bg-secondary;
+        /*background-color: $bg-secondary;*/
 
         @for $i from 1 through 30 {
             &.wd-table-borders.wd-table-cols-#{$i} > .wd-table-header-cell:not(:nth-child(#{$i})),
@@ -325,7 +347,7 @@
         &.wd-table-borders > .wd-table-cell,
         &.wd-table-borders > .wd-table-header-cell {
             transition: background-color 150ms, border-bottom-color 150ms;
-            background-color: $bg-transparent;
+            /*background-color: $bg-transparent;*/
         }
 
         &.wd-table-borders > .wd-table-header-cell {
@@ -333,16 +355,16 @@
         }
 
         &.wd-table-borders > .wd-table-header-cell:hover {
-            background-color: $border-color-primary-5;
+            /*background-color: $border-color-primary-5;*/
             border-bottom: 1px solid $border-color-primary-3;
         }
 
         &.wd-table-borders > .wd-table-cell:hover {
-            background-color: $border-color-primary-5-2;
+            /*background-color: $border-color-primary-5-2;*/
         }
 
         & > .wd-table-cell, {
-            background-color: $bg-primary;
+            /*background-color: $bg-primary;*/
         }
 
 
@@ -475,5 +497,8 @@
             opacity: 1;
         }
     }
+
+
+
 
 </style>

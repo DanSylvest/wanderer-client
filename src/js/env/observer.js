@@ -24,13 +24,14 @@ class Observer extends Emitter {
         super.destructor();
     }
     subscribe () {
+        this._tid !== -1 && clearTimeout(this._tid);
+        this._tid = -1;
+
         let id = counter++;
         this._subscribers[id] = true;
         this._subscribersCount++;
 
         if(this._subscribersCount === 1 && !this._isStarted) {
-            this._tid !== -1 && clearTimeout(this._tid);
-            this._tid = -1;
             this._isStarted = true;
             this.emit("started");
         }
@@ -47,6 +48,7 @@ class Observer extends Emitter {
         }
     }
     _onTimeout () {
+        this._isStarted = false;
         this._tid = -1;
         this.emit("stopped");
     }

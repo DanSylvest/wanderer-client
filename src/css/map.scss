@@ -21,7 +21,7 @@ $active-color: #7be1ff;
             left: 0;
             top: 0;
             width: 120px;
-            height: 35px;
+            height: 37px;
             padding: 2px;
 
             box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.2);
@@ -118,21 +118,12 @@ $active-color: #7be1ff;
                     height: 50%;
                     display: flex;
                     justify-content: flex-start;
-                    padding-left: 3px;
+                    padding-left: 4px;
+                    padding-right: 4px;
                     padding-top: 2px;
 
                     & > *:not(:last-child) {
                         margin-right: 3px;
-                    }
-
-                    .locked {
-                        background-image: url("./../images/svg/lock.svg");
-                        background-repeat: no-repeat;
-                        background-size: contain;
-                        width: 12px;
-                        height: 12px;
-                        position: relative;
-                        top: 1px;
                     }
 
                     .effect-color {
@@ -163,30 +154,55 @@ $active-color: #7be1ff;
                     height: 50%;
                     display: flex;
                     justify-content: space-between;
-                    padding-bottom: 1px;
-                    padding-right: 3px;
-                    padding-left: 3px;
+                    padding-bottom: 2px;
+                    padding-right: 4px;
+                    padding-left: 4px;
+
+                    .extra {
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: flex-end;
+                    }
+
+                    .locked {
+                        background-image: url("./../images/svg/lock.svg");
+                        background-repeat: no-repeat;
+                        background-size: contain;
+                        width: 12px;
+                        height: 12px;
+                        position: relative;
+                    }
+
+                    .marked-as-hub {
+                        background-image: url("/img/my_location_black_24dp.svg");
+                        background-size: contain;
+                        background-repeat: no-repeat;
+
+                        width: 12px;
+                        height: 12px;
+                        margin-right: 2px;
+                    }
 
                     .online {
                         display: flex;
                         justify-content: flex-start;
-
-                        *:not(:last-child) {
-                            margin-right: 2px;
-                        }
+                        align-items: flex-end;
 
                         .online-icon {
-                            background-image: url("./../images/svg/people-24px.svg");
+                            background-image: url("/img/people_white_24dp.svg");
                             background-size: contain;
                             background-repeat: no-repeat;
 
                             width: 13px;
                             height: 13px;
+                            position: relative;
+                            top: 1px;
                         }
 
                         .online-count {
                             font-size: 11px;
                             color: $fg-contrast;
+                            margin-left: 2px;
                         }
                     }
 
@@ -197,7 +213,7 @@ $active-color: #7be1ff;
                         & > .static {
                             display: flex;
                             flex-direction: column;
-                            justify-content: flex-end;
+                            justify-content: flex-start;
                         }
 
                         & > .static:not(:last-child) {
@@ -213,7 +229,7 @@ $active-color: #7be1ff;
     }
 
     .hidden {
-        display: none;
+        display: none !important;
     }
 
     .eve-zInd-top {

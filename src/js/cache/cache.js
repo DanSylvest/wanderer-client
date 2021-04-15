@@ -5,7 +5,9 @@
 import ServerStatus from "./providers/serverStatus.js";
 import SolarSystems from "./providers/solarSystems.js";
 import Maps from "./providers/maps/maps.js";
- 
+import Characters from "./providers/characters/characters.js";
+import Ships from "./providers/universe/ships.js";
+
 class Cache {
     constructor() {
 
@@ -15,6 +17,8 @@ class Cache {
         this.serverStatus = new ServerStatus();
         this.solarSystems = new SolarSystems();
         this.maps = new Maps();
+        this.characters = new Characters();
+        this.ships = new Ships();
     }
 }
 

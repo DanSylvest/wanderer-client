@@ -37,7 +37,7 @@
                         </div>
                     </template>
 
-                    <template v-slot:empty-state v-if="signatures.length !== 0 && filteredSignatures.length === 0">
+                    <template v-slot:empty-state>
                         <md-empty-state
                             md-icon="announcement"
                             md-label="All existing signatures were filtered"
@@ -184,6 +184,9 @@
             }
         },
         methods: {
+            _getMapSolarSystemProvider () {
+                return cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId);
+            },
             createHiddenInput () {
                 this._hiddenInput = this.$el.querySelector(".c-hidden-input");
                 this._hiddenInput.addEventListener("paste", this._pasteHandler);
@@ -219,12 +222,12 @@
                 this.loaded = false;
                 this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
 
-                this._map = cache.maps.touch(this.lMapId);
-                this._mapSolarSystem = this._map.item.solarSystems.touch(this.lSolarSystemId);
+                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
+                this._mapSolarSystemProviderUnsubscribe = mapSolarSystemProvider.subscribe();
 
                 Promise.all([
                     this.solarSystemInfo.item.readyPromise(),
-                    this._mapSolarSystem.item.readyPromise(),
+                    mapSolarSystemProvider.readyPromise(),
                 ])
                     .then(this._onLoaded.bind(this));
             },
@@ -232,11 +235,10 @@
                 this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
                 this.solarSystemInfo && delete this.solarSystemInfo;
 
-                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-                this._mapSolarSystem && delete this._mapSolarSystem;
-
-                this._map && this._map.unsubscribe();
-                this._map && delete this._map;
+                if(exists(this._mapSolarSystemProviderUnsubscribe)) {
+                    this._mapSolarSystemProviderUnsubscribe();
+                    delete this._mapSolarSystemProviderUnsubscribe;
+                }
             },
             _onLoaded () {
                 this.loaded = true;

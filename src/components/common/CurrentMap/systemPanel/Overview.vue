@@ -73,7 +73,6 @@
                     :map-id="lMapId"
                     :solar-system-id="lSolarSystemId"
                     @highlight-route="onHighlightRoute"
-                    @hubs-updated="onHubsUpdated"
                 />
             </div>
 
@@ -102,6 +101,7 @@
     import cache from "../../../../js/cache/cache.js";
     import api from "../../../../js/api.js";
     import helper from "../../../../js/utils/helper.js";
+    import exists from "../../../../js/env/tools/exists.js";
 
     export default {
         name: "Overview",
@@ -278,28 +278,28 @@
                 this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
                 this.solarSystemInfo && delete this.solarSystemInfo;
 
-                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-                this._mapSolarSystem && delete this._mapSolarSystem;
-
-                this._map && this._map.unsubscribe();
-                this._map && delete this._map;
+                if(exists(this._mapSolarSystemProviderUnsubscribe)) {
+                    this._mapSolarSystemProviderUnsubscribe();
+                    delete this._mapSolarSystemProviderUnsubscribe;
+                }
             },
             subscribeSolarSystem() {
                 this.loaded = false;
                 this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
 
-                this._map = cache.maps.touch(this.mapId);
-                this._mapSolarSystem = this._map.item.solarSystems.touch(this.lSolarSystemId);
+                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
+                this._mapSolarSystemProviderUnsubscribe = mapSolarSystemProvider.subscribe();
 
                 Promise.all([
                     this.solarSystemInfo.item.readyPromise(),
-                    this._mapSolarSystem.item.readyPromise(),
+                    mapSolarSystemProvider.readyPromise(),
                 ])
                     .then(this._onLoaded.bind(this));
             },
             _onLoaded () {
                 this.loaded = true;
-                this._mapSolarSystem.item.on("changed", this._onSSDynamicChanged.bind(this));
+                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
+                mapSolarSystemProvider.on("changed", this._onSSDynamicChanged.bind(this));
             },
             _onSSDynamicChanged (data) {
                 if(data.description !== this.description) {
@@ -317,9 +317,6 @@
 
             onHighlightRoute (route) {
                 this.$emit("highlight-route", route);
-            },
-            onHubsUpdated (hubs) {
-                this.$emit("hubs-updated", hubs);
             },
             onDescriptionChange (event) {
                 if(!this.needToSave) {
@@ -347,13 +344,9 @@
             refresh: function () {
 
             },
-            // addHub (/*solarSystemId*/) {
-            //     this.routesUpdater += 1;
-            // },
-            // removeHub (/*solarSystemId*/) {
-            //     this.routesUpdater += 1;
-            // },
-
+            _getMapSolarSystemProvider () {
+                return cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId);
+            }
         }
     }
 

@@ -5,26 +5,22 @@
 import Subscriber from "../../../../utils/subscriber";
 import extend from "../../../../env/tools/extend";
 
-class MapChainDataSubscribe extends Subscriber {
+class SubscribeHubs extends Subscriber {
     constructor(_options) {
         let base = extend({
             /** @type string */
             mapId: null,
-            /** @type string */
-            chainId: null,
-            path: ["api", "eve", "map", "link", "subscribeData"]
+            path: ["api", "eve", "map", "routes", "subscribeHubs"]
         }, _options);
 
         super(base);
 
         this._mapId = base.mapId;
-        this._chainId = base.chainId;
     }
 
     _sendData() {
         return {
             mapId: this._mapId,
-            chainId: this._chainId,
         }
     }
 
@@ -33,10 +29,9 @@ class MapChainDataSubscribe extends Subscriber {
     }
 }
 
-export default function (mapId, chainId) {
-    return new MapChainDataSubscribe({
+export default function (mapId) {
+    return new SubscribeHubs({
         dispatcher: this,
-        mapId: mapId,
-        chainId: chainId,
+        mapId: mapId
     });
 }

@@ -10,7 +10,7 @@ Array.prototype.removeByIndex = function removeByIndex (index) {
 
 Array.prototype.removeByValue = function removeByValue (value) {
     let index = this.indexOf(value);
-    index !== -1 && this.removeByIndex();
+    index !== -1 && this.removeByIndex(index);
 }
 
 Array.prototype.first = function () {

@@ -1,5 +1,4 @@
 <template>
-
     <div class="wd-current-map">
         <AppToolbar>
             <div class="wd-map-toolbar">
@@ -12,9 +11,11 @@
                             :style="getCharImageUrlStyle(item.charId)"
                             :key="item.charId"
                         >
-                            <md-tooltip md-direction="bottom" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
-                                <character-card :map-id="selectedMap" :character-id="item.charId" />
-                            </md-tooltip>
+                            <tooltip placement="bottom" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
+<!--                                <md-tooltip md-direction="bottom" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >-->
+                                    <character-card :map-id="selectedMap" :character-id="item.charId" />
+<!--                                </md-tooltip>-->
+                            </tooltip>
                         </div>
                     </div>
                 </transition>
@@ -38,8 +39,8 @@
                         <div v-if="showMapLoader" class="wd fs relative wd-map-loader">
                             <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="100" md-mode="indeterminate"></md-progress-spinner>
                             <md-empty-state
-                                    md-label="Loading..."
-                                    :md-description="getRandomAdvice()"
+                                md-label="Loading..."
+                                :md-description="getRandomAdvice()"
                             />
                         </div>
                     </transition>
@@ -77,10 +78,10 @@
                 </div>
 
                 <md-empty-state
-                        v-if="showMapEmpty"
-                        md-icon="map"
-                        md-label="Unfortunately, maps not found"
-                        md-description="But you can change it! Just do it... Use mapper functional for create maps, groups and attach your characters."
+                    v-if="showMapEmpty"
+                    md-icon="map"
+                    md-label="Unfortunately, maps not found"
+                    md-description="But you can change it! Just do it... Use mapper functional for create maps, groups and attach your characters."
                 >
                     <md-button class="md-primary md-raised" @click="onClickCreateMap">Create map</md-button>
                 </md-empty-state>
@@ -123,7 +124,6 @@
                 :map-id="systemPanelMapId"
                 :solar-system-id="systemPanelSolarSystemId"
                 @highlight-route="onHighlightRoute"
-                @hubs-updated="onHubsUpdated"
                 @closed="onSystemInfoPanelClosed"
             />
             <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
@@ -278,12 +278,10 @@
                 let pr = new CustomPromise();
 
                 let prarr = [];
-                // prarr.push(api.eve.character.list());
                 prarr.push(this.subscribeOnMaps());
                 Promise.all(prarr)
                     .then(
                          () => {
-                            // this.characters = arr[0];
                             this.isLoaded = true;
                             this.showMapEmpty = this.allowedMaps.length === 0;
                             pr.resolve();
@@ -414,11 +412,7 @@
             _onMapError (errData) {
                 helper.errorHandler(this, errData)
             },
-            // eslint-disable-next-line no-unused-vars
             _onAllowedCharactersUpdated (data) {
-                // eslint-disable-next-line no-debugger
-                // debugger;
-
                 this.charactersStatuses = data;
             },
             _onSystemChange (_data) {
@@ -429,36 +423,18 @@
                         }
 
                         this.mapController.offAllShade();
-                        // this.$refs.systemPanel.systemRemoved(_data.data);
-                        break;
-                    case "systemUpdated":
-                        // if(_data.systemId === this._currentOpenSystem)
-                            // this.$refs.systemPanel.update(_data.data);
-                        break;
-                    case "bulk":
-                    case "updatedSystemsPosition":
                         break;
                     case "add":
                         this.mapController.offAllShade();
-                        // this.$refs.systemPanel.systemAdded(_data.data);
                         break;
                 }
             },
             _onLinkChanged (_data) {
                 switch (_data.type) {
                     case "removed":
-                        this.mapController.offAllShade();
-                        // this.$refs.systemPanel.linkRemoved(_data.data);
-                        break;
-                    case "bulk":
-                        break;
                     case "linkUpdated":
-                        this.mapController.offAllShade();
-                        // this.$refs.systemPanel.linkUpdated(_data.data);
-                        break;
                     case "add":
                         this.mapController.offAllShade();
-                        // this.$refs.systemPanel.linkAdded(_data.data);
                         break;
                 }
             },
@@ -493,7 +469,7 @@
                     tag: systemInfo.tag,
                     status: systemInfo.status,
                     isSystemInKSpace: isSystemInKSpace,
-                    markAsHub: this.hubs.indexOf(this._currentContextSystem) === -1,
+                    markAsHub: this.mapController.hubs.indexOf(this._currentContextSystem) === -1,
                     isLocked: systemInfo.isLocked,
                     mapId: this.mapController.mapId,
                     solarSystemId: solarSystemId
@@ -519,17 +495,15 @@
                         break;
                     case "markAsHub":
                         if (event.data) {
-                            this.hubs.push(this._currentContextSystem);
                             api.eve.map.routes.addHub(this.selectedMap, this._currentContextSystem)
                                 .then(
-                                    () => this.$refs.systemPanel.addHub(this._currentContextSystem),
+                                    helper.dummy,
                                     error => helper.errorHandler(this, error)
                                 );
                         } else {
-                            this.hubs.removeByValue(this._currentContextSystem);
                             api.eve.map.routes.removeHub(this.selectedMap, this._currentContextSystem)
                                 .then(
-                                    () => this.$refs.systemPanel.removeHub(this._currentContextSystem),
+                                    helper.dummy,
                                     err => helper.errorHandler(this, err)
                                 );
                         }
@@ -671,29 +645,21 @@
                 this._offContexts();
             },
             onMapSelected: function(_mapId) {
-                // this.charactersStatuses = [];
-
                 cookie.set("selectedMap", _mapId);
 
                 api.eve.map.updateWatchStatus({mapId: _mapId, status: true})
                     .then(
-                        () => api.eve.map.routes.hubs(_mapId),
+                        () => this._initMap(_mapId),
                         error => helper.errorHandler(this, error)
                     )
-                    .then(
-                        hubs => {
-                            this.hubs = hubs;
-                            this._initMap(_mapId);
-                        },
-                        error => helper.errorHandler(this, error)
-                    );
             },
-            // this handler enable auto alignment
-            onAAClick: function () {
-                this.isAutoAlignment = !this.isAutoAlignment;
+            // // this handler enable auto alignment
+            // onAAClick: function () {
+            //     this.isAutoAlignment = !this.isAutoAlignment;
+            //
+            //     this.mapController.map.enableForce(this.isAutoAlignment);
+            // },
 
-                this.mapController.map.enableForce(this.isAutoAlignment);
-            },
             // this handler will save solar system positions
             onSaveClick: function () {
                 let positions = this.mapController.map.collectPositions();
@@ -723,9 +689,6 @@
             },
             onHighlightRoute (route) {
                 this.mapController.highlightRoute(route);
-            },
-            onHubsUpdated (hubs) {
-                this.hubs = hubs;
             },
             onRootCMClosed: function () {
 

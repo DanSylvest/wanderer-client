@@ -18,14 +18,18 @@ class MapController extends Emitter {
         this.links = Object.create(null);
 
         this.allowedCharacters = [];
+        this.hubs = [];
+
         this._unsubscribeMSSId = null;
     }
     init () {
-        // we must subscribe on map systems and links
-        this._mapProvider = cache.maps.touch(this.mapId);
-        this._mapSolarSystems = this._mapProvider.item.solarSystems.subscribe();
-        this._mapChains = this._mapProvider.item.chains.subscribe();
+        let mapProvider = cache.maps.list.get(this.mapId);
+        this._unsubscribeSolarSystems = mapProvider.solarSystems.existence.subscribe();
+        this._unsubscribeChains = mapProvider.chains.existence.subscribe();
+        this._unsubscribeHubs = mapProvider.hubs.subscribe();
 
+
+        // TODO это что за дела!? Надо переписать это
         // subscribe on map existence
         this._existenceSubscription = api.eve.map.subscribeMapExistence(this.mapId);
         this._existenceSubscription.on("change", this._onExistenceSubscriptionChange.bind(this));
@@ -48,8 +52,9 @@ class MapController extends Emitter {
         let initPromise = new CustomPromise();
 
         this._existenceSubscription.subscribe()
-            .then(() => this._mapSolarSystems.item.readyPromise())
-            .then(() => this._mapChains.item.readyPromise())
+            .then(() => mapProvider.solarSystems.existence.readyPromise())
+            .then(() => mapProvider.chains.existence.readyPromise())
+            .then(() => mapProvider.hubs.readyPromise())
             .then(() => this._charactersSubscription.subscribe())
             .then(() => {this._loaded(); initPromise.resolve()})
             .catch(() => initPromise.reject());
@@ -59,24 +64,35 @@ class MapController extends Emitter {
     deinit () {
         this.map = null;
 
+        let mapProvider = cache.maps.list.get(this.mapId);
+
         if(exists(this._unsubscribeMSSId)) {
-            this._mapSolarSystems.item.off(this._unsubscribeMSSId);
-            this._unsubscribeMSSId = null;
+            mapProvider.solarSystems.existence.off(this._unsubscribeMSSId);
+            delete this._unsubscribeMSSId;
         }
 
         if(exists(this._unsubscribeMChainsId)) {
-            this._mapChains.item.off(this._unsubscribeMChainsId);
-            this._unsubscribeMChainsId = null;
+            mapProvider.chains.existence.off(this._unsubscribeMChainsId);
+            delete this._unsubscribeMChainsId;
         }
 
-        this._mapChains && this._mapChains.unsubscribe();
-        delete this._mapChains;
+        if(exists(this._unsubscribeMHubsId)) {
+            mapProvider.hubs.off(this._unsubscribeMHubsId);
+            delete this._unsubscribeMHubsId;
+        }
 
-        this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-        delete this._mapSolarSystem;
-
-        this._mapProvider && this._mapProvider.unsubscribe();
-        delete this._mapProvider;
+        if(exists(this._unsubscribeSolarSystems)){
+            this._unsubscribeSolarSystems();
+            delete this._unsubscribeSolarSystems;
+        }
+        if(exists(this._unsubscribeChains)){
+            this._unsubscribeChains();
+            delete this._unsubscribeChains;
+        }
+        if(exists(this._unsubscribeHubs)){
+            this._unsubscribeHubs();
+            delete this._unsubscribeHubs;
+        }
 
         this._existenceSubscription.unsubscribe();
         this._charactersSubscription.unsubscribe();
@@ -111,8 +127,10 @@ class MapController extends Emitter {
         }
     }
     _loaded () {
-        this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
-        this._unsubscribeMChainsId = this._mapChains.item.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
+        let mapProvider = cache.maps.list.get(this.mapId);
+        this._unsubscribeMHubsId = mapProvider.hubs.on("changedEvent", this._onHubsSubscriptionChange.bind(this));
+        this._unsubscribeMSSId = mapProvider.solarSystems.existence.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
+        this._unsubscribeMChainsId = mapProvider.chains.existence.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
     }
     _onAllowedCharactersSubscriptionChange (event) {
         switch (event.type) {
@@ -142,6 +160,7 @@ class MapController extends Emitter {
                 let prarr = [];
                 for (let a = 0; a < _data.list.length; a++) {
                     this.systems[_data.list[a]] = new System(this.map, this.mapId, _data.list[a]);
+                    this.systems[_data.list[a]].setIsHub(this.hubs.includes(_data.list[a]));
                     prarr.push(this.systems[_data.list[a]].init());
                 }
                 Promise.all(prarr).then(() => this.map.enableForce(true));
@@ -150,6 +169,7 @@ class MapController extends Emitter {
             case "add":
                 this.systems[_data.solarSystemId] = new System(this.map, this.mapId, _data.solarSystemId);
                 this.systems[_data.solarSystemId].init();
+                this.systems[_data.solarSystemId].setIsHub(this.hubs.includes(_data.solarSystemId));
                 break;
             case "removed":
                 if(this.systems[_data.solarSystemId]) {
@@ -183,6 +203,22 @@ class MapController extends Emitter {
         }
 
         this.emit("linkChanged", data);
+    }
+    _onHubsSubscriptionChange(event) {
+        switch (event.type) {
+            case "bulk":
+                this.hubs = event.list.slice(0);
+                this.hubs.map(x => exists(this.systems[x]) && this.systems[x].setIsHub(true))
+                break;
+            case "add":
+                this.hubs.push(event.hubId);
+                exists(this.systems[event.hubId]) && this.systems[event.hubId].setIsHub(true)
+                break;
+            case "removed":
+                this.hubs.removeByValue(event.hubId);
+                exists(this.systems[event.hubId]) && this.systems[event.hubId].setIsHub(false)
+                break;
+        }
     }
     _onLinkContextMenu (_linkId, _event) {
         this.emit("linkContextMenu", _linkId, _event)
@@ -250,9 +286,12 @@ class MapController extends Emitter {
         if(route.length > 1) {
             let links = [];
             for (let a = 1; a < filteredSystems.length; a++) {
-                let origin = route[a - 1];
-                let dest = route[a];
-                links.push(this.getLinkBySystems(origin, dest));
+                let origin = filteredSystems[a - 1];
+                let dest = filteredSystems[a];
+                console.log("CHAIN %s(%s) => %s(%s)", this.systems[origin].data().solarSystemName, origin, this.systems[dest].data().solarSystemName, dest);
+
+                let chain = this.getLinkBySystems(origin, dest);
+                exists(chain) && links.push(chain);
             }
 
             links.map(x => this.map.shadeLink(x, false));
@@ -267,16 +306,9 @@ class MapController extends Emitter {
         origin = origin.toString();
         destination = destination.toString();
 
-        for(let linkId in this.links) {
-            let link = this.links[linkId];
-
-            if(
-                origin === link.info.solarSystemSource && destination === link.info.solarSystemTarget
-                || destination === link.info.solarSystemSource && origin === link.info.solarSystemTarget
-            ) {
-                return link.uiLinkId;
-            }
-        }
+        let chain = this.links[`${origin}_${destination}`] || this.links[`${destination}_${origin}`];
+        if(chain)
+            return chain.uiLinkId;
     }
 }
 

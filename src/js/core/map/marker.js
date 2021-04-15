@@ -37,16 +37,19 @@ class Marker extends Emitter{
             <div class="eve-marker">
                 <div class="eve-marker-body">
                     <div class="eve-marker-first-row off-events">
-                        <div class="locked hidden"></div>
                         <div class="effect-color hidden"></div>
                         <div class="system-type"></div>
                         <div class="system-name"></div>
                         <div class="system-tag"></div>
                     </div>
                     <div class="eve-marker-second-row off-events">
-                        <div class="online">
-                            <div class="online-icon hidden"></div>    
-                            <div class="online-count hidden">${Number.randomInt(0, 199)}</div>    
+                        <div class="extra">
+                            <div class="locked hidden"></div>
+                            <div class="marked-as-hub hidden"></div>
+                            <div class="online hidden">
+                                <div class="online-icon"></div>    
+                                <div class="online-count">${Number.randomInt(0, 199)}</div>                           
+                            </div>
                         </div>
                         <div class="wormhole-statics"></div>
                     </div>
@@ -90,7 +93,6 @@ class Marker extends Emitter{
         }
 
         if(exists(_data.position)) {
-            // setTimeout(() => markerEl.classRemove("hidden"), 400);
             markerEl.classRemove("hidden")
         }
 
@@ -105,16 +107,10 @@ class Marker extends Emitter{
         }
 
         if (exists(_data.onlineCount) && _data.onlineCount !== markerData.onlineCount) {
-            let onlineIconEl = _ui.fromElement(markerEl.el.querySelector(".online-icon"));
+            let onlineEl = _ui.fromElement(markerEl.el.querySelector(".online"))
             let onlineCountEl = _ui.fromElement(markerEl.el.querySelector(".online-count"));
             onlineCountEl.text(_data.onlineCount);
-            if(_data.onlineCount === 0) {
-                onlineIconEl.el.classList.add("hidden");
-                onlineCountEl.el.classList.add("hidden");
-            } else {
-                onlineIconEl.el.classList.remove("hidden");
-                onlineCountEl.el.classList.remove("hidden");
-            }
+            _data.onlineCount === 0 ? onlineEl.classAdd("hidden") : onlineEl.classRemove("hidden");
         }
 
         if(exists(_data.status)) {
@@ -122,37 +118,39 @@ class Marker extends Emitter{
             markerEl.classAdd(`system-status-${environment.statuses[_data.status].id}`);
         }
 
+        if(exists(_data.isHub)) {
+            let hubEl = _ui.fromElement(markerEl.el.querySelector(".marked-as-hub"));
+            _data.isHub ? hubEl.classRemove("hidden") : hubEl.classAdd("hidden");
+        }
+
         if(_data.effectType !== "") {
             if (exists(_data.systemType) && _data.systemType === 3) {
                 let effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
-                effectEl.el.classList.add(printf("eve-wh-effect-color-%s", _data.effectType));
-                effectEl.el.classList.remove("hidden");
+                effectEl.classAdd(printf("eve-wh-effect-color-%s", _data.effectType));
+                effectEl.classRemove("hidden");
             }
 
             let bodyEl;
             switch(_data.effectType) {
                 case "dazhLiminalityLocus":
                     bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
-                    bodyEl.el.classList.remove("edencom");
-                    bodyEl.el.classList.add("triglavian");
+                    bodyEl.classRemove("edencom");
+                    bodyEl.classAdd("triglavian");
                     break;
                 case "imperialStellarObservatory":
                 case "stateStellarObservatory":
                 case "republicStellarObservatory":
                 case "federalStellarObservatory":
                     bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
-                    bodyEl.el.classList.remove("triglavian");
-                    bodyEl.el.classList.add("edencom");
+                    bodyEl.classRemove("triglavian");
+                    bodyEl.classAdd("edencom");
                     break;
             }
         }
 
         if (exists(_data.isLocked) && _data.isLocked !== markerData.isLocked) {
             let lockedEl = _ui.fromElement(markerEl.el.querySelector(".locked"));
-            if (_data.isLocked)
-                lockedEl.el.classList.remove("hidden");
-            else
-                lockedEl.el.classList.add("hidden");
+            _data.isLocked ? lockedEl.classRemove("hidden") : lockedEl.classAdd("hidden")
         }
 
         if (exists(_data.systemType) && _data.systemType !== markerData.systemType) {
@@ -176,13 +174,12 @@ class Marker extends Emitter{
                     break;
             }
 
-            systemTypeEl.el.classList.add(colorClass);
+            systemTypeEl.classAdd(colorClass);
             systemTypeEl.text(_data.typeName);
         }
 
         extend(this.data, _data);
     }
-
     /**
      *
      * @param _statics {Array<{type: String}>}
@@ -199,13 +196,9 @@ class Marker extends Emitter{
         }
     }
     select (_isSelect) {
-        if(!this.data.isLocked) {
+        if (!this.data.isLocked) {
             this.data.isSelect = _isSelect;
-
-            if (_isSelect)
-                this.wrapper.el.classList.add("selected");
-            else
-                this.wrapper.el.classList.remove("selected");
+            _isSelect ? this.wrapper.classAdd("selected") : this.wrapper.classRemove("selected")
         }
     }
     isMarkerSelected () {
@@ -213,11 +206,7 @@ class Marker extends Emitter{
     }
     setActive (isActive) {
         this.data.isActive = isActive;
-
-        if (isActive)
-            this.wrapper.el.classList.add("active");
-        else
-            this.wrapper.el.classList.remove("active");
+        isActive ? this.wrapper.classAdd("active") : this.wrapper.classRemove("active")
     }
     _onMarkerTouchStart (event) {
         if (!this._enableActions)
@@ -255,7 +244,6 @@ class Marker extends Emitter{
 
         this.emit("mouseout", _event);
     }
-
     _onMouseInLazy (_event) {
         if(!this._enableActions)
             return;
@@ -267,15 +255,12 @@ class Marker extends Emitter{
             originalEvent: _event
         });
     }
-
     _onMouseOutLazy (_event){
         if(!this._enableActions)
             return;
 
         this.emit("mouseoutLazy", _event);
     }
-
-
     enableShade (_bool) {
         this.data.shade = _bool;
 
@@ -285,7 +270,6 @@ class Marker extends Emitter{
             this.wrapper.el.classList.remove("shaded");
 
     }
-
     enableActions (bool) {
         this._enableActions = bool;
 

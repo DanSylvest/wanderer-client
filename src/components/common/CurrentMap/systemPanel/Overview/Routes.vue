@@ -1,84 +1,93 @@
 <template>
-    <div>
+    <div class="wd-route">
         <md-card class="wd-module-card">
-            <md-card-header>
-                <div class="wd-system-overview__card-header wd flex flex-justify-sb flex-align-center">
-                    <div>Routes</div>
+            <div class="wd-loader" v-show="loading" >
+                <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="50" md-mode="indeterminate"></md-progress-spinner>
+            </div>
 
-                    <md-button class="md-icon-button md-dense" @click="onClickAddHubSystem">
-                        <md-icon>add_circle_outline</md-icon>
-                    </md-button>
-                </div>
-            </md-card-header>
-
-            <md-card-content>
-                <div class="wd-routes-container">
-                    <div class="wd-loader" v-show="loading" >
-                        <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="50" md-mode="indeterminate"></md-progress-spinner>
+            <wd-table :rows="processedRoutes" :enable-borders="true" v-if="!loading" sort-col="jumps" sort-order="ascend">
+                <template v-slot:toolbar>
+                    <div class="md-toolbar-section-start">
+                        <div>Routes</div>
                     </div>
-                    <template v-if="routes.length === 0 && !loading">
-                        <md-empty-state
-                            class="md-primary"
-                            md-label="No hubs or systems added"
-                            md-description="Here may be your routes for navigating to hubs or systems.">
-                        </md-empty-state>
-                    </template>
-                    <div class="wd-route" v-show="routes.length > 0 && !loading">
-                        <template v-for="item in routes">
-                            <div class="wd-route__destination-type" :class="getSystemTypeClass(item.systems.last())" :key="item.id">
-                                {{item.systems.last().typeName}}
-                            </div>
-                            <div class="wd-route__destination" :key="item.id">
-                                {{item.systems.last().solarSystemName}}
-                            </div>
-                            <div class="wd-route__jumps" :key="item.id">
-                                <template v-if="item.hasConnection">
-                                    {{item.systems.length - 1}}
-                                </template>
-                            </div>
-                            <div class="wd-route__systems" :key="item.id">
-                                <template v-if="item.hasConnection">
-                                    <div
-                                        class="wd-route-system"
-                                        :class="getBackgroundClass(routeSystem) + ' ' + getShapeClass(routeSystem)"
-                                        v-for="routeSystem in item.systems"
-                                        v-bind:key="routeSystem.solarSystemId"
-                                    >
-                                        <tooltip placement="top" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
-                                            <system-card
-                                                :c-map-id="lMapId"
-                                                :c-solar-system-id="routeSystem.solarSystemId.toString()"
-                                                :is-load-char-data="false"
-                                                class="wd-layout-secondary"
-                                            ></system-card>
-                                        </tooltip>
-                                    </div>
-                                </template>
-                                <template class="wd-route__systems" v-if="!item.hasConnection">
-                                    No connection
-                                </template>
-                            </div>
 
-                            <div :key="item.id" style="visibility: hidden;"></div>
-                            <div :key="item.id">
-                                <div class="wd-icon-button" @click="onHighlightRoute(item)">
-                                    <md-tooltip>Highlight this route at map</md-tooltip>
-                                    <md-icon>gps_fixed</md-icon>
-                                </div>
-                            </div>
-                            <div :key="item.id">
-                                <div class="wd-icon-button" @click="onRemoveRoute(item.destination)">
-                                    <md-tooltip>Remove {{item.systems.last().solarSystemName}}</md-tooltip>
-                                    <md-icon>delete_forever</md-icon>
-                                </div>
-                            </div>
-                        </template>
+                    <div class="md-toolbar-section-end">
+                        <md-button class="md-icon-button md-dense" @click="onClickAddHubSystem">
+                            <md-icon>add_circle_outline</md-icon>
+                        </md-button>
                     </div>
-                </div>
+                </template>
 
-            </md-card-content>
+                <template v-slot:header>
+                    <table-header-cell sortable id="name">name</table-header-cell>
+                    <table-header-cell sortable id="jumps" width-policy="55px">jumps</table-header-cell>
+                    <table-header-cell id="path" width-policy="1fr">path</table-header-cell>
+                    <table-header-cell id="buttonbar" width-policy="45px"></table-header-cell>
+                </template>
+
+                <template v-slot:row="{row}">
+                    <table-cell id="name">
+                        <div class="wd-gl-2c">
+                            <div class="wd-route__destination-type" :class="row.statusClass">
+                                {{row.status}}
+                            </div>
+                            <div class="wd-route__destination" >
+                                {{row.name}}
+                            </div>
+                        </div>
+                    </table-cell>
+                    <table-cell id="jumps">
+                        <div class="wd-route__jumps">
+                            <template v-if="row.hasConnection">
+                                {{row.jumps}}
+                            </template>
+                        </div>
+                    </table-cell>
+                    <table-cell id="path">
+                        <div class="wd-route__systems">
+                            <template v-if="row.hasConnection">
+                                <div
+                                    class="wd-route-system"
+                                    :class="getBackgroundClass(routeSystem) + ' ' + getShapeClass(routeSystem)"
+                                    v-for="routeSystem in row.systems"
+                                    v-bind:key="routeSystem.solarSystemId"
+                                >
+                                    <tooltip placement="top" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
+                                        <system-card
+                                            :c-map-id="lMapId"
+                                            :c-solar-system-id="routeSystem.solarSystemId.toString()"
+                                            :is-load-char-data="false"
+                                            class="wd-layout-secondary"
+                                        ></system-card>
+                                    </tooltip>
+                                </div>
+                            </template>
+                            <template v-else>
+                                No connection
+                            </template>
+                        </div>
+                    </table-cell>
+                    <table-cell id="buttonbar">
+                        <div class="wd-icon-button" @click="onHighlightRoute(row.systems)">
+                            <md-tooltip>Highlight this route at map</md-tooltip>
+                            <md-icon>gps_fixed</md-icon>
+                        </div>
+                        <div class="wd-icon-button" @click="onRemoveRoute(row.destination)">
+                            <md-tooltip>Remove {{row.name}}</md-tooltip>
+                            <md-icon>delete_forever</md-icon>
+                        </div>
+                    </table-cell>
+                </template>
+
+                <template v-slot:empty-state>
+                    <md-empty-state
+                        class="md-primary"
+                        md-label="No hubs or systems added"
+                        md-description="Here may be your routes for navigating to hubs or systems.">
+                    </md-empty-state>
+                </template>
+            </wd-table>
         </md-card>
-
         <system-add-dialog :activated.sync="isSystemAddDialogActivated" @system-selected="onSystemSelected"></system-add-dialog>
     </div>
 </template>
@@ -94,13 +103,21 @@
     import SpamFilter from "../../../../../js/env/spamFilter.js";
     import Tooltip from "../../../../ui/Tooltip.vue";
     import cache from "../../../../../js/cache/cache.js";
+    import WdTable from "../../../../ui/Table/WdTable.vue";
+    import TableHeaderCell from "../../../../ui/Table/TableHeaderCell.vue";
+    import TableCell from "../../../../ui/Table/TableCell.vue";
+    import CustomPromise from "../../../../../js/env/promise.js";
+    import extend from "../../../../../js/env/tools/extend.js";
 
     export default {
         name: "Routes",
         components: {
             Tooltip,
             SystemAddDialog,
-            SystemCard
+            SystemCard,
+            WdTable,
+            TableHeaderCell,
+            TableCell,
         },
         props : {
             mapId: {
@@ -142,60 +159,150 @@
                 this._attrUpdatedSF.call();
             }
         },
+        computed : {
+            processedRoutes () {
+                return this.routes.map(row => ({
+                    status: row.systems.last().typeName,
+                    statusClass: this.getSystemTypeClass(row.systems.last()),
+                    name: row.systems.last().solarSystemName,
+                    hasConnection: row.hasConnection,
+                    jumps: row.hasConnection ? row.systems.length - 1 : Infinity,
+                    systems: row.systems,
+                    destination: row.destination
+                }))
+            }
+        },
         methods : {
             _watchAttrsUpdated () {
                 if(this.isValidAttrs()) {
                     this.unsubscribeAll();
                     this.subscribeAll();
-                    this.loadRoutesData();
                 }
             },
             subscribeAll() {
                 this.subscribed = false;
 
-                this._mapProvider = cache.maps.touch(this.lMapId);
-                this._mapSolarSystems = this._mapProvider.item.solarSystems.subscribe();
-                this._mapChains = this._mapProvider.item.chains.subscribe();
+                let mapProvider = cache.maps.list.get(this.mapId);
+                this._unsubscribeSolarSystems = mapProvider.solarSystems.existence.subscribe();
+                this._unsubscribeChains = mapProvider.chains.existence.subscribe();
+                this._unsubscribeHubs = mapProvider.hubs.subscribe();
 
                 Promise.all([
-                    this._mapSolarSystems.item.readyPromise(),
-                    this._mapChains.item.readyPromise(),
+                    mapProvider.solarSystems.existence.readyPromise(),
+                    mapProvider.chains.existence.readyPromise(),
+                    mapProvider.hubs.readyPromise(),
                 ])
                     .then(this._onSubscribedAll.bind(this))
             },
             unsubscribeAll() {
                 this.subscribed = false;
 
+                let mapProvider = cache.maps.list.get(this.mapId);
+
                 if(exists(this._unsubscribeMSSId)) {
-                    this._mapSolarSystems.item.off(this._unsubscribeMSSId);
-                    this._unsubscribeMSSId = null;
+                    mapProvider.solarSystems.existence.off(this._unsubscribeMSSId);
+                    delete this._unsubscribeMSSId;
                 }
 
                 if(exists(this._unsubscribeMChainsId)) {
-                    this._mapChains.item.off(this._unsubscribeMChainsId);
-                    this._unsubscribeMChainsId = null;
+                    mapProvider.chains.existence.off(this._unsubscribeMChainsId);
+                    delete this._unsubscribeMChainsId;
                 }
 
-                this._mapChains && this._mapChains.unsubscribe();
-                delete this._mapChains;
+                if(exists(this._unsubscribeMHubsId)) {
+                    mapProvider.hubs.off(this._unsubscribeMHubsId);
+                    delete this._unsubscribeMHubsId;
+                }
 
-                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-                delete this._mapSolarSystem;
-
-                this._mapProvider && this._mapProvider.unsubscribe();
-                delete this._mapProvider;
+                if(exists(this._unsubscribeSolarSystems)){
+                    this._unsubscribeSolarSystems();
+                    delete this._unsubscribeSolarSystems;
+                }
+                if(exists(this._unsubscribeChains)){
+                    this._unsubscribeChains();
+                    delete this._unsubscribeChains;
+                }
+                if(exists(this._unsubscribeHubs)){
+                    this._unsubscribeHubs();
+                    delete this._unsubscribeHubs;
+                }
             },
             _onSubscribedAll () {
                 this.subscribed = true;
-                this._unsubscribeMSSId = this._mapSolarSystems.item.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
-                this._unsubscribeMChainsId = this._mapChains.item.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
-                this.loadRoutesData();
+
+                let mapProvider = cache.maps.list.get(this.mapId);
+                this._unsubscribeMHubsId = mapProvider.hubs.on("changedEvent", this._onHubsSubscriptionChange.bind(this));
+                this._unsubscribeMSSId = mapProvider.solarSystems.existence.on("changedEvent", this._onSystemSubscriptionChange.bind(this));
+                this._unsubscribeMChainsId = mapProvider.chains.existence.on("changedEvent", this._onChainsSubscriptionChange.bind(this));
             },
             _onSystemSubscriptionChange () {
-                this.loadRoutesData();
+                this.reload();
             },
             _onChainsSubscriptionChange () {
-                this.loadRoutesData();
+                this.reload();
+            },
+            _onHubsSubscriptionChange (event) {
+                switch (event.type) {
+                    case "bulk":
+                        this.loading = false;
+                        this.reload();
+                        break;
+                    case "add":
+                        this._loadRoutes([event.hubId]);
+                        break;
+                    case "removed":
+                        this._removeRoute(event.hubId);
+                        break;
+                }
+            },
+            _loadRoutes (hubs) {
+                let pr = new CustomPromise();
+                api.eve.map.routes.getRoutes(this.lMapId, this.lSolarSystemId, hubs)
+                    .then(
+                        event => {
+                            this.updateRoutes(event);
+                            pr.resolve();
+                        },
+                        err => helper.errorHandler(this, err)
+                    );
+
+                return pr.native;
+            },
+            _removeRoute (routeId) {
+                this.routes.eraseByObjectKey("destination", routeId);
+            },
+            reload() {
+                if(!this.loading) {
+                    this.loading = true;
+                    this._loadRoutes(cache.maps.list.get(this.mapId).hubs.data())
+                        .then(
+                            () => this.loading = false
+                        )
+                }
+            },
+            updateRoutes (routes) {
+                let newArr = [];
+
+                routes.map(x => {
+                    let obj = this.routes.searchByObjectKey("destination", x.destination);
+                    if(obj)
+                        newArr.push(extend(extend({}, obj), x));
+                    else
+                        newArr.push(x);
+                });
+
+                let out = [];
+                this.routes.map(x => {
+                    let obj = newArr.searchByObjectKey("destination", x.destination);
+                    out.push(obj ? obj : x)
+                })
+
+                newArr.map(x => {
+                    let obj = out.searchByObjectKey("destination", x.destination);
+                    !obj && out.push(x);
+                });
+
+                this.routes = out;
             },
             isValidAttrs () {
                 return exists(this.lMapId) && exists(this.lSolarSystemId);
@@ -206,38 +313,21 @@
             onSystemSelected (solarSystemId) {
                 api.eve.map.routes.addHub(this.lMapId, solarSystemId)
                     .then(
-                        () => {
-                            this.isSystemAddDialogActivated  = false;
-                            this.loadRoutesData();
-                        },
+                        () => this.isSystemAddDialogActivated  = false,
                         err => helper.errorHandler(this, err)
                     );
             },
             onRemoveRoute(destinationSolarSystemId) {
                 api.eve.map.routes.removeHub(this.lMapId, destinationSolarSystemId)
                     .then (
-                        () => this.loadRoutesData(),
+                        helper.dummy,
                         err => helper.errorHandler(this, err)
                     )
             },
-            onHighlightRoute (route) {
-                this.$emit("highlight-route", route.systems.map(x => x.solarSystemId))
+            onHighlightRoute (systems) {
+                this.$emit("highlight-route", systems.map(x => x.solarSystemId))
             },
-            updateRoutes (routes) {
-                this.routes = routes;
-                this.$emit("hubs-updated", routes.map(x => x.destination));
-            },
-            loadRoutesData() {
-                if(this.subscribed) {
-                    this.loading = true;
-                    api.eve.map.routes.list(this.lMapId, this.lSolarSystemId).then((routes) => {
-                        this.loading = false;
-                        this.updateRoutes(routes);
-                    }, (errMsg) => {
-                        alert(errMsg);
-                    });
-                }
-            },
+
             //typeName systemType, security
             getSystemTypeClass (data){
                 switch (data.systemType) {
@@ -311,8 +401,6 @@
 
     .wd-icon-button {
         cursor: pointer;
-        /*width: 10px;*/
-        /*height: 10px;*/
 
         i {
             color: $fg-primary-2 !important;
@@ -327,53 +415,69 @@
         }
     }
 
-    .wd-routes-container {
-        .wd-route {
-            display: grid;
-            grid-column-gap: 5px;
-            grid-row-gap: 5px;
-            grid-template-columns: auto auto auto auto 1fr auto auto;
-            line-height: initial;
 
-            & > div {
-                display: flex;
-                align-items: center;
+    .wd-route {
+        /*.md-card-content:last-of-type {*/
+        /*     padding-bottom: initial !important;*/
+        /*}*/
 
-                font-size: $font-size-medium-small;
-                font-family: sans-serif;
-                color: $fg-primary;
-            }
-
-            .wd-route__destination-type {
-                min-width: 10px;
-                font-weight: bold;
-            }
-
-            .wd-route__destination {
-                min-width: 60px;
-                font-weight: bold;
-                color: $fg-contrast;
-            }
-
-            .wd-route__jumps {
-                min-width: 10px;
-            }
-
-            .wd-route__systems {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: flex-start;
-                padding-left: 2px;
-                padding-top: 2px;
-                width: 100%;
-
-                .wd-route-system {
-                    width: 9px;
-                    height: 9px;
-                    margin-right: 2px;
-                    margin-bottom: 2px;
+        .wd-table {
+            .wd-table-content {
+                & > .wd-table-cell,
+                & > .wd-table-header-cell {
+                    min-height: 30px !important;
                 }
+
+                @for $i from 1 through 30 {
+                    &.wd-table-borders.wd-table-cols-#{$i} > .wd-table-header-cell:not(:nth-child(#{$i})),
+                    &.wd-table-borders.wd-table-cols-#{$i} > .wd-table-cell:not(:nth-child(#{$i}n+#{$i * 2})),
+                    {
+                        border-right: 1px solid $border-color-primary-5;
+                    }
+
+                    &.wd-table-borders.wd-table-cols-#{$i} > .wd-table-cell:nth-last-child(n + #{$i + 1}),
+                    {
+                        border-bottom: 1px solid $border-color-primary-5;
+                    }
+                }
+            }
+        }
+
+        .wd-module-card {
+            padding: 10px 5px;
+        }
+
+        line-height: initial;
+
+        .wd-route__destination-type {
+            min-width: 10px;
+            font-weight: bold;
+        }
+
+        .wd-route__destination {
+            min-width: 60px;
+            font-weight: bold;
+            color: $fg-contrast;
+        }
+
+        .wd-route__jumps {
+            min-width: 10px;
+        }
+
+        .wd-route__systems {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            padding: 2px 5px;
+            box-sizing: border-box;
+
+            .wd-route-system {
+                width: 9px;
+                height: 9px;
+                margin-right: 2px;
+                margin-bottom: 2px;
             }
         }
     }

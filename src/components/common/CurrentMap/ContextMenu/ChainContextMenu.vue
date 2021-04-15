@@ -41,6 +41,7 @@
     import environment from "../../../../js/core/map/environment.js";
     import cache from "../../../../js/cache/cache.js";
     import SpamFilter from "../../../../js/env/spamFilter.js";
+    import exists from "../../../../js/env/tools/exists.js";
 
     let uuidCounter = 0;
     export default {
@@ -96,7 +97,7 @@
         },
         beforeDestroy() {
             this._attrUpdatedSF.stop();
-            this.unsubscribeSolarSystem();
+            this.unsubscribeChain();
         },
         mounted() {
             this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
@@ -135,6 +136,9 @@
             }
         },
         methods: {
+            _getMapChainProvider() {
+                return cache.maps.list.get(this.lMapId).chains.list.get(this.lChainId);
+            },
             _watchAttrsUpdated () {
                 this.loaded = false;
 
@@ -147,20 +151,19 @@
                 this.loaded = true;
             },
             subscribeChain () {
-                this._map = cache.maps.touch(this.lMapId);
-                this._mapChains = this._map.item.chains.touch(this.lChainId);
+                let mapChain = this._getMapChainProvider();
+                this._unsubscribeMapChain = mapChain.subscribe();
 
                 Promise.all([
-                    this._mapChains.item.readyPromise(),
+                    mapChain.readyPromise(),
                 ])
                     .then(this._onLoaded.bind(this));
             },
             unsubscribeChain () {
-                this._mapSolarSystem && this._mapSolarSystem.unsubscribe();
-                delete this._mapSolarSystem;
-
-                this._map && this._map.unsubscribe();
-                delete this._map;
+                if (exists(this._unsubscribeMapChain)) {
+                    this._unsubscribeMapChain();
+                    delete this._unsubscribeMapChain;
+                }
             },
             onTimeStateChange(state) {
                 api.eve.map.link.update(this.mapId, this.chainId, {timeStatus: state})

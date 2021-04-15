@@ -4,7 +4,7 @@ import exists from "../../../../js/env/tools/exists";
 import cache from "../../../../js/cache/cache.js";
 
 class Chain extends Emitter {
-    constructor (controller, _map, _mapId, _id) {
+    constructor(controller, _map, _mapId, _id) {
         super();
 
         this.controller = controller;
@@ -15,11 +15,13 @@ class Chain extends Emitter {
         this._handlerDynamicDataChanged = null;
         this._data = Object.create(null);
     }
-    init () {
+
+    init() {
         this.initProviders();
     }
-    deinit () {
-        if(exists(this.uiLinkId)) {
+
+    deinit() {
+        if (exists(this.uiLinkId)) {
             this.map.removeLink(this.uiLinkId);
         }
 
@@ -28,27 +30,29 @@ class Chain extends Emitter {
         this.deinitProviders();
     }
 
-    initProviders () {
-        this._map = cache.maps.touch(this.mapId);
-        this._mapChains = this._map.item.chains.touch(this.id);
-        this._handlerDynamicDataChanged = this._mapChains.item.on("changed", this._onDynamicDataChanged.bind(this));
+    initProviders() {
+        let mapChain = this._getMapChainProvider();
+        this._unsubscribeMapChain = mapChain.subscribe();
+        this._handlerDynamicDataChanged = mapChain.on("changedEvent", this._onDynamicDataChanged.bind(this));
     }
 
-    deinitProviders () {
-        if(this._mapChains) {
-            this._mapChains.item.off(this._handlerDynamicDataChanged);
-            this._mapChains.unsubscribe();
-            delete this._mapChains;
+    deinitProviders() {
+        let mapChain = this._getMapChainProvider();
+        if (exists(this._handlerDynamicDataChanged)) {
+            mapChain.off(this._handlerDynamicDataChanged)
+            delete this._handlerDynamicDataChanged;
         }
 
-        this._map && this._map.unsubscribe();
-        delete this._map;
+        if (exists(this._unsubscribeMapChain)) {
+            this._unsubscribeMapChain();
+            delete this._unsubscribeMapChain;
+        }
     }
 
-    _onDynamicDataChanged (data) {
-        this._data = extend(this._data, data);
+    _onDynamicDataChanged(/*data*/) {
+        this._data = extend(this._data, this._getMapChainProvider().data());
 
-        if(!exists(this.uiLinkId)) {
+        if (!exists(this.uiLinkId)) {
             let sourceMarkerId = this.controller.systems[this._data.solarSystemSource].markerId;
             let targetMarkerId = this.controller.systems[this._data.solarSystemTarget].markerId;
             this.uiLinkId = this.map.createLink(this.id, sourceMarkerId, targetMarkerId);
@@ -57,10 +61,13 @@ class Chain extends Emitter {
         this.map.updateLink(this.uiLinkId, this._data);
     }
 
-    data () {
+    data() {
         return this._data;
     }
 
+    _getMapChainProvider() {
+        return cache.maps.list.get(this.mapId).chains.list.get(this.id);
+    }
 }
 
 export default Chain;

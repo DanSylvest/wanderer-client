@@ -151,3 +151,10 @@ body {
         opacity: 1;
     }
 }
+
+.wd-gl-2c {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 5px;
+    padding: 0 10px;
+}

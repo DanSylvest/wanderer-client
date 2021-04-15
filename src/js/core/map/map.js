@@ -409,8 +409,10 @@ class Map extends Emitter {
             }
 
             requestAnimationFrame(function () {
-                this._ao.destructor();
-                this._ao = null;
+                if(this._ao) {
+                    this._ao.destructor();
+                    this._ao = null;
+                }
             }.bind(this));
 
             this.render();
@@ -505,8 +507,6 @@ class Map extends Emitter {
         this.emit("systemContextMenu", marker.data.customId, _event);
     }
     _onMarkerMouseIn (_markerId, _event) {
-
-
         if (!this._isDragging) {
             let marker = this._markers[_markerId];
             this.emit("markerIn", marker.data.customId, _event);

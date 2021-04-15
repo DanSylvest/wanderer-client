@@ -21,6 +21,7 @@ class ActionObserver extends Emitter {
 
         this._state = "initial";
         this.subject = null;
+        this._lastEvent = null;
 
         this._createHandlers();
         this.options.container.addEventListener("mousedown", this._h.mousedown);
@@ -31,6 +32,7 @@ class ActionObserver extends Emitter {
         this.options.container.removeEventListener("mousedown", this._h.mousedown);
         this.options.container.removeEventListener("touchstart", this._h.touchstart);
 
+        this._lastEvent = null;
         this._state = "initial";
         this.subject = null;
 
@@ -98,6 +100,7 @@ class ActionObserver extends Emitter {
 
             this._startedMouse = currentMouse;
             this._state = "wait";
+            this._lastEvent = event;
         }
     }
 
@@ -113,6 +116,7 @@ class ActionObserver extends Emitter {
                 this._dragging(event, currentMouse);
                 break;
         }
+        this._lastEvent = event;
     }
 
     _up (currentMouse, event) {
@@ -130,6 +134,7 @@ class ActionObserver extends Emitter {
                 this.subject = null;
                 break;
         }
+        this._lastEvent = false;
         this._unbindEvents();
     }
 
@@ -153,6 +158,7 @@ class ActionObserver extends Emitter {
         if(event.touches.length > 0){
             let outEvent = extend(copyTouchEvent(event), copyTouch(event.touches[0]));
             this._down(this.getCurrentMouseOffset(outEvent), outEvent);
+            this._lastEvent = outEvent;
         }
     }
 
@@ -163,10 +169,9 @@ class ActionObserver extends Emitter {
         }
     }
 
-    _onTouchEnd (event) {
-        if(event.touches.length > 0){
-            let outEvent = extend(copyTouchEvent(event), copyTouch(event.touches[0]));
-            this._up(this.getCurrentMouseOffset(outEvent), outEvent);
+    _onTouchEnd () {
+        if(this._lastEvent) {
+            this._up(this.getCurrentMouseOffset(this._lastEvent), this._lastEvent);
         }
     }
 

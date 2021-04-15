@@ -2,106 +2,106 @@
  * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 3/21/21.
  */
 
-import Emitter from "../../../env/tools/emitter.js";
 import store from "../../../store";
 import SolarSystems from "./solarSystems.js";
-import Observer from "../../../env/observer.js";
 import Chains from "./chains.js";
+import api from "../../../api.js";
+import HubsStore from "../../../store/modules/maps/hubsStore.js";
+import MultipleProvider from "../base/multipleProvider.js";
+import MapStore from "../../../store/modules/maps/mapStore.js";
+import ListProvider from "../base/listProvider.js";
+import SubscriptionProvider from "../base/subscriptionProvider.js";
 
-const LIFE_TIME = 1000 * 60 * 20;
-class Map extends Emitter{
+class Hubs extends SubscriptionProvider {
+    constructor(mapId) {
+        super();
+
+        this.mapId = mapId;
+        this._vuexModulePath = ["maps", this.mapId, "hubs"];
+        this._vuexTemplate = HubsStore;
+        this._data = [];
+    }
+
+    destructor() {
+        delete this.mapId;
+        super.destructor();
+    }
+
+    _eventProcess(event) {
+        switch (event.type) {
+            case "bulk":
+                this._data = this._data.concat(event.list);
+                break;
+            case "add":
+                this._data.push(event.hubId);
+                break;
+            case "removed":
+                this._data.removeByValue(event.hubId);
+                break;
+        }
+
+        store.dispatch(`maps/${this.mapId}/hubs/update`, this._data);
+    }
+
+    _createSubscriber() {
+        return api.eve.map.routes.subscribeHubs(this.mapId);
+    }
+
+    _emulateEvent() {
+        return {
+            type: "bulk",
+            list: this._data.slice(0)
+        };
+    }
+}
+
+/**
+ * @property {SolarSystems} solarSystems
+ * @property {Chains} chains
+ * @property {Hubs} hubs
+ */
+class Map extends MultipleProvider {
     constructor(id) {
         super();
 
         this._id = id;
-        this._unregisterTimerId = -1;
+        this._vuexModulePath = ["maps", this._id];
+        this._vuexTemplate = MapStore;
 
-        this.solarSystems = new SolarSystems(this._id);
-        this.solarSystems.on("unregistered", this._onSSUnregistered.bind(this));
-        this.solarSystems.on("registered", this._onSSRegistered.bind(this));
-        this.solarSystemsUnsubscriber = null;
-
-        this.chains = new Chains(this._id);
-        this.chains.on("unregistered", this._onChainsUnregistered.bind(this));
-        this.chains.on("registered", this._onChainsRegistered.bind(this));
-        this.chainsUnsubscriber = null;
-
-        this.observer = new Observer(LIFE_TIME);
-        this.observer.on("started", this._registerModule.bind(this));
-        this.observer.on("stopped", this._unregisterModule.bind(this));
+        this.addProvider("solarSystems", () => new SolarSystems(this._id));
+        this.addProvider("chains", () => new Chains(this._id));
+        this.addProvider("hubs", () => new Hubs(this._id));
     }
-    destructor() {
-        this.observer.destructor();
-        super.destructor();
-    }
-    _onSSRegistered () {
-        this.solarSystemsUnsubscriber = this.subscribe();
-    }
-    _onSSUnregistered () {
-        this.solarSystemsUnsubscriber();
-    }
-    _onChainsRegistered () {
-        this.chainsUnsubscriber = this.subscribe();
-    }
-    _onChainsUnregistered () {
-        this.chainsUnsubscriber();
-    }
-    subscribe () {
-        let sid = this.observer.subscribe();
-        return () => this.observer.unsubscribe(sid);
-    }
-    _registerModule () {
-        if(!store.hasModule(["maps", this._id]))
-            store.registerModule(["maps", this._id], {
-                namespaced: true
-            });
-    }
-    _unregisterModule () {
-        store.unregisterModule(["maps", this._id]);
-
-        this.emit("unregistered");
-    }
-    count () {
-        return this.observer.count();
-    }
-
 }
 
-class Maps extends Emitter {
+class MapsListProvider extends ListProvider {
+    _createModel(id) {
+        return new Map(id);
+    }
+
+    /**
+     *
+     * @param id
+     * @returns {Map}
+     */
+    get(id) {
+        return super.get(id);
+    }
+}
+
+
+/**
+ * @property {MapsListProvider} list
+ */
+class Maps extends MultipleProvider {
     constructor() {
         super();
 
-        this._items = Object.create(null);
-        store.registerModule(["maps"], {
-            namespaced: true,
-        });
-    }
-    destructor() {
-        store.unregisterModule(["maps"]);
-        super.destructor();
-    }
-    touch(itemId) {
-        if(!this._items[itemId]) {
-            this._items[itemId] = new Map(itemId);
-            this._items[itemId].on("unregistered", this._onSystemUnregistered.bind(this, itemId))
-        }
+        this._vuexModulePath = ["maps"];
+        this._vuexTemplate = MapStore;
 
-        return {
-            unsubscribe: this._items[itemId].subscribe(),
-            item: this._items[itemId]
-        };
+        this.addProvider("list", () => new MapsListProvider());
     }
-    _onSystemUnregistered (itemId) {
-        this._items[itemId].destructor();
-        delete this._items[itemId];
-    }
-    countOfSubModules () {
-        return Object.keys(this._items).length;
-    }
-    hasSubModules () {
-        return this.countOfSubModules() > 0;
-    }
-
 }
 
 export default Maps;

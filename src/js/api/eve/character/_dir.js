@@ -10,6 +10,8 @@ import fastSearch from "./fastSearch";
 import online from "./online";
 import remove from "./remove";
 import byUser from "./byUser";
+import subscribeLocation from "./subscribeLocation";
+import subscribeShip from "./subscribeShip";
 
 export default {
     add: add,
@@ -19,5 +21,7 @@ export default {
     fastSearch: fastSearch,
     online: online,
     byUser: byUser,
-    remove: remove
+    remove: remove,
+    subscribeLocation: subscribeLocation,
+    subscribeShip: subscribeShip,
 }

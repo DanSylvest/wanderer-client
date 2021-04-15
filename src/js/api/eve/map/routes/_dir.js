@@ -4,12 +4,12 @@
 
 import addHub from "./addHub";
 import removeHub from "./removeHub";
-import list from "./list";
-import hubs from "./hubs";
+import subscribeHubs from "./subscribeHubs";
+import getRoutes from "./getRoutes";
 
 export default {
     addHub: addHub,
+    getRoutes: getRoutes,
     removeHub: removeHub,
-    list: list,
-    hubs: hubs
+    subscribeHubs: subscribeHubs
 }
