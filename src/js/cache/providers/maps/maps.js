@@ -47,6 +47,11 @@ class Hubs extends SubscriptionProvider {
         return api.eve.map.routes.subscribeHubs(this.mapId);
     }
 
+    reset () {
+        super.reset();
+        this._data = [];
+    }
+
     _emulateEvent() {
         return {
             type: "bulk",

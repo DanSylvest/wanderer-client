@@ -247,16 +247,18 @@ class MapController extends Emitter {
         }
     }
     onNewChain (sourceSolarSystemId, targetSolarSystemId) {
-        api.eve.map.addChain(this.mapId, sourceSolarSystemId, targetSolarSystemId)
-            .then(
-                helper.dummy,
-                err => {
-                    this.emit("error", {
-                        message: "Error on load links info",
-                        err: err
-                    });
-                }
-            )
+        if(sourceSolarSystemId !== targetSolarSystemId) {
+            api.eve.map.addChain(this.mapId, sourceSolarSystemId, targetSolarSystemId)
+                .then(
+                    helper.dummy,
+                    err => {
+                        this.emit("error", {
+                            message: "Error on load links info",
+                            err: err
+                        });
+                    }
+                )
+        }
     }
     setSystemActive (systemId) {
         if(this.systems[systemId]) {

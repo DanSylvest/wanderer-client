@@ -54,8 +54,8 @@
                                 >
                                     <tooltip placement="top" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
                                         <system-card
-                                            :c-map-id="lMapId"
-                                            :c-solar-system-id="routeSystem.solarSystemId.toString()"
+                                            :map-id="lMapId"
+                                            :solar-system-id="routeSystem.solarSystemId.toString()"
                                             :is-load-char-data="false"
                                             class="wd-layout-secondary"
                                         ></system-card>

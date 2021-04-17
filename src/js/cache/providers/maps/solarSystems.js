@@ -36,6 +36,8 @@ class SolarSystem extends SubscriptionProvider {
         this._addAccessData("position");
         this._addAccessData("onlineCount");
         this._addAccessData("onlineCharacters");
+
+        this._markedAsRemoved = false;
     }
 
     destructor() {
@@ -79,6 +81,20 @@ class SolarSystem extends SubscriptionProvider {
             list: extend({}, this._data)
         };
     }
+
+    markAsRemoved () {
+        this._markedAsRemoved = true;
+
+        if(this.observer.count() === 0){
+            this.observer.stop();
+        }
+    }
+
+    _onObserverUnsubscribed () {
+        if(this._markedAsRemoved && this.observer.count() === 0) {
+            this.observer.stop();
+        }
+    }
 }
 
 class SolarSystemsListProvider extends ListProvider {
@@ -104,6 +120,10 @@ class SolarSystemsListProvider extends ListProvider {
     get(id) {
         return super.get(id);
     }
+
+    markAsRemoved (id) {
+        this.has(id) && this.get(id).markAsRemoved();
+    }
 }
 
 class SolarSystemExistenceProvider extends SubscriptionProvider {
@@ -120,6 +140,11 @@ class SolarSystemExistenceProvider extends SubscriptionProvider {
     destructor() {
         delete this.mapId;
         super.destructor();
+    }
+
+    reset () {
+        super.reset();
+        this._data = [];
     }
 
     _eventProcess(event) {
@@ -163,7 +188,30 @@ class SolarSystems extends MultipleProvider {
 
         this.addProvider("existence", () => new SolarSystemExistenceProvider(mapId));
         this.addProvider("list", () => new SolarSystemsListProvider(mapId));
+
+        // придется сделать прерывание...
+        setTimeout(() => this.watchingForRemove(), 0);
     }
+
+    watchingForRemove () {
+        this._unsubscribeExistence = this.existence.subscribe();
+        this.existence.on("changedEvent", this._onChanged.bind(this));
+        this.list.on("unsubscribed", this._onListUnsubscribed.bind(this))
+    }
+
+    _onChanged (event) {
+        if(event.type === "removed") {
+            this.list.markAsRemoved(event.solarSystemId);
+        }
+    }
+
+    _onListUnsubscribed () {
+        if(this.existence.observer.count() === 1) {
+            this._unsubscribeExistence();
+            delete this._unsubscribeExistence;
+        }
+    }
+
 }
 
 export default SolarSystems;

@@ -125,11 +125,7 @@
             }
         },
         methods: {
-            _watchAttrsUpdated () {
-                // if(this.isValidAttrs()) {
-                //     this.unsubscribeSolarSystem();
-                //     this.subscribeSolarSystem();
-                // }
+            _watchAttrsUpdated() {
                 this.refresh();
                 this.focus();
             },
@@ -145,7 +141,7 @@
                 }.bind(this));
             },
             refresh: function () {
-                if(!this.showPopup)
+                if (!this.showPopup)
                     return;
 
                 this._rtid !== -1 && clearTimeout(this._rtid);
@@ -161,22 +157,16 @@
 
 
             },
-
-            // eslint-disable-next-line no-unused-vars
             onTabChange: function (_tabName) {
-                if(_tabName === undefined)
+                if (_tabName === undefined)
                     return;
 
                 this.currentTab = _tabName;
 
                 switch (_tabName) {
                     case "tab-overview":
-                        // this.$refs.systemInfo.update(this.mapId, this.currentSystemData);
                         break;
                     case "tab-signatures":
-                        // this.$refs.signatures.load(this.mapId, this.systemId);
-                        // this.$refs.signatures.update(this.currentSystemData.signatures);
-
                         this.$refs.signatures.focus();
                         break;
 
@@ -195,12 +185,6 @@
                 }.bind(this));
 
             },
-            // addHub (solarSystemId) {
-            //     this.$refs.systemInfo && this.$refs.systemInfo.addHub(solarSystemId);
-            // },
-            // removeHub (solarSystemId) {
-            //     this.$refs.systemInfo && this.$refs.systemInfo.removeHub(solarSystemId);
-            // },
         }
     }
 

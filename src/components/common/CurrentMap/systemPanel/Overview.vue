@@ -1,6 +1,6 @@
 <template>
     <div
-        v-if="loaded"
+        v-if="loadedSolarSystem"
         class="wd-system-overview wd off-user-select"
     >
         <div class="wd-content" :class="gridClass">
@@ -101,33 +101,20 @@
     import cache from "../../../../js/cache/cache.js";
     import api from "../../../../js/api.js";
     import helper from "../../../../js/utils/helper.js";
-    import exists from "../../../../js/env/tools/exists.js";
+    import SolarSystemMixin from "../../../mixins/solarSystem.js";
 
     export default {
         name: "Overview",
-        components : {
-            Routes
-        },
+        mixins: [SolarSystemMixin],
+        components : {Routes},
         props: {
             isCompact: {
                 type: Boolean,
                 default: false
             },
-            solarSystemId: {
-                type: String,
-                default: ""
-            },
-            mapId: {
-                type: String,
-                default: ""
-            }
         },
         data: function () {
             return {
-                loaded: false,
-                lSolarSystemId: this.solarSystemId,
-                lMapId: this.mapId,
-
                 savingDescription: false,
                 description: "",
                 lIsCompact: this.isCompact,
@@ -137,28 +124,12 @@
         watch: {
             isCompact: function (_newVal) {
                 this.lIsCompact = _newVal;
-            },
-            solarSystemId (val) {
-                this.lSolarSystemId = val;
-                this._attrUpdatedSF.call();
-            },
-            mapId (val) {
-                this.lMapId = val;
-                this._attrUpdatedSF.call();
-            },
+            }
         },
         beforeDestroy() {
             this._descIE.stop();
-            this._attrUpdatedSF.stop();
-            this.unsubscribeSolarSystem();
-        },
-        beforeMount() {
-
         },
         mounted: function () {
-            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
-            this.isValidAttrs() && this._attrUpdatedSF.call();
-
             this._descIE = new IntervalEmitter(3000, 100);
             this._descIE.on("interval", delta => this.savingDelay = (delta / 1000).toFixed(1));
 
@@ -262,43 +233,19 @@
             }
         },
         methods: {
-            _watchAttrsUpdated () {
+            watchAttrsUpdatedSolarSystem () {
                 this._sfInput.stop();
                 this._descIE.stop();
                 this._descriptionIsNotSetted = false;
                 this.savingDescription = false;
                 this.needToSave = true;
 
-                if(this.isValidAttrs()) {
-                    this.unsubscribeSolarSystem();
-                    this.subscribeSolarSystem();
-                }
+                SolarSystemMixin.methods.watchAttrsUpdatedSolarSystem.call(this);
             },
-            unsubscribeSolarSystem() {
-                this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
-                this.solarSystemInfo && delete this.solarSystemInfo;
+            onLoadedSolarSystem () {
+                SolarSystemMixin.methods.onLoadedSolarSystem.call(this);
 
-                if(exists(this._mapSolarSystemProviderUnsubscribe)) {
-                    this._mapSolarSystemProviderUnsubscribe();
-                    delete this._mapSolarSystemProviderUnsubscribe;
-                }
-            },
-            subscribeSolarSystem() {
-                this.loaded = false;
-                this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
-
-                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
-                this._mapSolarSystemProviderUnsubscribe = mapSolarSystemProvider.subscribe();
-
-                Promise.all([
-                    this.solarSystemInfo.item.readyPromise(),
-                    mapSolarSystemProvider.readyPromise(),
-                ])
-                    .then(this._onLoaded.bind(this));
-            },
-            _onLoaded () {
-                this.loaded = true;
-                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
+                let mapSolarSystemProvider = cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId);
                 mapSolarSystemProvider.on("changed", this._onSSDynamicChanged.bind(this));
             },
             _onSSDynamicChanged (data) {
@@ -337,15 +284,6 @@
                         helper.dummy,
                         err => helper.errorHandler(this, err)
                     );
-            },
-            isValidAttrs () {
-                return this.lSolarSystemId !== "" && this.lMapId !== "";
-            },
-            refresh: function () {
-
-            },
-            _getMapSolarSystemProvider () {
-                return cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId);
             }
         }
     }

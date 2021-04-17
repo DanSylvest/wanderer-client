@@ -1,10 +1,10 @@
 <template>
     <div class="wd-system-card">
-        <div v-show="!loaded" >
+        <div v-show="!loadedSolarSystem" >
             <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="30" md-mode="indeterminate"></md-progress-spinner>
         </div>
-        <div v-show="loaded">
-            <div v-if="loaded">
+        <div v-show="loadedSolarSystem">
+            <div v-if="loadedSolarSystem">
             <div class="wd-system-card__header">
                 <div :class="getTypeNameClasses">{{getTypeName}}</div>
                 <div class="solar-system-name">{{info.solarSystemName}}</div>
@@ -18,7 +18,7 @@
                 </div>
             </div>
             <!-- Offline part -->
-            <template v-if="lExistsOnMap && false">
+            <template v-if="lExistsOnMap">
                 <div class="wd-system-card__divider" v-show="onlineCount > 0"></div>
                 <div class="wd-system-card__content" v-show="onlineCount > 0">
                     <local :map-id="mapId" :solar-system-id="solarSystemId" />
@@ -31,23 +31,14 @@
 
 <script>
     import environment from "../../../js/core/map/environment";
-    import cache from "../../../js/cache/cache.js";
     import Local from "./SolarSystem/Local.vue";
-    import SpamFilter from "../../../js/env/spamFilter.js";
-    import exists from "../../../js/env/tools/exists.js";
+    import SolarSystemMixin from "../../mixins/solarSystem.js";
 
     export default {
         name: "SystemCard",
+        mixins: [SolarSystemMixin],
         components: {Local},
         props: {
-            cSolarSystemId: {
-                type: String,
-                default: null
-            },
-            cMapId: {
-                type: String,
-                default: null
-            },
             isLoadCharData: {
                 type: Boolean,
                 default: true
@@ -59,23 +50,10 @@
         },
         data: function () {
             return {
-                loaded: false,
-                solarSystemId: this.cSolarSystemId,
-                mapId: this.cMapId,
                 lExistsOnMap: this.existsOnMap,
-                characters: [],
-                localIsLoadCharData: this.isLoadCharData,
+                isLoadDynamicSSData: this.lExistsOnMap,
+                characters: []
             }
-        },
-        mounted: function () {
-            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
-            this._attrUpdatedSF.call();
-        },
-        beforeDestroy() {
-            this.unsubscribeSolarSystem();
-        },
-        beforeMount() {
-
         },
         computed : {
             statusClass () {
@@ -139,66 +117,6 @@
             hasEffect() {
                 return this.info.effectName !== "";
             },
-        },
-        watch: {
-            cSolarSystemId (val) {
-                this.solarSystemId = val;
-                this._attrUpdatedSF.call();
-            },
-            cMapId (val) {
-                this.mapId = val;
-                this._attrUpdatedSF.call();
-            },
-        },
-        methods: {
-            _getMapSolarSystemProvider () {
-                return cache.maps.list.get(this.mapId).solarSystems.list.get(this.solarSystemId);
-            },
-            _watchAttrsUpdated () {
-                if(this.isValidAttrs()) {
-                    this.unsubscribeSolarSystem();
-                    this.subscribeSolarSystem();
-                }
-            },
-            unsubscribeSolarSystem() {
-                this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
-                this.solarSystemInfo = null;
-
-                if(this.lExistsOnMap) {
-                    if(exists(this._solarSystemProviderUnsubscriber)) {
-                        this._solarSystemProviderUnsubscriber();
-                        delete this._solarSystemProviderUnsubscriber;
-                    }
-
-                }
-            },
-            subscribeSolarSystem() {
-                this.loaded = false;
-
-                let prarr = [];
-                this.solarSystemInfo = cache.solarSystems.touch(this.solarSystemId);
-                prarr.push(this.solarSystemInfo.item.readyPromise());
-
-                if(this.lExistsOnMap) {
-                    let solarSystemProvider = this._getMapSolarSystemProvider();
-                    this._solarSystemProviderUnsubscriber = solarSystemProvider.subscribe();
-                    prarr.push(solarSystemProvider.readyPromise());
-                }
-
-                Promise.all(prarr)
-                    .then(this._onLoaded.bind(this));
-            },
-            isValidAttrs () {
-                return this.solarSystemId && this.mapId;
-            },
-            _onLoaded () {
-                this.loaded = true;
-            },
-
-            // API
-            refresh: function () {
-
-            }
         }
     }
 </script>
@@ -263,19 +181,6 @@
                     font-family: sans-serif;
                     color: #848484;
                     font-size: 11px;
-                }
-
-                .solar-system-local {
-                    .solar-system-local-name {
-                        font-weight: bold;
-                        color: #006890;
-                    }
-                    .solar-system-local-name.solar-system-local-name-own {
-                        color: $character-color-1;
-                    }
-                    .solar-system-local-ship {
-                        font-weight: bold;
-                    }
                 }
             }
         }

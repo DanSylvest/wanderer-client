@@ -45,6 +45,7 @@ class Observer extends Emitter {
             if(this._subscribersCount === 0) {
                 this._tid = setTimeout(this._onTimeout.bind(this), this._timeout);
             }
+            this.emit("unsubscribed");
         }
     }
     _onTimeout () {
@@ -54,6 +55,13 @@ class Observer extends Emitter {
     }
     count () {
         return this._subscribersCount;
+    }
+    stop () {
+        this._tid !== -1 && clearTimeout(this._tid);
+        this._tid = -1;
+
+        this._isStarted = false;
+        this.emit("stopped");
     }
 
 }

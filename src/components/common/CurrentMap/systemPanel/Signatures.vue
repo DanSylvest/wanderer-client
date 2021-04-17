@@ -1,6 +1,6 @@
 <template>
     <div class="wd fs wd-signatures">
-        <div v-if="enable === true && loaded" class="wd fs">
+        <div v-if="enable && loadedSolarSystem" class="wd fs">
             <div v-if="signatures.length > 0" class="wd fs">
                 <wd-table :rows="filteredSignatures" selectable @selected="onSelect">
                     <template v-slot:toolbar>
@@ -95,34 +95,20 @@
     import cookie from "../../../../js/env/cookie.js";
     import helper from "../../../../js/utils/helper.js";
     import cache from "../../../../js/cache/cache.js";
-    import SpamFilter from "../../../../js/env/spamFilter.js";
     import WdTable from "../../../ui/Table/WdTable.vue";
     import TableHeaderCell from "../../../ui/Table/TableHeaderCell.vue";
     import TableCell from "../../../ui/Table/TableCell.vue";
+    import SolarSystemMixin from "../../../mixins/solarSystem.js";
 
 
     export default {
         name: "Signatures",
-        props: {
-            solarSystemId: {
-                type: String,
-                default: ""
-            },
-            mapId: {
-                type: String,
-                default: ""
-            }
-        },
+        mixins: [SolarSystemMixin],
         components: { TimeLeft, WdTable, TableHeaderCell, TableCell },
         data: function () {
             return {
-                loaded: false,
-                lSolarSystemId: this.solarSystemId,
-                lMapId: this.mapId,
-
                 showFilterDialog: false,
                 filterTypes: [],
-
                 saveSigsDialogActive: false,
                 selected: [],
                 enable: true
@@ -130,9 +116,6 @@
         },
         mounted: function () {
             this._pasteHandler = this.onPaste.bind(this);
-
-            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
-            this.isValidAttrs() && this._attrUpdatedSF.call();
 
             this._tidHI = -1;
 
@@ -148,22 +131,8 @@
 
             this._rtid !== -1 && clearTimeout(this._rtid);
             this._rtid = -1;
-            this.systemId = null;
             this._so.destructor();
             this._to.destructor()
-
-            this._attrUpdatedSF.stop();
-            this.unsubscribeSolarSystem();
-        },
-        watch : {
-            solarSystemId (val) {
-                this.lSolarSystemId = val;
-                this._attrUpdatedSF.call();
-            },
-            mapId (val) {
-                this.lMapId = val;
-                this._attrUpdatedSF.call();
-            }
         },
         computed: {
             filteredSignatures () {
@@ -178,12 +147,22 @@
                 });
 
                 return filtered;
-            },
-            signatures () {
-                return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].signatures
             }
         },
         methods: {
+            watchAttrsUpdatedSolarSystem () {
+                this.destroyHiddenInput();
+
+                SolarSystemMixin.methods.watchAttrsUpdatedSolarSystem.call(this);
+            },
+            onLoadedSolarSystem () {
+                SolarSystemMixin.methods.onLoadedSolarSystem.call(this);
+
+                this._hiddenInputLoop();
+            },
+            _getStaticSolarSystemProvider () {
+                return cache.solarSystems.list.get(this.lSolarSystemId);
+            },
             _getMapSolarSystemProvider () {
                 return cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId);
             },
@@ -208,42 +187,6 @@
             hasHiddenInput () {
                 return !!this.$el.querySelector(".c-hidden-input");
             },
-            _watchAttrsUpdated () {
-                this.destroyHiddenInput();
-                if(this.isValidAttrs()) {
-                    this.unsubscribeSolarSystem();
-                    this.subscribeSolarSystem();
-                }
-            },
-            isValidAttrs () {
-                return this.lSolarSystemId !== "" && this.lMapId !== "";
-            },
-            subscribeSolarSystem() {
-                this.loaded = false;
-                this.solarSystemInfo = cache.solarSystems.touch(this.lSolarSystemId);
-
-                let mapSolarSystemProvider = this._getMapSolarSystemProvider();
-                this._mapSolarSystemProviderUnsubscribe = mapSolarSystemProvider.subscribe();
-
-                Promise.all([
-                    this.solarSystemInfo.item.readyPromise(),
-                    mapSolarSystemProvider.readyPromise(),
-                ])
-                    .then(this._onLoaded.bind(this));
-            },
-            unsubscribeSolarSystem() {
-                this.solarSystemInfo && this.solarSystemInfo.unsubscribe();
-                this.solarSystemInfo && delete this.solarSystemInfo;
-
-                if(exists(this._mapSolarSystemProviderUnsubscribe)) {
-                    this._mapSolarSystemProviderUnsubscribe();
-                    delete this._mapSolarSystemProviderUnsubscribe;
-                }
-            },
-            _onLoaded () {
-                this.loaded = true;
-                this._hiddenInputLoop();
-            },
             _hiddenInputLoop () {
                 this._tidHI = -1;
 
@@ -251,7 +194,7 @@
                     this.createHiddenInput();
                     this.focus();
                 } else {
-                    this._tidHI = setTimeout(this._onLoaded.bind(this), 10);
+                    this._tidHI = setTimeout(this.onLoadedSolarSystem.bind(this), 10);
                 }
             },
             _loadFilterData () {

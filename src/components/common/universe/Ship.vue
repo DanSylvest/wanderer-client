@@ -1,75 +1,16 @@
 <template>
-    <div v-if="loaded" class="wd-ship-type">
-        <span class="wd-ship-type__name">{{info.typeName}}</span>&nbsp;
-        <span class="wd-ship-type__group">{{info.groupName}}</span>
+    <div v-if="loadedShip" class="wd-ship-type">
+        <span class="wd-ship-type__name">{{shipInfo.typeName}}</span>&nbsp;
+        <span class="wd-ship-type__group">{{shipInfo.groupName}}</span>
     </div>
 </template>
 
 <script>
-    import cache from "../../../js/cache/cache.js";
-    import SpamFilter from "../../../js/env/spamFilter.js";
-    import exists from "../../../js/env/tools/exists.js";
+    import ShipMixin from "../../mixins/ship.js";
 
     export default {
-        name: "CharacterCard",
-        components: {},
-        props: {
-            shipId: {
-                type: Number,
-                default: null
-            }
-        },
-        data: function () {
-            return {
-                lShipId: this.shipId,
-                loaded: false,
-            }
-        },
-        beforeMount() {
-        },
-        beforeDestroy () {
-            this.unsubscribeData();
-        },
-        mounted() {
-            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
-            this._attrUpdatedSF.call();
-        },
-        watch: {
-            shipId (val) {
-                this.lShipId = val;
-                this._attrUpdatedSF.call();
-            }
-        },
-        computed: {
-            info () {
-                return this.$store.state.ships[this.lShipId].info;
-            }
-        },
-        methods: {
-            isValidAttrs () {
-                return exists(this.lShipId);
-            },
-            _watchAttrsUpdated () {
-                if(this.isValidAttrs()) {
-                    this.unsubscribeData();
-                    this.subscribeData();
-                }
-            },
-            unsubscribeData() {
-                if (exists(this._unsubscriberShipInfo)) {
-                    this._unsubscriberShipInfo();
-                    delete this._unsubscriberShipInfo;
-                }
-            },
-            subscribeData() {
-                this._unsubscriberShipInfo = cache.ships.list.get(this.lShipId).info.subscribe();
-                this.loaded = false;
-                cache.ships.list.get(this.lShipId).info.readyPromise()
-                    .then(() => {
-                        this.loaded = true
-                    });
-            },
-        }
+        name: "Ship",
+        mixins: [ShipMixin],
     }
 </script>
 

@@ -22,7 +22,7 @@ class System extends Emitter {
         let mapSolarSystem = this._getMapSolarSystemProvider();
 
         return Promise.all([
-            this._staticSolarSystem.item.readyPromise(),
+            this._getStaticSolarSystemProvider().readyPromise(),
             mapSolarSystem.readyPromise(),
         ])
     }
@@ -38,24 +38,23 @@ class System extends Emitter {
     }
 
     initProviders () {
-        this._staticSolarSystem = cache.solarSystems.touch(this.id);
-        this._handlerStaticDataChanged = this._staticSolarSystem.item.on("changed", this._onStaticDataChanged.bind(this));
+        this._staticDataUnsubscribe = this._getStaticSolarSystemProvider().subscribe();
+        this._handlerStaticDataChanged = this._getStaticSolarSystemProvider().on("changedEvent", this._onStaticDataChanged.bind(this));
 
         let mapSolarSystem = this._getMapSolarSystemProvider();
         this._unsubscribeMapSolarSystem = mapSolarSystem.subscribe();
         this._handlerDynamicDataChanged = mapSolarSystem.on("changedEvent", this._onDynamicDataChanged.bind(this));
-
-        // this._map = cache.maps.touch(this.mapId);
-        // this._mapSolarSystem = this._map.item.solarSystems.touch(this.id);
-        //
-        // this._handlerDynamicDataChanged = this._mapSolarSystem.item.on("changed", this._onDynamicDataChanged.bind(this));
     }
 
     deinitProviders () {
-        if(this._staticSolarSystem)  {
-            this._staticSolarSystem.item.off(this._handlerStaticDataChanged);
-            this._staticSolarSystem.unsubscribe();
-            this._staticSolarSystem = null;
+         if(exists(this._handlerStaticDataChanged)) {
+            this._getStaticSolarSystemProvider().off(this._handlerStaticDataChanged);
+            delete this._handlerStaticDataChanged;
+        }
+
+        if(exists(this._staticDataUnsubscribe)) {
+            this._staticDataUnsubscribe();
+            delete this._staticDataUnsubscribe;
         }
 
         let mapSolarSystem = this._getMapSolarSystemProvider();
@@ -68,9 +67,6 @@ class System extends Emitter {
             this._unsubscribeMapSolarSystem();
             delete this._unsubscribeMapSolarSystem;
         }
-
-        // this._map && this._map.unsubscribe();
-        // delete this._map;
     }
 
     _onDynamicDataChanged (/*data*/) {
@@ -82,10 +78,11 @@ class System extends Emitter {
             this.map.updateMarker(this.markerId, this._data);
     }
 
-    _onStaticDataChanged (event) {
-        this._data = extend(this._data, event);
+    _onStaticDataChanged (/*event*/) {
+        // this._data = extend(this._data, event);
 
         // this._data = extend(this._data, newData);
+        this._data = extend(this._data, this._getStaticSolarSystemProvider().data());
 
         if(exists(this.markerId))
             this.map.updateMarker(this.markerId, this._data);
@@ -102,6 +99,10 @@ class System extends Emitter {
 
     _getMapSolarSystemProvider () {
         return cache.maps.list.get(this.mapId).solarSystems.list.get(this.id);
+    }
+
+    _getStaticSolarSystemProvider () {
+        return cache.solarSystems.list.get(this.id);
     }
 }
 

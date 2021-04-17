@@ -3,7 +3,7 @@
  */
 
 import ServerStatus from "./providers/serverStatus.js";
-import SolarSystems from "./providers/solarSystems.js";
+import SolarSystems from "./providers/universe/solarSystems.js";
 import Maps from "./providers/maps/maps.js";
 import Characters from "./providers/characters/characters.js";
 import Ships from "./providers/universe/ships.js";

@@ -19,7 +19,7 @@ class MultipleProvider extends BaseProvider {
             get() {
                 return this._subProviders[id].instance;
             }
-        })
+        });
     }
 
     _onSubProviderRegistered(id) {

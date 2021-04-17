@@ -39,26 +39,14 @@
     import api from "../../../../js/api.js";
     import helper from "../../../../js/utils/helper.js";
     import environment from "../../../../js/core/map/environment.js";
-    import cache from "../../../../js/cache/cache.js";
-    import SpamFilter from "../../../../js/env/spamFilter.js";
-    import exists from "../../../../js/env/tools/exists.js";
+    import ChainMixin from "../../../mixins/chain.js";
 
     let uuidCounter = 0;
     export default {
         name: "ChainContextMenu",
-        components: {
-            ContextMenu,
-            ContextMenuItem,
-        },
+        mixins: [ChainMixin],
+        components: {ContextMenu,ContextMenuItem},
         props: {
-            mapId: {
-                type: String,
-                default: null
-            },
-            chainId: {
-                type: String,
-                default: null
-            },
             offset: {
                 type: Object,
                 default: () => ({x: 0, y: 0})
@@ -72,43 +60,25 @@
             return {
                 lShow: this.show,
                 lOffset: this.offset,
-                lMapId: this.mapId,
-                lChainId: this.chainId,
-                loaded: false
             }
         },
         watch: {
             show (val) {
                 this.lShow = val;
-            },
-            mapId (val) {
-                this.lMapId = val;
-                this._attrUpdatedSF.call();
-            },
-            chainId (val) {
-                this.lChainId = val;
-                this._attrUpdatedSF.call();
+
+                if(!this.lShow) {
+                    ChainMixin.methods.unsubscribeDataChain.call(this);
+                } else {
+                    this.chainData.delayedAttrUpdate.call();
+                }
             },
             offset (val) {
                 this.lOffset = val;
             }
         },
-        beforeMount() {
-        },
-        beforeDestroy() {
-            this._attrUpdatedSF.stop();
-            this.unsubscribeChain();
-        },
-        mounted() {
-            this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
-            this.isValidAttrs() && this._attrUpdatedSF.call();
-        },
         computed : {
-            chainInfo () {
-                return this.$store.state.maps[this.lMapId].chains[this.lChainId];
-            },
             timeStatuses  () {
-                if(!this.loaded) return [];
+                if(!this.loadedChain) return [];
 
                 return environment.timeStatuses.map(x => {
                     x.active = x.id === this.chainInfo.timeStatus;
@@ -117,7 +87,7 @@
                 });
             },
             massStatuses () {
-                if(!this.loaded) return [];
+                if(!this.loadedChain) return [];
 
                 return environment.massStatuses.map(x => {
                     x.active = x.id === this.chainInfo.massStatus;
@@ -126,7 +96,7 @@
                 });
             },
             shipSizeStatuses () {
-                if(!this.loaded) return [];
+                if(!this.loadedChain) return [];
 
                 return environment.shipSizeStatuses.map(x => {
                     x.active = x.id === this.chainInfo.shipSizeType;
@@ -136,35 +106,6 @@
             }
         },
         methods: {
-            _getMapChainProvider() {
-                return cache.maps.list.get(this.lMapId).chains.list.get(this.lChainId);
-            },
-            _watchAttrsUpdated () {
-                this.loaded = false;
-
-                if(this.isValidAttrs()) {
-                    this.unsubscribeChain();
-                    this.subscribeChain();
-                }
-            },
-            _onLoaded () {
-                this.loaded = true;
-            },
-            subscribeChain () {
-                let mapChain = this._getMapChainProvider();
-                this._unsubscribeMapChain = mapChain.subscribe();
-
-                Promise.all([
-                    mapChain.readyPromise(),
-                ])
-                    .then(this._onLoaded.bind(this));
-            },
-            unsubscribeChain () {
-                if (exists(this._unsubscribeMapChain)) {
-                    this._unsubscribeMapChain();
-                    delete this._unsubscribeMapChain;
-                }
-            },
             onTimeStateChange(state) {
                 api.eve.map.link.update(this.mapId, this.chainId, {timeStatus: state})
                     .then(
@@ -207,10 +148,7 @@
             },
             onClosedLinkContext () {
                 this.$emit("update:show", false);
-            },
-            isValidAttrs () {
-                return !!this.lChainId && !!this.lMapId;
-            },
+            }
         }
     }
 </script>

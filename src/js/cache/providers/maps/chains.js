@@ -68,6 +68,20 @@ class Chain extends SubscriptionProvider {
             data: extend({}, this._data)
         };
     }
+
+    markAsRemoved () {
+        this._markedAsRemoved = true;
+
+        if(this.observer.count() === 0){
+            this.observer.stop();
+        }
+    }
+
+    _onObserverUnsubscribed () {
+        if(this._markedAsRemoved && this.observer.count() === 0) {
+            this.observer.stop();
+        }
+    }
 }
 
 class ChainsListProvider extends ListProvider {
@@ -92,6 +106,10 @@ class ChainsListProvider extends ListProvider {
     get(id) {
         return super.get(id);
     }
+
+    markAsRemoved (id) {
+        this.has(id) && this.get(id).markAsRemoved();
+    }
 }
 
 class ChainsExistenceProvider extends SubscriptionProvider {
@@ -110,17 +128,21 @@ class ChainsExistenceProvider extends SubscriptionProvider {
         super.destructor();
     }
 
+    reset () {
+        super.reset();
+        this._data = [];
+    }
+
     _eventProcess(event) {
         switch (event.type) {
             case "bulk":
                 this._data = this._data.concat(event.list);
-                this._readyPromise.resolve();
                 break;
             case "add":
-                this._data.push(event.solarSystemId);
+                this._data.push(event.chainId);
                 break;
             case "removed":
-                this._data.removeByValue(event.systemId);
+                this._data.removeByValue(event.chainId);
                 break;
         }
 
@@ -152,6 +174,27 @@ class Chains extends MultipleProvider {
 
         this.addProvider("list", () => new ChainsListProvider(mapId));
         this.addProvider("existence", () => new ChainsExistenceProvider(mapId));
+
+        setTimeout(() => this.watchingForRemove(), 0);
+    }
+
+    watchingForRemove () {
+        this._unsubscribeExistence = this.existence.subscribe();
+        this.existence.on("changedEvent", this._onChanged.bind(this));
+        this.list.on("unsubscribed", this._onListUnsubscribed.bind(this))
+    }
+
+    _onChanged (event) {
+        if(event.type === "removed") {
+            this.list.markAsRemoved(event.chainId);
+        }
+    }
+
+    _onListUnsubscribed () {
+        if(this.existence.observer.count() === 1) {
+            this._unsubscribeExistence();
+            delete this._unsubscribeExistence;
+        }
     }
 }
 

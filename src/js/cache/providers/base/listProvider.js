@@ -34,6 +34,10 @@ class ListProvider extends BaseProvider {
         return this._items[id].instance;
     }
 
+    has (id) {
+        return !!this._items[id];
+    }
+
     // eslint-disable-next-line no-unused-vars
     _createModel(id) {
         throw `Error - _createModel should be overlapped`;

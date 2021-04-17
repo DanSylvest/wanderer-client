@@ -114,7 +114,7 @@
                     v-for="item in systemsTooltipDisplayed"
                     class="wd-layout-secondary"
                 >
-                    <system-card :c-solar-system-id="item.systemId" :c-map-id="item.mapId" :exists-on-map="true"/>
+                    <system-card :solar-system-id="item.systemId" :map-id="item.mapId" :exists-on-map="true"/>
                 </tooltip>
 
                 <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
