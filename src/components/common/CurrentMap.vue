@@ -11,7 +11,7 @@
                             :style="getCharImageUrlStyle(item.charId)"
                             :key="item.charId"
                         >
-                            <tooltip placement="bottom" :customPosition="false" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >
+                            <tooltip placement="bottom" :customPosition="false" class="wd wd-layout-secondary md-elevation-2" >
 <!--                                <md-tooltip md-direction="bottom" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >-->
                                     <character-card :map-id="selectedMap" :character-id="item.charId" />
 <!--                                </md-tooltip>-->

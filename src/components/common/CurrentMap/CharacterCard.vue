@@ -1,21 +1,27 @@
 <template>
-    <div class="wd-character-card" v-if="loadedCharacter">
+    <div class="wd-character-card">
+        <template v-if="loadedCharacter">
+            <div class="wd-character-avatar f-width f-height wd-bg-default wd relative" :class="{'character-online':online}" :style="getCharImageUrlStyle(this.lCharacterId)">
 
-        <div class="wd-character-avatar f-width f-height wd-bg-default wd relative" :class="{'character-online':online}" :style="getCharImageUrlStyle(this.lCharacterId)">
-
-        </div>
-        <div class="wd-character-content">
-            <system-card :map-id="lMapId" :solar-system-id="location" />
-            <div>
-                <span class="wd-character-name">{{info.name}}</span>&nbsp;
-                <span class="wd-character-corporation" v-if="hasCorporation">{{info.corporation}}</span>&nbsp;
-                <span class="wd-character-alliance" v-if="hasAlliance">{{info.alliance}}</span>
             </div>
+            <div class="wd-character-content">
+                <system-card :map-id="lMapId" :solar-system-id="location" />
+                <div>
+                    <span class="wd-character-name">{{info.name}}</span>&nbsp;
+                    <span class="wd-character-corporation" v-if="hasCorporation">{{info.corporation}}</span>&nbsp;
+                    <span class="wd-character-alliance" v-if="hasAlliance">{{info.alliance}}</span>
+                </div>
 
-            <div>
-                <ship :ship-id="info.ship"/>
+                <div>
+                    <ship :ship-id="info.ship"/>
+                </div>
             </div>
-        </div>
+        </template>
+        <template v-if="!loadedCharacter">
+            <div class="wd-character-card__loader">
+                <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="60" md-mode="indeterminate"></md-progress-spinner>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -37,6 +43,9 @@
             }
         },
         methods: {
+            // _onLoadedCharacter () {
+            //     setTimeout(() => this.loadedCharacter = true, 1500)
+            // },
             getCharImageUrlStyle(characterId) {
                 return {"background-image": `url("https://images.evetech.net/characters/${characterId}/portrait")`};
             }
@@ -70,6 +79,14 @@
         padding: 10px 5px;
         box-sizing: border-box;
         min-width: 100px;
+
+        & > .wd-character-card__loader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 290px;
+            height: 110px;
+        }
 
         & > *:not(:last-child) {
             margin-right: 10px;
