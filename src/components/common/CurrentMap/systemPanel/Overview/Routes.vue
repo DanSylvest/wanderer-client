@@ -12,8 +12,19 @@
                     </div>
 
                     <div class="md-toolbar-section-end">
+                        <md-button class="md-icon-button md-dense" @click="reload">
+                            <md-icon>refresh</md-icon>
+                            <md-tooltip>Refresh</md-tooltip>
+                        </md-button>
+
+                        <md-button class="md-icon-button md-dense" @click="onClickRoutesSettings">
+                            <md-icon>construction</md-icon>
+                            <md-tooltip>Settings</md-tooltip>
+                        </md-button>
+
                         <md-button class="md-icon-button md-dense" @click="onClickAddHubSystem">
                             <md-icon>add_circle_outline</md-icon>
+                            <md-tooltip>Add hub</md-tooltip>
                         </md-button>
                     </div>
                 </template>
@@ -88,7 +99,8 @@
                 </template>
             </wd-table>
         </md-card>
-        <system-add-dialog :activated.sync="isSystemAddDialogActivated" @system-selected="onSystemSelected"></system-add-dialog>
+        <system-add-dialog :activated.sync="isSystemAddDialogActivated" @system-selected="onSystemSelected" />
+        <routes-settings :activated.sync="isSettingsDialogActivated" :settings="routeSettings" @edited="onRoutesEdited"/>
     </div>
 </template>
 
@@ -108,6 +120,8 @@
     import TableCell from "../../../../ui/Table/TableCell.vue";
     import CustomPromise from "../../../../../js/env/promise.js";
     import extend from "../../../../../js/env/tools/extend.js";
+    import RoutesSettings from "./Routes/RoutesSettings.vue";
+    import cookie from "../../../../../js/env/cookie.js";
 
     export default {
         name: "Routes",
@@ -118,6 +132,7 @@
             WdTable,
             TableHeaderCell,
             TableCell,
+            RoutesSettings,
         },
         props : {
             mapId: {
@@ -132,11 +147,15 @@
         data: function () {
             return {
                 isSystemAddDialogActivated: false,
+                isSettingsDialogActivated: false,
                 lMapId: this.mapId,
                 lSolarSystemId: this.solarSystemId,
                 routes: [],
                 loading: true,
-                subscribed: false
+                subscribed: false,
+                routeSettings: {...environment.defaultRouteSettings},
+
+                pathType: "shortest"
             }
         },
         mounted() {
@@ -177,6 +196,7 @@
                 if(this.isValidAttrs()) {
                     this.unsubscribeAll();
                     this.subscribeAll();
+                    this.loadRoutesSettings();
                 }
             },
             subscribeAll() {
@@ -257,7 +277,7 @@
             },
             _loadRoutes (hubs) {
                 let pr = new CustomPromise();
-                api.eve.map.routes.getRoutes(this.lMapId, this.lSolarSystemId, hubs)
+                api.eve.map.routes.getRoutes(this.lMapId, this.lSolarSystemId, hubs, this.routeSettings)
                     .then(
                         event => {
                             this.updateRoutes(event);
@@ -310,12 +330,28 @@
             onClickAddHubSystem () {
                 this.isSystemAddDialogActivated = true;
             },
+            onClickRoutesSettings () {
+                this.isSettingsDialogActivated = true;
+            },
             onSystemSelected (solarSystemId) {
                 api.eve.map.routes.addHub(this.lMapId, solarSystemId)
                     .then(
                         () => this.isSystemAddDialogActivated  = false,
                         err => helper.errorHandler(this, err)
                     );
+            },
+            onRoutesEdited (data) {
+                cookie.set(`routes_settings_${this.lMapId}`, JSON.stringify(data), {expires: 60 * 60 * 24 * 365 * 1000});
+
+                this.routeSettings = data;
+                this.isSettingsDialogActivated = false;
+                this.reload();
+            },
+            loadRoutesSettings () {
+                let savedFilter = cookie.get(`routes_settings_${this.lMapId}`);
+                if(savedFilter) {
+                    this.routeSettings = JSON.parse(savedFilter);
+                }
             },
             onRemoveRoute(destinationSolarSystemId) {
                 api.eve.map.routes.removeHub(this.lMapId, destinationSolarSystemId)

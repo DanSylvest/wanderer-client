@@ -158,3 +158,60 @@ body {
     grid-column-gap: 5px;
     padding: 0 10px;
 }
+
+.wd-scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar:hover {
+
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.0);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        transition: background-color 200ms;
+        width: 8px;
+        border-radius: 3px;
+        background-color: rgba(158, 140, 140, 0.5);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(205, 166, 87, 0.5);
+    }
+}
+
+.wd-flex-horizontal-cc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wd-flex-vertical-cc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.wd-empty-state {
+    .wd-empty-state__content {
+        & > *:not(:last-child) {
+            margin-bottom: 5px;
+        }
+
+        .wd-icon {
+            margin: 10px;
+        }
+
+        .wd-label {
+            font-size: 13pt;
+        }
+    }
+}
+
+

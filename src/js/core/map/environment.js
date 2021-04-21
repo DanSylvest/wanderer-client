@@ -217,5 +217,18 @@ export default {
         {id: "starbase", title: "Show Starbase", value: true},
         {id: "ship", title: "Show Ships", value: true},
         {id: "drone", title: "Show Drones And Charges", value: true},
-    ]
+    ],
+
+    defaultRouteSettings: {
+        pathType: "shortest",
+        includeMassCrit: true,
+        includeEol: true,
+        includeFrig: true,
+        includeCruise: true,
+        avoidWormholes: false,
+        avoidPochven: false,
+        avoidEdencom: false,
+        avoidTriglavian: false,
+        includeThera: true,
+    }
 }

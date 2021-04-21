@@ -12,9 +12,7 @@
                             :key="item.charId"
                         >
                             <tooltip placement="bottom" :customPosition="false" class="wd wd-layout-secondary md-elevation-2" >
-<!--                                <md-tooltip md-direction="bottom" class="wd initial-line-height initial-height wd-layout-secondary md-elevation-2" >-->
-                                    <character-card :map-id="selectedMap" :character-id="item.charId" />
-<!--                                </md-tooltip>-->
+                                <character-card :map-id="selectedMap" :character-id="item.charId" />
                             </tooltip>
                         </div>
                     </div>
@@ -88,8 +86,6 @@
             </div>
 
             <div style="height: 0">
-
-
                 <!-- CHAIN CONTEXT MENU -->
                 <chain-context-menu :show.sync="linkCMActive" :map-id="selectedMap" :chain-id="currentChainId" :offset="currentChainOffset"/>
 

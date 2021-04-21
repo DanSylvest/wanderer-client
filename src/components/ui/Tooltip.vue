@@ -320,20 +320,13 @@
         align-items: center;
         pointer-events: none;
 
-        /*border: 1px solid $border-color-primary-4;
-        background: $bg-3;
-        overflow: hidden;
-        border-radius: 3px;
-        box-sizing: border-box;*/
-
-
         width: 0;
         height: 0;
-        transition: width 150ms, height 150ms;
+        transition: width 450ms, height 250ms;
 
         &.transition-left {
             left: 0;
-            transition: left 150ms;
+            transition: left 250ms;
         }
 
 

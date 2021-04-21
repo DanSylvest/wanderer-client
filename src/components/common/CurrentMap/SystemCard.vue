@@ -1,8 +1,9 @@
 <template>
     <div class="wd-system-card">
-        <div v-show="!loadedSolarSystem" >
+        <div v-show="!loadedSolarSystem" class="wd-loader">
             <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="30" md-mode="indeterminate"></md-progress-spinner>
         </div>
+        <transition name="fade">
         <div v-show="loadedSolarSystem">
             <div v-if="loadedSolarSystem">
             <div class="wd-system-card__header">
@@ -26,6 +27,7 @@
             </template>
             </div>
         </div>
+        </transition>
     </div>
 </template>
 
@@ -42,18 +44,17 @@
             isLoadCharData: {
                 type: Boolean,
                 default: true
-            },
-            existsOnMap: {
-                type: Boolean,
-                default: false
             }
         },
         data: function () {
             return {
-                lExistsOnMap: this.existsOnMap,
-                isLoadDynamicSSData: this.lExistsOnMap,
                 characters: []
             }
+        },
+        methods: {
+            // onLoadedSolarSystem () {
+            //     setTimeout(() => this.loadedSolarSystem = true, 1115000);
+            // },
         },
         computed : {
             statusClass () {
@@ -135,6 +136,14 @@
         padding: 5px 10px;
         box-sizing: border-box;
         min-width: 100px;
+
+        & > .wd-loader {
+            width: 150px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         & {
             &__header {

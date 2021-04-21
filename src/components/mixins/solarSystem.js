@@ -11,17 +11,24 @@ const SolarSystemMixin = {
         mapId: {
             type: String,
             default: null
+        },
+        existsOnMap: {
+            type: Boolean,
+            default: false
         }
     },
     data: function () {
         return {
+            lExistsOnMap: this.existsOnMap,
             loadedSolarSystem: false,
             lSolarSystemId: this.solarSystemId,
-            lMapId: this.mapId,
-            isLoadDynamicSSData: true
+            lMapId: this.mapId
         }
     },
     watch: {
+        lExistsOnMap (val) {
+            this.lExistsOnMap = val;
+        },
         solarSystemId (val) {
             this.lSolarSystemId = val;
             this.ssData.delayedAttrUpdate.call();
@@ -69,7 +76,13 @@ const destroyDelayedUpdater = function () {
 }
 
 const isValidAttrs = function () {
-    return exists(this.lSolarSystemId) && this.lSolarSystemId !== "" && exists(this.lMapId) && this.lMapId !== "";
+    let valid = exists(this.lSolarSystemId) && this.lSolarSystemId !== "";
+
+    if(valid && this.lExistsOnMap) {
+        valid = exists(this.lMapId) && this.lMapId !== "";
+    }
+
+    return valid;
 }
 
 const unsubscribeData = function () {
@@ -78,7 +91,7 @@ const unsubscribeData = function () {
         delete this.ssData.staticDataUnsubscribe;
     }
 
-    if(this.isLoadDynamicSSData && exists(this.ssData.dynamicDataUnsubscribe)) {
+    if(this.lExistsOnMap && exists(this.ssData.dynamicDataUnsubscribe)) {
         this.ssData.dynamicDataUnsubscribe();
         delete this.ssData.dynamicDataUnsubscribe;
     }
@@ -88,12 +101,12 @@ const subscribeData = function () {
 
     this.ssData.staticDataUnsubscribe = cache.solarSystems.list.get(this.lSolarSystemId).subscribe();
 
-    if(this.isLoadDynamicSSData)
+    if(this.lExistsOnMap)
         this.ssData.dynamicDataUnsubscribe = cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId).subscribe();
 
     Promise.all([
         cache.solarSystems.list.get(this.lSolarSystemId).readyPromise(),
-        this.isLoadDynamicSSData && cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId).readyPromise(),
+        this.lExistsOnMap && cache.maps.list.get(this.lMapId).solarSystems.list.get(this.lSolarSystemId).readyPromise(),
     ])
         .then(this.onLoadedSolarSystem.bind(this));
 }

@@ -4,7 +4,7 @@
 
 import CustomPromise from "../../../../env/promise";
 
-export default function (mapId, solarSystemId, hubs) {
+export default function (mapId, solarSystemId, hubs, settings) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -13,9 +13,10 @@ export default function (mapId, solarSystemId, hubs) {
     }.bind(this));
 
     this.send(id, ["api", "eve", "map", "routes", "getRoutes"], {
-        mapId: mapId,
-        solarSystemId: solarSystemId,
-        hubs: hubs
+        mapId,
+        solarSystemId,
+        hubs,
+        settings
     });
 
     return p.native;

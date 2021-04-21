@@ -7,24 +7,15 @@ const CharacterMixin = {
         characterId: {
             type: String,
             default: null
-        },
-        mapId: {
-            type: String,
-            default: null
         }
     },
     data: function () {
         return {
             lCharacterId: this.characterId,
-            lMapId: this.mapId,
             loadedCharacter: false,
         }
     },
     watch: {
-        mapId (val) {
-            this.lMapId = val;
-            this.characterData.delayedAttrUpdate.call();
-        },
         characterId (val) {
             this.lCharacterId = val;
             this.characterData.delayedAttrUpdate.call();
@@ -77,7 +68,7 @@ const destroyDelayedUpdater = function () {
 }
 
 const isValidAttrs = function () {
-    return exists(this.lCharacterId) && this.lCharacterId !== "" && exists(this.lMapId) && this.lMapId !== "";
+    return exists(this.lCharacterId) && this.lCharacterId !== "";
 }
 
 const watchAttrsUpdated = function () {

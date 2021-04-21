@@ -39,9 +39,9 @@
             <md-dialog-actions>
                 <md-button class="md-primary md-accent" @click="close">Close</md-button>
                 <md-button
-                        class="md-primary md-raised"
-                        @click="onEditSubmit"
-                        :disabled="formButtonDisabled">Confirm</md-button>
+                    class="md-primary md-raised"
+                    @click="onEditSubmit"
+                    :disabled="formButtonDisabled">Confirm</md-button>
             </md-dialog-actions>
         </md-dialog>
     </div>
