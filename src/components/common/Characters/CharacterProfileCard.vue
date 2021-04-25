@@ -7,7 +7,7 @@
         </template>
 
         <transition name="fade">
-            <div class="wd-character-profile-card__content" v-if="loadedCharacter">
+            <div class="wd-character-profile-card__content wd flex-col-sb" v-if="loadedCharacter">
                 <div class="wd-content">
                     <div class="wd-character-avatar f-width f-height wd-bg-default wd relative" :class="{'character-online':online}" :style="getCharImageUrlStyle(this.lCharacterId)">
 
@@ -21,16 +21,16 @@
                     </div>
                 </div>
                 <div class="wd-toolbar">
-                    <div class="md-toolbar-section-end">
-                        <md-button class="md-icon-button md-dense">
-                            <md-icon>refresh</md-icon>
+                    <div class="md-toolbar-section-end wd-list-margins">
+                        <div class="wd-icon-button">
                             <md-tooltip>Refresh</md-tooltip>
-                        </md-button>
+                            <md-icon>refresh</md-icon>
+                        </div>
 
-                        <md-button class="md-icon-button md-dense" @click="onRemoveClick">
-                            <md-icon>delete</md-icon>
+                        <div class="wd-icon-button" @click="onRemoveClick">
                             <md-tooltip>Remove</md-tooltip>
-                        </md-button>
+                            <md-icon>delete</md-icon>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,27 +115,25 @@
 
         .wd-character-profile-card__content {
             user-select: none;
-
-
             padding: 10px 10px;
 
             width: 100%;
             height: 100%;
 
             & > .wd-toolbar {
-                .md-icon-button.md-dense {
+                /*.md-icon-button.md-dense {
                     width: 30px;
                     min-width: 30px;
                     height: 30px;
-                }
+                }*/
 
-                i.md-icon {
+              /*  i.md-icon {
                     font-size: 14pt !important;
                     color: $fg-primary !important;
                     width: 25px;
                     min-width: 25px;
                     height: 25px;
-                }
+                }*/
             }
 
             & > .wd-content {

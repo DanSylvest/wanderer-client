@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import Notifications from 'vue-notification'
+import Notifications from 'vue-notification' /** https://www.npmjs.com/package/vue-notification */
 import VueMaterial from 'vue-material'
 import './css/main.scss'
 import "./js/env/tools/standardTypeExtend"

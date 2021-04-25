@@ -1,20 +1,6 @@
 <template>
     <div class="page-container wd fs">
         <App>
-
-<!--            <template v-slot:AppToolbar>-->
-<!--                <AppToolbar>-->
-<!--                    <div class="wd-app-toolbar-content">-->
-<!--                        <div>-->
-<!--                            TQ status is-->
-<!--                            <span :class="classColor">-->
-<!--                                {{$store.state.eveServerStatus.online ? "online" : "offline"}}-->
-<!--                            </span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </AppToolbar>-->
-<!--            </template>-->
-
             <template v-slot:AppLeftMenu>
                 <AppMenu>
                     <AppMenuItem icon="my_location" title="Map" @click="onCurrentMapClick" :active="currentMapButtonIsActive"></AppMenuItem>
@@ -168,8 +154,19 @@
 
     let setItem = function (_itemName) {
         let urlInfo = query.searchObject();
-        urlInfo.item = _itemName;
-        window.history.replaceState(null, null, printf("?%s", query.toString(urlInfo)));
+
+        let out = {
+            item: _itemName
+        }
+
+        if(urlInfo.page) {
+            out.page = urlInfo.page;
+        }
+
+        if(urlInfo.id && _itemName === "currentMap")
+            out.id = urlInfo.id;
+
+        window.history.replaceState(null, null, printf("?%s", query.toString(out)));
     };
 
     let _getSubPage = function (){

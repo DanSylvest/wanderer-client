@@ -288,6 +288,11 @@
                 return pr.native;
             },
             _initMap: function (_mapId) {
+                let queryData = query.searchObject();
+                queryData.id = _mapId;
+                window.history.replaceState(null, null, `?${query.toString(queryData)}`);
+
+
                 this.initMapTid !== -1 && clearTimeout(this.initMapTid);
                 this.initMapTid = setTimeout(() => {
                     this.initMapTid = -1;
@@ -533,7 +538,7 @@
                 this.showMapEmpty = this.allowedMaps.length === 0;
 
                 let currentMapId = null;
-                let queryMapId = query.searchObject().mapId;
+                let queryMapId = query.searchObject().id;
                 let cookieMapId = cookie.get("selectedMap");
 
                 if(exists(queryMapId)) {

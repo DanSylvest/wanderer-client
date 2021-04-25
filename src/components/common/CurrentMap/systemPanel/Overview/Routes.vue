@@ -5,27 +5,49 @@
                 <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="50" md-mode="indeterminate"></md-progress-spinner>
             </div>
 
-            <wd-table :rows="processedRoutes" :enable-borders="true" v-if="!loading" sort-col="jumps" sort-order="ascend">
+            <wd-table
+                :rows="processedRoutes"
+                :enable-borders="true"
+                v-if="!loading"
+                sort-col="jumps"
+                sort-order="ascend"
+                class="no-cell-hover"
+            >
                 <template v-slot:toolbar>
                     <div class="md-toolbar-section-start">
                         <div>Routes</div>
                     </div>
 
-                    <div class="md-toolbar-section-end">
-                        <md-button class="md-icon-button md-dense" @click="reload">
-                            <md-icon>refresh</md-icon>
+                    <div class="md-toolbar-section-end wd-list-margins-x1">
+                        <div class="wd-icon-button-x1" @click="reload">
                             <md-tooltip>Refresh</md-tooltip>
-                        </md-button>
+                            <md-icon>refresh</md-icon>
+                        </div>
 
-                        <md-button class="md-icon-button md-dense" @click="onClickRoutesSettings">
-                            <md-icon>construction</md-icon>
+                        <div class="wd-icon-button-x1" @click="onClickRoutesSettings">
                             <md-tooltip>Settings</md-tooltip>
-                        </md-button>
+                            <md-icon>construction</md-icon>
+                        </div>
 
-                        <md-button class="md-icon-button md-dense" @click="onClickAddHubSystem">
-                            <md-icon>add_circle_outline</md-icon>
+                        <div class="wd-icon-button-x1" @click="onClickAddHubSystem">
                             <md-tooltip>Add hub</md-tooltip>
-                        </md-button>
+                            <md-icon>add_circle_outline</md-icon>
+                        </div>
+
+<!--                        <md-button class="md-icon-button md-dense" @click="reload">-->
+<!--                            <md-icon>refresh</md-icon>-->
+<!--                            <md-tooltip>Refresh</md-tooltip>-->
+<!--                        </md-button>-->
+
+<!--                        <md-button class="md-icon-button md-dense" @click="onClickRoutesSettings">-->
+<!--                            <md-icon>construction</md-icon>-->
+<!--                            <md-tooltip>Settings</md-tooltip>-->
+<!--                        </md-button>-->
+
+<!--                        <md-button class="md-icon-button md-dense" @click="onClickAddHubSystem">-->
+<!--                            <md-icon>add_circle_outline</md-icon>-->
+<!--                            <md-tooltip>Add hub</md-tooltip>-->
+<!--                        </md-button>-->
                     </div>
                 </template>
 
@@ -54,7 +76,7 @@
                             </template>
                         </div>
                     </table-cell>
-                    <table-cell id="path">
+                    <table-cell id="path" >
                         <div class="wd-route__systems">
                             <template v-if="row.hasConnection">
                                 <div
@@ -78,11 +100,12 @@
                             </template>
                         </div>
                     </table-cell>
-                    <table-cell id="buttonbar">
+                    <table-cell id="buttonbar" class="wd-list-margins wd padding-horizontal-primary">
                         <div class="wd-icon-button" @click="onHighlightRoute(row.systems)">
                             <md-tooltip>Highlight this route at map</md-tooltip>
                             <md-icon>gps_fixed</md-icon>
                         </div>
+
                         <div class="wd-icon-button" @click="onRemoveRoute(row.destination)">
                             <md-tooltip>Remove {{row.name}}</md-tooltip>
                             <md-icon>delete_forever</md-icon>
@@ -435,27 +458,8 @@
         padding: 20px;
     }
 
-    .wd-icon-button {
-        cursor: pointer;
-
-        i {
-            color: $fg-primary-2 !important;
-            width: 10px;
-            height: 10px;
-            min-width: 17px;
-            font-size: 18px !important;
-
-            &:hover {
-                color: $fg-contrast-2 !important;
-            }
-        }
-    }
-
-
     .wd-route {
-        /*.md-card-content:last-of-type {*/
-        /*     padding-bottom: initial !important;*/
-        /*}*/
+        line-height: initial;
 
         .wd-table {
             .wd-table-content {
@@ -476,14 +480,21 @@
                         border-bottom: 1px solid $border-color-primary-5;
                     }
                 }
+
+                &.wd-table-borders > .wd-table-header-cell {
+                    border-bottom: 1px solid $border-color-primary-5;
+                }
+
+                &.wd-table-borders > .wd-table-header-cell:hover {
+                    border-bottom: 1px solid $border-color-primary-2;
+                }
+
             }
         }
 
         .wd-module-card {
             padding: 10px 5px;
         }
-
-        line-height: initial;
 
         .wd-route__destination-type {
             min-width: 10px;

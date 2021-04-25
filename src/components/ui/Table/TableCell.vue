@@ -1,6 +1,9 @@
 <template>
-    <div class="wd-table-cell wd fs">
-        <div class="wd-table-cell__content wd fs">
+    <div class="wd-table-cell wd fs"
+         @click="$emit('clicked', $event)"
+         @contextmenu="$emit('context', $event)"
+    >
+        <div class="wd-table-cell__content wd fs" :style="'justify-content: ' + alignment">
             <slot></slot>
         </div>
     </div>
@@ -14,6 +17,10 @@
                 type: String,
                 default: ""
             },
+            alignment: {
+                type: String,
+                default: "center"
+            }
         },
         data: function () {
             return {
@@ -25,12 +32,15 @@
                 this.lId = val;
             }
         },
+        computed: {
+
+        },
         mounted() {
 
         }
     }
 </script>
 
-<style scoped>
+<style lang="scss">
 
 </style>

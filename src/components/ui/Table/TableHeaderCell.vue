@@ -1,7 +1,9 @@
 <template>
-    <div class="wd-table-header-cell" @click="onSortableClicked">
+    <div class="wd-table-header-cell" :style="'justify-content: ' + alignment" @click="onSortableClicked">
         <template>
-            <slot></slot>
+            <div class="wd-table-header-cell__content" >
+                <slot></slot>
+            </div>
         </template>
 
         <div
@@ -31,6 +33,10 @@
             sort : {
                 type: String,
                 default: "none"
+            },
+            alignment: {
+                type: String,
+                default: "center"
             }
         },
         data: function () {
@@ -78,6 +84,11 @@
 
 <style lang="scss">
     .wd-table-header-cell {
+
+        &:not(.wd-check-header-cell) {
+            padding-left: 10px;
+        }
+
         & > .wd-table-header-cell__sort-button {
             transform: rotateZ(0deg);
             position: absolute;
@@ -95,6 +106,10 @@
             &.descend-sorted {
                 transform: rotateZ(180deg);
             }
+        }
+
+        & > .wd-table-header-cell__content {
+
         }
 
         &:hover {

@@ -9,14 +9,16 @@ import edit from "./edit";
 import allowedGroups from "./allowedGroups";
 import getAllowedCharacters from "./getAllowedCharacters";
 import updateAllowedCharacters from "./updateAllowedCharacters";
+import mapsByGroup from "./mapsByGroup.js";
 
 export default {
-    add: add,
-    list: list,
-    info: info,
-    remove: remove,
-    edit: edit,
-    allowedGroups: allowedGroups,
-    getAllowedCharacters: getAllowedCharacters,
-    updateAllowedCharacters: updateAllowedCharacters
+    add,
+    list,
+    info,
+    remove,
+    edit,
+    allowedGroups,
+    getAllowedCharacters,
+    updateAllowedCharacters,
+    mapsByGroup,
 }

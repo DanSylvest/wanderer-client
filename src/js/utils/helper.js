@@ -15,6 +15,14 @@ const helper = {
             type: 'error'
         });
     },
+    infoMessage (context, message) {
+        context.$notify({
+            group: 'mainNotifications',
+            title: 'Notification',
+            text: message,
+            type: 'success'
+        });
+    },
     dummy (){},
     extractErrorReason (err) {
         if(exists(err.data) && exists(err.data.handledError)) {

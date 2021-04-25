@@ -8,13 +8,13 @@
 
         <div class="wd-outer-table wd fs relative">
             <div class="wd-table-toolbar">
-                <div v-if="hasToolbar" class="">
+                <div v-if="hasToolbar" class="wd fs">
                     <slot name="toolbar"></slot>
                 </div>
             </div>
             <div class="wd fs relative wd-table-content-wrapper">
                 <div class="wd-table-content" :class="{'wd-table-borders': lEnableBorders}" v-show="!isEmptyStateActive">
-                    <table-header-cell v-if="selectable" width-policy="40px" >
+                    <table-header-cell v-if="selectable" width-policy="40px" class="wd-check-header-cell">
                         <md-checkbox v-model="globalSelect" @change="onGlobalCheckboxChanged" />
                     </table-header-cell>
                     <slot name="header"></slot>
@@ -43,7 +43,15 @@
 <script>
     import TableCell from "./TableCell.vue";
     import TableHeaderCell from "./TableHeaderCell.vue";
+    import extend from "../../../js/env/tools/extend.js";
+    import exists from "../../../js/env/tools/exists.js";
 
+    /**
+     * also you can use classes to wd-table
+     *  - no-cell-hover - will turn off row hovering
+     *  - text-centering - will centering text in cells
+     *  - nowrap-cells - will nowrap text in cells
+     */
     export default {
         name: "WdTable",
         components: { TableCell, TableHeaderCell },
@@ -71,6 +79,14 @@
             sortOrder : {
                 type: String,
                 default: "none"
+            },
+            activeRows : {
+                type: Array,
+                default: () => []
+            },
+            suppressContext : {
+                type: Boolean,
+                default: true
             }
         },
         data: function () {
@@ -83,13 +99,16 @@
                 selected: Object.create(null),
                 lastSortedHeader: null,
                 currentSortHeader: this.sortCol,
-                currentSortOrder: this.sortOrder
+                currentSortOrder: this.sortOrder,
+                lActiveRows: this.activeRows
             }
         },
         watch: {
             rows (val) {
+                removeCellsHandlers.call(this);
                 this.lRows = val;
                 this.updateSelectedCheckboxes();
+                this.$nextTick(updateHandlersForSlots.bind(this));
             },
             enableHeaders (val) {
                 this.lEnableHeaders = val;
@@ -102,20 +121,35 @@
             },
             sortOrder (val) {
                 this.currentSortOrder = val;
+            },
+            activeRows (val) {
+                this.lActiveRows = val;
+                updateActive.call(this);
             }
         },
+        updated() {
+            updateActive.call(this);
+        },
         mounted() {
+            this.rowClickHandler = onRowClicked.bind(this);
+            this.rowContextHandler = onRowContext.bind(this);
+
+            getTable(this.$el).classList.add(`wd-table-cols-${countOfColumns.call(this)}`);
+
             this.updateSelectedCheckboxes();
             calculateColumns.call(this);
             upgradeSortableHeaders.call(this);
-
-            getTable(this.$el).classList.add(`wd-table-cols-${countOfColumns.call(this)}`);
+            updateHandlersForSlots.call(this);
+            updateActive.call(this);
 
             this.isDisplay = true;
         },
         computed : {
             hasToolbar() {
                 return !!this.$slots.toolbar;
+            },
+            hasAlternateToolbar() {
+                return !!this.$slots['alternate-toolbar'];
             },
             hasEmptyState() {
                 return !!this.$slots['empty-state'];
@@ -127,7 +161,9 @@
                 return this.selectable && !this.hasToolbar;
             },
             updatedRows () {
-                return this.lRows.map(x => ({...x, __uid : counter++}))
+                return this.lRows.map(x => extend(x, {
+                    __uid : counter++
+                }))
             },
             sortedRows () {
                 if(this.currentSortHeader !== null && this.currentSortHeader !== "none" && this.currentSortOrder !== "none") {
@@ -139,7 +175,7 @@
             },
             hasSelected () {
                 let selected = this.sortedRows.filter(x => this.selected[x.__uid]);
-                return selected.length > 0;
+                return this.hasAlternateToolbar && selected.length > 0;
             }
         },
         methods : {
@@ -174,6 +210,7 @@
     const classes = {
         TABLE: "wd-table-content",
         TABLE_HEADER_CELL: "wd-table-header-cell",
+        TABLE_CELL: "wd-table-cell",
     }
 
     let counter = 0;
@@ -196,6 +233,66 @@
         } else {
             return 0;
         }
+    }
+
+    const updateActive = function () {
+        let colCount = countOfColumns.call(this);
+        let cells = getCells.call(this);
+
+        for (var colIndex = 0; colIndex < cells.length; colIndex++) {
+            if(colIndex % colCount === 0) {
+                cells[colIndex].$el.classList.remove("active");
+            }
+        }
+
+        this.lActiveRows.map(x => {
+            let index = this.sortedRows.indexOf(x);
+            let colIndex = colCount * index;
+            cells[colIndex].$el.classList.add("active");
+        });
+    }
+
+    const removeCellsHandlers = function () {
+        let cells = getCells.call(this);
+        cells.map(x => x.$off("clicked", this.rowClickHandler));
+        cells.map(x => x.$off("context", this.rowContextHandler));
+    }
+
+    const updateHandlersForSlots = function () {
+        let cells = getCells.call(this);
+        cells.map(x => x.$on("clicked", this.rowClickHandler));
+        cells.map(x => x.$on("context", this.rowContextHandler));
+    }
+
+    const onRowClicked = function (event) {
+        let data = getRowData.call(this, event.currentTarget);
+        !!data && this.$emit("row-clicked", {originalEvent: event, data});
+    }
+
+    const onRowContext = function (event) {
+        if(this.suppressContext) {
+            event.preventDefault();
+        }
+
+        let data = getRowData.call(this, event.currentTarget);
+        !!data && this.$emit("row-context", {originalEvent: event, data});
+    }
+
+    const getRowData = function (cellElement) {
+        let cells = getCells.call(this);
+        for (var a = 0; a < cells.length; a++) {
+            if (cells[a].$el === cellElement) {
+                break;
+            }
+        }
+
+        if (a < cells.length) {
+            let colCount = countOfColumns.call(this);
+            let rowIndex = (a - a % colCount) / colCount;
+            return this.sortedRows[rowIndex];
+        }
+
+        return null;
     }
 
     const upgradeSortableHeaders = function () {
@@ -232,18 +329,30 @@
         let sortableHeaders = [];
 
         this.$children.map(x => {
-            if (x.$el.classList.contains(classes.TABLE_HEADER_CELL) && x.$data.lSortable)
+            if (exists(x.$el.classList) && x.$el.classList.contains(classes.TABLE_HEADER_CELL) && x.$data.lSortable)
                 sortableHeaders.push(x);
         });
 
         return sortableHeaders;
     }
 
+
+    const getCells = function () {
+        let out = [];
+
+        this.$children.map(x => {
+            if (exists(x.$el.classList) && x.$el.classList.contains(classes.TABLE_CELL))
+                out.push(x);
+        });
+
+        return out;
+    }
+
     const calculateColumns = function () {
         let colsTemplate = [];
 
         this.$children.map(x => {
-            if (x.$el.classList.contains(classes.TABLE_HEADER_CELL))
+            if (exists(x.$el.classList) && x.$el.classList.contains(classes.TABLE_HEADER_CELL))
                 colsTemplate.push(x.$data.lWidthPolicy);
         });
 
@@ -254,7 +363,7 @@
         let colsTemplate = [];
 
         this.$children.map(x => {
-            if (x.$el.classList.contains(classes.TABLE_HEADER_CELL))
+            if (exists(x.$el.classList) && x.$el.classList.contains(classes.TABLE_HEADER_CELL))
                 colsTemplate.push(x.$data.lWidthPolicy);
         });
 
@@ -271,6 +380,19 @@
     @import "/src/css/variables";
     $row-width: 40px;
     $row-height: 40px;
+    $toolbar-height: 50px;
+
+    .wd-table.wd-cell-padding-primary {
+        & > .wd-outer-table {
+            & > .wd-table-content-wrapper {
+                & > .wd-table-content {
+                    .wd-table-cell, .wd-table-header-cell {
+                        padding: 0 10px;
+                    }
+                }
+            }
+        }
+    }
 
     .wd-outer-table {
         display: grid;
@@ -282,7 +404,7 @@
             background-color: $bg-transparent;
         }
 
-        .fade {
+        & > div > .fade {
             &-enter-active, &-leave-active {
                 position: absolute;
                 top: 40px;
@@ -299,9 +421,7 @@
             width: 8px;
         }
 
-        &::-webkit-scrollbar:hover {
-
-        }
+        &::-webkit-scrollbar:hover {}
 
         &::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.0);
@@ -319,12 +439,45 @@
         }
     }
 
+    .wd-table.no-cell-hover .wd-table-content {
+        & > .wd-table-cell {
+            cursor: initial !important;
+        }
+
+        & > .wd-table-cell:hover::before, {
+            background-color: initial !important;
+        }
+
+        & > .wd-table-cell:active::before, {
+            background-color: initial !important;
+        }
+
+    }
+
+    .wd-table.text-centering .wd-table-content
+    {
+        & > .wd-table-cell > .wd-table-cell__content,
+        & > .wd-table-header-cell > .wd-table-cell__content,
+        {
+            text-align: center;
+        }
+    }
+
+    .wd-table.nowrap-cells .wd-table-content
+    {
+        & > .wd-table-cell > .wd-table-cell__content,
+        & > .wd-table-header-cell > .wd-table-cell__content,
+        {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
     .wd-table-content {
         display: grid;
         line-height: initial;
         align-items: center;
         position: relative;
-        /*background-color: $bg-secondary;*/
 
         @for $i from 1 through 30 {
             &.wd-table-borders.wd-table-cols-#{$i} > .wd-table-header-cell:not(:nth-child(#{$i})),
@@ -347,26 +500,19 @@
         &.wd-table-borders > .wd-table-cell,
         &.wd-table-borders > .wd-table-header-cell {
             transition: background-color 150ms, border-bottom-color 150ms;
-            /*background-color: $bg-transparent;*/
         }
 
         &.wd-table-borders > .wd-table-header-cell {
-            border-bottom: 1px solid $border-color-primary-5;
+            border-bottom: 1px solid $border-color-primary-6;
         }
 
         &.wd-table-borders > .wd-table-header-cell:hover {
-            /*background-color: $border-color-primary-5;*/
             border-bottom: 1px solid $border-color-primary-3;
         }
 
-        &.wd-table-borders > .wd-table-cell:hover {
-            /*background-color: $border-color-primary-5-2;*/
+        & > .wd-table-header-cell {
+            color: $fg-theme-primary-solid;
         }
-
-        & > .wd-table-cell, {
-            /*background-color: $bg-primary;*/
-        }
-
 
         & > .wd-table-cell,
         & > .wd-table-header-cell {
@@ -375,9 +521,7 @@
             box-sizing: border-box;
             justify-content: center;
             align-items: center;
-            /*height: $row-height;*/
             min-height: $row-height;
-            /*padding: 5px;*/
             cursor: pointer;
 
             & .md-checkbox {
@@ -413,16 +557,6 @@
             height: 100%;
         }
 
-/*        & > .wd-table-cell::after, {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-        }*/
-
         & > .wd-table-cell::before, {
             pointer-events: none;
             content: "";
@@ -447,36 +581,42 @@
             background-color: transparentize($bg-3-major, 0.45);
         }
 
-
+        & > .wd-table-cell.active::before, {
+            background-color: $fg-theme-primary;
+        }
     }
 
     .wd-table-toolbar {
+        font-size: 13pt;
         background-color: $bg-secondary-2;
 
         & > div {
             display: flex;
             align-items: center;
             box-sizing: border-box;
-
-            padding: 0 10px;
-            height: $row-height;
         }
     }
 
-    .wd-table-alternate-toolbar {
+    .wd-table-toolbar,
+    .wd-table-toolbar > div,
+    .wd-table-alternate-toolbar
+    {
         display: flex;
         align-items: center;
+        padding: 10px 10px;
+        height: $toolbar-height;
+    }
+
+    .wd-table-alternate-toolbar {
         position: absolute;
 
         background-color: $bg-3;
-        height: $row-height;
 
         top: 0;
         left: 0;
         z-index: 1;
         width: 100%;
         opacity: 1;
-        padding: 0 10px;
 
         &.wd-toolbar-short {
             width: calc(100% - #{$row-width});
@@ -497,8 +637,6 @@
             opacity: 1;
         }
     }
-
-
 
 
 </style>
