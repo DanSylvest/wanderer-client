@@ -13,6 +13,7 @@ const CharacterMixin = {
         return {
             lCharacterId: this.characterId,
             loadedCharacter: false,
+            loadDynamicCharacterData: false
         }
     },
     watch: {
@@ -79,37 +80,46 @@ const watchAttrsUpdated = function () {
 }
 
 const unsubscribeData = function () {
-    if (exists(this.characterData.unsubscriberOnline)) {
-        this.characterData.unsubscriberOnline();
-        delete this.characterData.unsubscriberOnline;
+    if (this.loadDynamicCharacterData) {
+        if (exists(this.characterData.unsubscriberOnline)) {
+            this.characterData.unsubscriberOnline();
+            delete this.characterData.unsubscriberOnline;
+        }
+        if (exists(this.characterData.unsubscriberLocation)) {
+            this.characterData.unsubscriberLocation();
+            delete this.characterData.unsubscriberLocation;
+        }
+        if (exists(this.characterData.unsubscriberShip)) {
+            this.characterData.unsubscriberShip();
+            delete this.characterData.unsubscriberShip;
+        }
     }
-    if (exists(this.characterData.unsubscriberLocation)) {
-        this.characterData.unsubscriberLocation();
-        delete this.characterData.unsubscriberLocation;
-    }
-    if (exists(this.characterData.unsubscriberShip)) {
-        this.characterData.unsubscriberShip();
-        delete this.characterData.unsubscriberShip;
-    }
+
     if (exists(this.characterData.unsubscriberInfo)) {
         this.characterData.unsubscriberInfo();
         delete this.characterData.unsubscriberInfo;
     }
 }
+
 const subscribeData = function () {
     this.loadedCharacter = false;
 
-    this.characterData.unsubscriberOnline = cache.characters.list.get(this.lCharacterId).online.subscribe();
-    this.characterData.unsubscriberLocation = cache.characters.list.get(this.lCharacterId).location.subscribe();
-    this.characterData.unsubscriberShip = cache.characters.list.get(this.lCharacterId).ship.subscribe();
+    if(this.loadDynamicCharacterData) {
+        this.characterData.unsubscriberOnline = cache.characters.list.get(this.lCharacterId).online.subscribe();
+        this.characterData.unsubscriberLocation = cache.characters.list.get(this.lCharacterId).location.subscribe();
+        this.characterData.unsubscriberShip = cache.characters.list.get(this.lCharacterId).ship.subscribe();
+    }
+
     this.characterData.unsubscriberInfo = cache.characters.list.get(this.lCharacterId).info.subscribe();
 
-    Promise.all([
-        cache.characters.list.get(this.lCharacterId).online.readyPromise(),
-        cache.characters.list.get(this.lCharacterId).location.readyPromise(),
-        cache.characters.list.get(this.lCharacterId).ship.readyPromise(),
+    let prarr = [
+        this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).online.readyPromise(),
+        this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).location.readyPromise(),
+        this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).ship.readyPromise(),
         cache.characters.list.get(this.lCharacterId).info.readyPromise(),
-    ])
+    ];
+
+    Promise.all(prarr)
         .then(this._onLoadedCharacter.bind(this));
 }
 

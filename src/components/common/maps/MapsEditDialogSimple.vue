@@ -7,7 +7,7 @@
                 <md-field md-clearable>
                     <label>Name</label>
                     <md-input v-model="formName" @input="onEditFormChange" @change="onEditFormChange"></md-input>
-                    <span class="wd-hint md-helper-text" v-show="isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
+                    <span class="wd-hint-negative md-helper-text" v-show="isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
                 </md-field>
 
                 <md-field md-clearable>
@@ -40,7 +40,7 @@
                             Such character not found "{{ term }}"!
                         </template>
                     </md-autocomplete>
-                    <span class="wd-hint md-helper-text" v-show="isValidCharacter">* Choose a character to create a map for</span>
+                    <span class="wd-hint-negative md-helper-text" v-show="isValidCharacter">* Choose a character to create a map for</span>
                 </md-field>
 
                 <div>
@@ -120,11 +120,6 @@
                 this.enableCorporations = exists(this.charactersItem) && exists(this.charactersItem.corporationId);
                 this.enableAlliances = exists(this.charactersItem) && exists(this.charactersItem.allianceId);
             },
-            close: function () {
-
-            },
-
-            // ========= SEARCHING GROUPS PART ===========
             onACOpened: function (){
                 setTimeout(function () {
                     window.dispatchEvent(new Event('resize'));
@@ -146,11 +141,6 @@
                 this.updateSwitchboxes();
                 this.validateEditForm();
             },
-
-            // ========= SEARCHING GROUPS PART ===========
-
-
-            // ========= EDITING DIALOG PART ===========
             onEditDialogOpened: function () {
                 this.validateEditForm();
             },
@@ -226,14 +216,6 @@
 
 <style lang="scss">
     @import "./src/css/variables";
-
-    .wd-hint {
-        color: $hint-color !important;
-    }
-
-    .wd-hint-positive {
-        color: $hint-color-positive !important;
-    }
 
     .wd-char-item {
 

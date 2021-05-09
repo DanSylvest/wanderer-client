@@ -32,7 +32,7 @@
                             System {{ term }} was not found!
                         </template>
                     </md-autocomplete>
-                    <span class="wd-hint md-helper-text">* Start search system. You should type at least 2 symbols.</span>
+                    <span class="wd-hint-negative md-helper-text">* Start search system. You should type at least 2 symbols.</span>
                 </md-field>
             </div>
 
@@ -64,7 +64,6 @@
         },
         data: function () {
             return {
-
                 systems: [],
                 currentSystem: "",
                 selectedValue: "",
@@ -99,8 +98,6 @@
                 this.formButtonDisabled = true;
                 this.$emit("update:activated", false);
             },
-
-            // ========= SEARCHING GROUPS PART ===========
             onACOpened: function (){
                 this.search();
                 setTimeout(function () {
@@ -124,7 +121,6 @@
                 }
                 this._selectLock = false;
             },
-
             search () {
                 if(this._passChange){
                     this._passChange = false;
@@ -139,15 +135,9 @@
                     this.systems = [];
                 }
             },
-
-            // ========= SEARCHING GROUPS PART ===========
-
-
             getStaticClassColor: function (_staticClass) {
                 return environment.typeClasses[_staticClass];
             },
-
-            // eslint-disable-next-line no-unused-vars
             getClassBySystemData (data) {
                 let colorClass = "";
                 switch (data.systemType) {
@@ -165,8 +155,6 @@
                 }
                 return colorClass;
             },
-
-            // ========= EDITING DIALOG PART ===========
             onEditDialogOpened: function () {
                 this._otid !== -1 && clearTimeout(this._otid);
                 this._otid = setTimeout(() => {
@@ -180,8 +168,6 @@
             onEditSubmit: function () {
                 this.$emit("system-selected", this.selectedItem.solarSystemId);
             },
-            // ========= EDITING DIALOG PART ===========
-
             _makeSearch: function (_match, _pr) {
                 api.eve.map.solarSystem.fastSearch({match: _match})
                     .then(
@@ -195,10 +181,6 @@
 
 <style lang="scss">
     @import "./src/css/variables";
-
-    .wd-hint {
-        color: $hint-color !important;
-    }
 
     .wd-char-item {
         & > div:not(:last-child) {

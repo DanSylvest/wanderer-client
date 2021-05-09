@@ -20,6 +20,11 @@
         name: "LocalCharacter",
         components: {Ship},
         mixins: [CharacterMixin],
+        data: function () {
+            return {
+                loadDynamicCharacterData: true
+            }
+        },
         mounted: function () {
 
         },

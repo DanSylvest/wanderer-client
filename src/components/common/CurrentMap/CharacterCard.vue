@@ -14,7 +14,7 @@
                     </div>
 
                     <div>
-                        <ship :ship-id="info.ship"/>
+                        <ship :ship-id="ship"/>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,8 @@
         },
         data: function () {
             return {
-                lMapId: this.mapId
+                lMapId: this.mapId,
+                loadDynamicCharacterData: true
             }
         },
         watch: {
@@ -129,7 +130,6 @@
             border-color: $border-color-primary-5-2;
             background-color: $bg-transparent;
             cursor: pointer;
-            /*opacity: 0.6;*/
 
             &.character-online {
                 border-color: $color-online;
@@ -163,10 +163,6 @@
             .wd-character-name {
                 font-size: 14px;
                 color: $fg-theme-primary-solid;
-            }
-
-            .wd-character-corporation {
-
             }
 
             .wd-character-alliance {

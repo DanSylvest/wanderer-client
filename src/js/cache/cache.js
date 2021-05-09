@@ -7,6 +7,7 @@ import SolarSystems from "./providers/universe/solarSystems.js";
 import Maps from "./providers/maps/maps.js";
 import Characters from "./providers/characters/characters.js";
 import Ships from "./providers/universe/ships.js";
+import TQStatus from "./providers/server/status.js";
 
 class Cache {
     constructor() {
@@ -19,6 +20,7 @@ class Cache {
         this.maps = new Maps();
         this.characters = new Characters();
         this.ships = new Ships();
+        this.tqStatus = new TQStatus();
     }
 }
 

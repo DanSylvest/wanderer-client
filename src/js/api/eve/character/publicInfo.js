@@ -3,7 +3,12 @@
  */
 import CustomPromise from "../../../env/promise";
 
-export default function (corporationId) {
+/**
+ *
+ * @param {string|Array<string>} characterId
+ * @returns {*}
+ */
+export default function (characterId) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -12,13 +17,13 @@ export default function (corporationId) {
     }.bind(this));
 
     let obj = {};
-    if(corporationId.constructor === Array) {
-        obj.corporationIds = corporationId;
+    if(characterId.constructor === Array) {
+        obj.characterIds = characterId;
     } else {
-        obj.corporationId = corporationId;
+        obj.characterId = characterId;
     }
 
-    this.send(id, ["api", "eve", "corporation", "info"], obj);
+    this.send(id, ["api", "eve", "character", "publicInfo"], obj);
 
     return p.native;
 }

@@ -36,16 +36,12 @@
     import AppToolbar from "../ui/App/AppToolbar";
     import AppMenu from "../ui/App/AppMenu";
     import AppMenuItem from "../ui/App/AppMenuItem";
-    import cache from "../../js/cache/cache.js";
+    import ServerStatusMixin from "../mixins/serverStatus.js";
 
     export default {
         name: "Home",
-        components: {
-            App, AppMenu, AppToolbar, AppMenuItem
-        },
-        props: [
-
-        ],
+        components: {App, AppMenu, AppToolbar, AppMenuItem, ServerStatusMixin},
+        mixins: [ServerStatusMixin],
         data: function () {
             return {
                 mainPageContent: '',
@@ -59,15 +55,6 @@
                 groupsAllowedButtonIsActive: false,
             }
         },
-        beforeDestroy() {
-            this.unsubscribeOnline && this.unsubscribeOnline();
-            this.unsubscribeOnline = null;
-        },
-        beforeMount() {
-            this.unsubscribeOnline = cache.serverStatus.subscribe();
-
-
-        },
         mounted: function () {
 
             this._tid = -1;
@@ -80,16 +67,13 @@
         },
         computed: {
             classColor () {
-                return this.$store.state.eveServerStatus.online ? "wd-online" : "wd-offline";
+                return this.serverStatus ? "wd-online" : "wd-offline";
             },
         },
         methods: {
-            // classColor () {
-            //     return this.unsubscribe && this.$store.state.eveServerStatus.online ? "wd-online" : "wd-offline";
+            // toggleMenu () {
+            //     this.menuVisible = !this.menuVisible
             // },
-            toggleMenu () {
-                this.menuVisible = !this.menuVisible
-            },
             onCurrentMapClick: function () {
                 this._load("currentMap");
             },
@@ -134,21 +118,21 @@
                 this.groupsOwnButtonIsActive = false;
                 this.groupsAllowedButtonIsActive = false;
             },
-            onMenuOpened: function () {
-                this._tid !== -1 && clearTimeout(this._tid);
-                this._tid = setTimeout(function () {
-                    this._tid = -1;
-                    this.$refs.contentRef.refresh();
-                }.bind(this), 150)
-
-            },
-            onMenuClosed: function () {
-                this._tid !== -1 && clearTimeout(this._tid);
-                this._tid = setTimeout(function () {
-                    this._tid = -1;
-                    this.$refs.contentRef.refresh();
-                }.bind(this), 150)
-            },
+            // onMenuOpened: function () {
+            //     this._tid !== -1 && clearTimeout(this._tid);
+            //     this._tid = setTimeout(function () {
+            //         this._tid = -1;
+            //         this.$refs.contentRef.refresh();
+            //     }.bind(this), 150)
+            //
+            // },
+            // onMenuClosed: function () {
+            //     this._tid !== -1 && clearTimeout(this._tid);
+            //     this._tid = setTimeout(function () {
+            //         this._tid = -1;
+            //         this.$refs.contentRef.refresh();
+            //     }.bind(this), 150)
+            // },
         }
     }
 
@@ -186,7 +170,6 @@
 
 <style lang="scss">
     @import "src/css/variables";
-
 
     .wd-online {
         color: $color-online !important;

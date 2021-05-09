@@ -17,7 +17,7 @@
                         <div class="wd-character-name">{{info.name}}</div>&nbsp;
                         <div class="wd-character-corporation" v-if="hasCorporation">{{info.corporation}}</div>&nbsp;
                         <div class="wd-character-alliance" v-if="hasAlliance">{{info.alliance}}</div>
-                        <ship :ship-id="info.ship"/>
+                        <ship :ship-id="ship"/>
                     </div>
                 </div>
                 <div class="wd-toolbar">
@@ -49,14 +49,10 @@
         name: "CharacterCard",
         components: {SystemCard, Ship},
         mixins: [CharacterMixin],
-        props: {
-
-        },
         data: function () {
-            return {}
-        },
-        watch: {
-
+            return {
+                loadDynamicCharacterData: true
+            }
         },
         computed: {
             getAllyImageUrlStyle() {
@@ -120,22 +116,6 @@
             width: 100%;
             height: 100%;
 
-            & > .wd-toolbar {
-                /*.md-icon-button.md-dense {
-                    width: 30px;
-                    min-width: 30px;
-                    height: 30px;
-                }*/
-
-              /*  i.md-icon {
-                    font-size: 14pt !important;
-                    color: $fg-primary !important;
-                    width: 25px;
-                    min-width: 25px;
-                    height: 25px;
-                }*/
-            }
-
             & > .wd-content {
                 display: flex;
                 justify-content: flex-start;
@@ -153,15 +133,6 @@
                     margin-right: -5px !important;
                     align-items: center;
 
-                    & > .wd-character-social__corporation {
-                        /*width: 45px;*/
-                        /*height: 45px;*/
-                        /*margin-top: 10px;*/
-                    }
-
-                    & > .wd-character-social__alliance {
-                        /*margin-bottom: 10px;*/
-                    }
                 }
 
                 .wd-character-avatar {
@@ -175,7 +146,6 @@
                     border-style: solid;
                     border-color: $border-color-primary-5-2;
                     background-color: $bg-transparent;
-                    /*opacity: 0.6;*/
                 }
 
                 .wd-character-content {
@@ -199,10 +169,6 @@
                     .wd-character-name {
                         font-size: 14px;
                         color: $fg-theme-primary-solid;
-                    }
-
-                    .wd-character-corporation {
-
                     }
 
                     .wd-character-alliance {

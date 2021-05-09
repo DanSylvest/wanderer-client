@@ -16,7 +16,7 @@ export default function (_characterId) {
         _e.success ? p.resolve(_e.result) : p.reject(_e.error);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "character", "info"], {
+    this.send(id, ["api", "eve", "character", "protectedInfo"], {
         characterId: _characterId
     });
 

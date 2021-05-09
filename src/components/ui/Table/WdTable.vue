@@ -109,6 +109,7 @@
                 this.lRows = val;
                 this.updateSelectedCheckboxes();
                 this.$nextTick(updateHandlersForSlots.bind(this));
+                updateActive.call(this);
             },
             enableHeaders (val) {
                 this.lEnableHeaders = val;
@@ -237,18 +238,18 @@
 
     const updateActive = function () {
         let colCount = countOfColumns.call(this);
-        let cells = getCells.call(this);
+        let cells = getCellsEl.call(this);
 
         for (var colIndex = 0; colIndex < cells.length; colIndex++) {
             if(colIndex % colCount === 0) {
-                cells[colIndex].$el.classList.remove("active");
+                cells[colIndex].classList.remove("active");
             }
         }
 
         this.lActiveRows.map(x => {
             let index = this.sortedRows.indexOf(x);
             let colIndex = colCount * index;
-            cells[colIndex].$el.classList.add("active");
+            cells[colIndex].classList.add("active");
         });
     }
 
@@ -279,17 +280,13 @@
     }
 
     const getRowData = function (cellElement) {
-        let cells = getCells.call(this);
-        for (var a = 0; a < cells.length; a++) {
-            if (cells[a].$el === cellElement) {
-                break;
+        let colCount = countOfColumns.call(this);
+        let cells = getCellsEl.call(this);
+        for (let cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+            if(cells[cellIndex] === cellElement) {
+                let rowIndex = (cellIndex - cellIndex % colCount) / colCount;
+                return this.sortedRows[rowIndex];
             }
-        }
-
-        if (a < cells.length) {
-            let colCount = countOfColumns.call(this);
-            let rowIndex = (a - a % colCount) / colCount;
-            return this.sortedRows[rowIndex];
         }
 
         return null;
@@ -336,6 +333,18 @@
         return sortableHeaders;
     }
 
+    const getCellsEl = function () {
+        let out = [];
+
+        let el = this.$el.querySelector('.wd-table-content');
+
+        for (let a = 0; a < el.children.length; a++) {
+            if (exists(el.children[a].classList) && el.children[a].classList.contains(classes.TABLE_CELL))
+                out.push(el.children[a]);
+        }
+
+        return out;
+    }
 
     const getCells = function () {
         let out = [];

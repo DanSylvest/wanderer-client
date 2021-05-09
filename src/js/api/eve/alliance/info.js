@@ -3,7 +3,7 @@
  */
 import CustomPromise from "../../../env/promise";
 
-export default function (_allianceId) {
+export default function (allianceId) {
     let p = new CustomPromise();
 
     let id = this.add(function (_e) {
@@ -11,9 +11,14 @@ export default function (_allianceId) {
         _e.success ? p.resolve(_e.result) : p.reject(_e.error);
     }.bind(this));
 
-    this.send(id, ["api", "eve", "alliance", "info"], {
-        allianceId: _allianceId
-    });
+    let obj = {};
+    if(allianceId.constructor === Array) {
+        obj.allianceIds = allianceId;
+    } else {
+        obj.allianceId = allianceId;
+    }
+
+    this.send(id, ["api", "eve", "alliance", "info"], obj);
 
     return p.native;
 }

@@ -94,7 +94,7 @@ class Info extends RequestProvider {
     }
 
     _createRequest() {
-        return api.eve.character.info(this._id);
+        return api.eve.character.protectedInfo(this._id);
     }
 }
 

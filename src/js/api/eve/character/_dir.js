@@ -4,7 +4,8 @@
 
 import add from "./add";
 import list from "./list";
-import info from "./info";
+import protectedInfo from "./protectedInfo";
+import publicInfo from "./publicInfo";
 import getName from "./getName";
 import fastSearch from "./fastSearch";
 import online from "./online";
@@ -16,7 +17,8 @@ import subscribeShip from "./subscribeShip";
 export default {
     add: add,
     list: list,
-    info: info,
+    protectedInfo: protectedInfo,
+    publicInfo: publicInfo,
     getName: getName,
     fastSearch: fastSearch,
     online: online,

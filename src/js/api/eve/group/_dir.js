@@ -10,6 +10,7 @@ import allowedGroups from "./allowedGroups";
 import getAllowedCharacters from "./getAllowedCharacters";
 import updateAllowedCharacters from "./updateAllowedCharacters";
 import mapsByGroup from "./mapsByGroup.js";
+import getOwnInfo from "./getOwnInfo.js";
 
 export default {
     add,
@@ -21,4 +22,5 @@ export default {
     getAllowedCharacters,
     updateAllowedCharacters,
     mapsByGroup,
+    getOwnInfo,
 }
