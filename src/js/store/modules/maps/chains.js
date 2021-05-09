@@ -1,5 +1,5 @@
 /**
- * Created by Aleksey Chichenkov <a.chichenkov@initi.ru> on 4/15/21.
+ * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 4/15/21.
  */
 
 import NamespacedStore from "../../base/namespacedStore.js";
