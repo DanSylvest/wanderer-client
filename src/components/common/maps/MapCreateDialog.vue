@@ -7,7 +7,7 @@
             @md-clicked-outside="onClickedOutside"
             @md-closed='$emit("update:show", false)'
         >
-            <group-editor @success="onEditSuccess" class="wd-group-tabs" />
+            <map-editor @success="onEditSuccess" class="wd-group-tabs" />
         </md-dialog>
 
         <md-dialog-confirm
@@ -22,11 +22,11 @@
 </template>
 
 <script>
-    import GroupEditor from "./GroupEditor.vue";
+    import MapEditor from "./MapEditor.vue";
 
     export default {
-        name: "GroupCreateDialog",
-        components: {GroupEditor},
+        name: "MapCreateDialog",
+        components: {MapEditor},
         props: {
             show : {
                 type: Boolean,

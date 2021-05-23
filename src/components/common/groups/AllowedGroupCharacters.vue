@@ -49,7 +49,6 @@
 </template>
 
 <script>
-    // import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
     import helper from "../../../js/utils/helper.js";
     import GroupAllowedCharactersMixin from "../../mixins/groupAllowedCharacters.js";

@@ -6,7 +6,7 @@
                     <wd-table
                         :rows="groupsOwnList"
                         @row-clicked="onRowClicked"
-                        @selected="false"
+                        @selected="selectedGroups = $event"
                         selectable
                         class="text-centering  wd"
                         :active-rows="activeRows"
@@ -30,7 +30,7 @@
                             </div>
 
                             <div class="md-toolbar-section-end">
-                                <md-button class="md-icon-button" @click="false">
+                                <md-button class="md-icon-button" @click="onRemoveGroups">
                                     <md-tooltip md-direction="bottom">Delete</md-tooltip>
                                     <md-icon>delete</md-icon>
                                 </md-button>
@@ -103,6 +103,8 @@
     import exists from "../../js/env/tools/exists.js";
     import GroupCreateDialog from "./groups/GroupCreateDialog.vue";
     import RelatedMaps from "./groups/RelatedMaps.vue";
+    import api from "../../js/api.js";
+    import helper from "../../js/utils/helper.js";
 
     const TRANSITION_TIMEOUT = 150;
 
@@ -125,7 +127,8 @@
                 isEditingFormLoading: false,
                 selectedGroupId: null,
                 activeRows: [],
-                showCreateDialog: false
+                showCreateDialog: false,
+                selectedGroups: [],
             }
         },
         beforeDestroy() {
@@ -147,6 +150,31 @@
             }
         },
         methods: {
+            onRemoveGroups () {
+                Promise.all(this.selectedGroups.map(x => api.eve.group.remove(x.id)))
+                    .then(
+                        () => {
+                            this.selectedGroups.map(x => this.groupsOwnList.eraseByObjectKey("id", x.id));
+                            if(this.selectedGroups.includes(this.selectedGroupId)) {
+                                this.selectedGroupId = null;
+                                this.isEditingGroup = false;
+                                this.isEditingFormLoading = false;
+                            }
+                        },
+                        err => helper.errorHandler(this, err)
+                    )
+            },
+
+            // onGroupContextMenuRemove: function () {
+            //     api.eve.group.remove(this._currentContextGroup)
+            //         .then(
+            //             () => {
+            //                 this.groups.eraseByObjectKey("id", this._currentContextGroup);
+            //                 this._currentContextGroup = null;
+            //             },
+            //             err => helper.errorHandler(this, err)
+            //         );
+            // },
             onRowClicked (event) {
                 if (this.selectedGroupId === event.data.id)
                     return;
@@ -187,7 +215,7 @@
 
 <style lang="scss">
     @import "./src/css/variables";
-    $edit-part-width: 400;
+    $edit-part-width: 500;
     $threshold: 850;
 
     .wd-groups {
@@ -234,11 +262,11 @@
             @media screen and (min-width: #{$threshold + 1 + 300 * $i}px) {
                 .wd-groups__table {
                     transition: width 350ms, height 350ms;
-                    width: calc(100% - #{$edit-part-width + 150 * $i}px);
+                    width: calc(100% - #{$edit-part-width + 100 * $i}px);
                 }
 
                 .wd-groups__info {
-                    width: #{$edit-part-width + 150 * $i}px;
+                    width: #{$edit-part-width + 100 * $i}px;
                 }
             }
         }

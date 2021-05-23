@@ -178,6 +178,20 @@ body {
     }
 }
 
+.fade-fast {
+    &-enter-active, &-leave-active {
+        transition: opacity 150ms;
+    }
+
+    &-enter, &-leave-to {
+        opacity: 0;
+    }
+
+    &-enter-to, &-leave {
+        opacity: 1;
+    }
+}
+
 .wd-gl-2c {
     display: grid;
     grid-template-columns: auto 1fr;

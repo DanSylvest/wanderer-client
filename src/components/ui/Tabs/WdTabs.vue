@@ -51,6 +51,9 @@
                 this.setActive(id);
             },
             setActive (id) {
+                if(id === this.lastSelectedTab)
+                    return;
+
                 if(!this._hidingTab)
                     this._hidingTab = this.lastSelectedTab;
 
@@ -63,7 +66,7 @@
                     pr = prevTab.hide()
                         .then(
                             () => {
-                                getTabById.call(this, this._hidingTab).$el.classList.add("wd-hidden");
+                                prevTab.$el.classList.add("wd-hidden");
                                 this.tabs.searchByObjectKey("id", this._hidingTab).active = false;
                                 delete this._hidingTab;
                             }
@@ -78,6 +81,7 @@
                         this.tabs.searchByObjectKey("id", id).active = true;
                         let curTab = getTabById.call(this, id);
                         curTab.show();
+                        this.$emit("tab-changed", id);
                     }
                 )
             },
@@ -118,18 +122,21 @@
     @import "src/css/variables";
 
     .wd-ui-tabs {
+        /*display: flex;*/
+        /*flex-direction: column;*/
         display: grid;
         grid-template-rows: 42px calc(100% - 42px);
 
         .wd-ui-tabs__nav-bar {
             display: flex;
+            align-items: center;
         }
 
         .wd-ui-tab__label {
 
             &.wd-active .wd-ui-tab__label-content {
                 transition: background-color 250ms, color 200ms;
-                color: $fg-thirdary;
+                color: $fg-fourth;
                 background-color: $primary-color;
 
                 &:hover {
@@ -140,12 +147,13 @@
             .wd-ui-tab__label-content {
                 transition: background-color 250ms;
                 background-color: $bg-secondary;
-                padding: 10px;
+                padding: 7px 10px;
                 user-select: none;
                 border-radius: 5px;
                 cursor: pointer;
                 border: 1px solid $border-color-primary-5-2;
                 box-sizing: border-box;
+                height: initial;
 
                 &:hover {
                     background-color: $bg-3;
@@ -158,6 +166,7 @@
         }
 
         .wd-ui-tabs__content {
+
         }
     }
 </style>

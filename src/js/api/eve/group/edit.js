@@ -13,6 +13,7 @@ import CustomPromise from "../../../env/promise";
  * @param {Array<number>} _options.characters
  * @param {Array<number>} _options.corporations
  * @param {Array<number>} _options.alliances
+ * @param {Array<number>} _options.moderators
  * @returns {*}
  */
 export default function (_groupId, _options) {
@@ -29,7 +30,8 @@ export default function (_groupId, _options) {
         description: _options.description,
         characters: _options.characters,
         corporations: _options.corporations,
-        alliances: _options.alliances
+        alliances: _options.alliances,
+        // moderators: _options.moderators,
     });
 
     return p.native;

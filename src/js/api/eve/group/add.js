@@ -11,6 +11,7 @@ import CustomPromise from "../../../env/promise";
  * @param {String} _options.characters
  * @param {String} _options.corporations
  * @param {String} _options.alliances
+ * @param {String} _options.moderators
  * @returns {*}
  */
 export default function (_options) {
@@ -26,7 +27,8 @@ export default function (_options) {
         description: _options.description,
         characters: _options.characters || [],
         corporations: _options.corporations || [],
-        alliances: _options.alliances || []
+        alliances: _options.alliances || [],
+        // moderators: _options.moderators || [],
     });
 
     return p.native;

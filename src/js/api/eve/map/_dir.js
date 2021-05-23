@@ -18,22 +18,24 @@ import subscribeAllowedMaps from "./subscribeAllowedMaps";
 import subscribeAllowedCharacters from "./subscribeAllowedCharacters";
 import waypoint from "./waypoint";
 import updateWatchStatus from "./updateWatchStatus";
+import groups from "./groups.js";
 
 export default {
-    link: link,
-    routes: routes,
-    solarSystem: solarSystem,
+    link,
+    routes,
+    solarSystem,
 
-    add: add,
-    addChain: addChain,
-    addFast: addFast,
-    edit: edit,
-    list: list,
-    remove: remove,
-    info: info,
-    subscribeMapExistence: subscribeMapExistence,
-    subscribeAllowedMaps: subscribeAllowedMaps,
-    subscribeAllowedCharacters: subscribeAllowedCharacters,
-    waypoint: waypoint,
-    updateWatchStatus: updateWatchStatus,
+    add,
+    addChain,
+    addFast,
+    edit,
+    list,
+    remove,
+    info,
+    subscribeMapExistence,
+    subscribeAllowedMaps,
+    subscribeAllowedCharacters,
+    waypoint,
+    updateWatchStatus,
+    groups,
 }

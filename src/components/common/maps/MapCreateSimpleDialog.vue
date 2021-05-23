@@ -7,7 +7,10 @@
                 <md-field md-clearable>
                     <label>Name</label>
                     <md-input v-model="formName" @input="onEditFormChange" @change="onEditFormChange"></md-input>
-                    <span class="wd-hint-negative md-helper-text" v-show="isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
+                    <transition name="fade">
+                        <span class="wd-hint-negative md-helper-text" v-if="!isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
+                        <span class="wd-hint-positive md-helper-text" v-if="isValidName">Name is valid</span>
+                    </transition>
                 </md-field>
 
                 <md-field md-clearable>
@@ -40,7 +43,10 @@
                             Such character not found "{{ term }}"!
                         </template>
                     </md-autocomplete>
-                    <span class="wd-hint-negative md-helper-text" v-show="isValidCharacter">* Choose a character to create a map for</span>
+
+                    <transition name="fade">
+                        <span class="wd-hint-negative md-helper-text" v-if="!isValidCharacter">* Choose a character to create a map for</span>
+                    </transition>
                 </md-field>
 
                 <div>
@@ -63,16 +69,18 @@
 </template>
 
 <script>
-    import CustomPromise from "../../../js/env/promise";
     import api from "../../../js/api";
     import exists from "../../../js/env/tools/exists";
     import helper from "../../../js/utils/helper.js";
 
     export default {
-        name: "MapsEditDialogSimple",
-        props: [
-
-        ],
+        name: "MapCreateSimpleDialog",
+        props: {
+            show: {
+                type: Boolean,
+                default: false
+            }
+        },
         data: function () {
             return {
                 characters: [],
@@ -93,27 +101,29 @@
                 isValidCharacter: true,
             }
         },
+        watch: {
+            show (val) {
+                if(val) {
+                    api.eve.character.list()
+                        .then(
+                            data => {
+                                this.characters = data.sort((a, b) => +new Date(a.addDate) - +new Date(b.addDate));
+                                this.charactersValue = this.characters[0].name;
+                                this.charactersItem = this.characters[0];
+                                this.updateSwitchboxes();
+                                this.showEditDialog = true;
+                            },
+                            err => helper.errorHandler(this, err)
+                        );
+                } else {
+                    this.showEditDialog = val;
+                }
+            }
+        },
         mounted: function () {
 
         },
         methods: {
-            show: function () {
-                this._showPromise = new CustomPromise();
-
-                api.eve.character.list()
-                    .then(
-                        data => {
-                            this.characters = data.sort((a, b) => +new Date(a.addDate) - +new Date(b.addDate));
-                            this.charactersValue = this.characters[0].name;
-                            this.charactersItem = this.characters[0];
-                            this.updateSwitchboxes();
-                            this.showEditDialog = true;
-                        },
-                        err => helper.errorHandler(this, err)
-                    );
-
-                return this._showPromise.native;
-            },
             updateSwitchboxes: function () {
                 this.formIsCorporationShare = false;
                 this.formIsAllianceShare = false;
@@ -146,6 +156,7 @@
             },
             onDialogClosed: function () {
                 this.clearForm();
+                this.$emit("update:show", false);
             },
             onEditSubmit: function () {
                 let data = {
@@ -159,15 +170,14 @@
                 api.eve.map.addFast(data)
                     .then(
                         data => {
-                            this.clearForm();
-                            this.showEditDialog = false;
-                            this._showPromise.resolve({
+                            this.$emit("success", {
                                 id          : data.mapId,
                                 name        : data.name,
                                 owner       : data.owner,
                                 description : data.description,
                                 groups      : data.groups,
                             });
+                            this.onDialogClosed();
                         },
                         error => helper.errorHandler(this, error)
                     );
@@ -181,9 +191,9 @@
 
                 let isValidCharacter = exists(this.charactersItem);
 
-                this.isValidName = !isValidName;
-                this.isValidDescr = !isValidDescription;
-                this.isValidCharacter = !isValidCharacter;
+                this.isValidName = isValidName;
+                this.isValidDescr = isValidDescription;
+                this.isValidCharacter = isValidCharacter;
 
                 this.formButtonDisabled = !(isValidName && isValidDescription && isValidCharacter);
             },

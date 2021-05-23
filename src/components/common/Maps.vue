@@ -1,223 +1,357 @@
 <template>
-    <div class="wd-maps wd padding-primary">
-        <div class="maps-toolbar" v-show="maps.length > 0">
-            <md-button class="md-dense md-accent md-raised" @click="addSimple">
-                <md-icon>add</md-icon>
-                <span style="vertical-align: middle">Add map</span>
-            </md-button>
+    <div class="wd fs">
+        <transition name="fade">
+            <div class="wd fs wd-groups" v-if="showMaps">
+                <div class="wd fs padding-primary wd-groups__table">
+                    <wd-table
+                        :rows="mapsList"
+                        @row-clicked="onRowClicked"
+                        @selected="selectedMaps = $event"
+                        selectable
+                        class="text-centering  wd"
+                        :active-rows="activeRows"
+                    >
+                        <template v-slot:toolbar>
+                            <div class="md-toolbar-section-start">
+                                Maps
+                            </div>
 
-            <md-button class="md-dense md-primary md-raised" @click="add">
-                <md-icon>add</md-icon>
-                <span style="vertical-align: middle">Add map (advanced)</span>
-            </md-button>
-        </div>
+                            <div class="md-toolbar-section-end">
+                                <md-button class="md-dense md-accent md-raised" @click="showCreateSimpleDialog = true">
+                                    <md-icon>add</md-icon>
+                                    <span style="vertical-align: middle">Add map</span>
+                                </md-button>
 
-        <div class="maps-content md-scrollbar">
-            <md-table v-model="maps" v-show="loaded && maps.length > 0" class="maps-table" md-fixed-header>
-                <md-table-row
-                    slot="md-table-row"
-                    @contextmenu="onContextMenu(item.id, $event)"
-                    @click="onMapRowClick(item.id, $event)"
-                    slot-scope="{ item }"
-                >
-                    <md-table-cell md-sort-by="name" md-label="Name">{{item.name}}</md-table-cell>
-                    <md-table-cell md-sort-by="owner"  md-label="Owner">{{item.owner}}</md-table-cell>
-                    <md-table-cell md-sort-by="description"  md-label="Description">{{item.description}}</md-table-cell>
-                </md-table-row>
-            </md-table>
+                                <md-button class="md-dense md-primary md-raised" @click="showCreateDialog = true">
+                                    <md-icon>add</md-icon>
+                                    <span style="vertical-align: middle">Add map (advanced)</span>
+                                </md-button>
+                            </div>
+                        </template>
 
+                        <template v-slot:alternate-toolbar>
+                            <div class="md-toolbar-section-start">
+                                Actions with selected
+                            </div>
 
+                            <div class="md-toolbar-section-end">
+                                <md-button class="md-icon-button" @click="onRemoveMaps">
+                                    <md-tooltip md-direction="bottom">Delete</md-tooltip>
+                                    <md-icon>delete</md-icon>
+                                </md-button>
+                            </div>
+                        </template>
+
+                        <template v-slot:header >
+                            <table-header-cell sortable id="name" >Name</table-header-cell>
+                            <table-header-cell sortable id="owner">Owner</table-header-cell>
+                            <table-header-cell sortable id="description">Description</table-header-cell>
+                        </template>
+
+                        <template v-slot:row="{row}">
+                            <table-cell id="name" class="wd padding-vertical-small">{{row.name}}</table-cell>
+                            <table-cell id="owner" class="wd fs padding-horizontal-primary">
+                                <character-with-ticker :character-id="row.owner" />
+                            </table-cell>
+                            <table-cell id="description" class="wd padding-horizontal-primary">{{row.description}}</table-cell>
+                        </template>
+                    </wd-table>
+                </div>
+
+                <div class="wd-groups__info">
+                    <transition name="fade">
+                        <div v-if="isEditingMap" class="wd-wgi-container wd fs">
+                            <map-editor :map-id="selectedMapId" @success="onMapEdited" :editing="true"/>
+<!--                            <related-maps :group-id="selectedGroupId" />-->
+                        </div>
+                    </transition>
+
+                    <transition name="fade">
+                        <md-empty-state
+                            v-if="!isEditingMap"
+                            md-icon="group"
+                            md-label="Map isn't selected"
+                            md-description="Select a map - in order to change settings."
+                        />
+                    </transition>
+                </div>
+
+            </div>
+        </transition>
+
+        <transition name="fade">
             <md-empty-state
-                v-if="loaded && maps.length === 0"
+                v-if="showEmptyMaps"
                 md-icon="layers"
                 md-label="Create your map!"
-                md-description="Map allow you attach groups and track characters. Its simple! Just click this button."
+                md-description="Map description."
             >
-                <md-button class="md-dense md-primary md-raised" @click="addSimple">
+                <md-button class="md-dense md-primary md-raised" @click="false">
                     <span style="vertical-align: middle">Create</span>
                 </md-button>
             </md-empty-state>
-        </div>
+        </transition>
 
-        <MapsEditDialog ref="mapsEditDialogRef"></MapsEditDialog>
-        <MapsEditDialogSimple ref="mapsEditDialogSimpleRef"></MapsEditDialogSimple>
-
-        <ContextMenu :c-activated.sync="mapContextMenuEnable" :c-offset-x="contextOffsetX" :c-offset-y="contextOffsetY">
-            <ContextMenuItem c-title="Edit" c-icon="edit" @click="onMapContextMenuEdit" />
-            <ContextMenuItem c-title="Remove" c-icon="delete" @click="onMapContextMenuRemove" />
-        </ContextMenu>
+        <map-create-dialog :show.sync="showCreateDialog" @success="onMapCreated"/>
+        <map-create-simple-dialog :show.sync="showCreateSimpleDialog" @success="onMapCreated"/>
     </div>
 </template>
 
 <script>
-    import ContextMenu from "../ui/ContextMenu/ContextMenu";
-    import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
-    import MapsEditDialog from "./maps/MapsEditDialog";
-    import MapsEditDialogSimple from "./maps/MapsEditDialogSimple";
-
+    // import ContextMenu from "../ui/ContextMenu/ContextMenu";
+    // import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
+    //
     import api from "../../js/api";
+    // import helper from "../../js/utils/helper.js";
+    import WdTable from "../ui/Table/WdTable.vue";
+    import TableCell from "../ui/Table/TableCell.vue";
+    import TableHeaderCell from "../ui/Table/TableHeaderCell.vue";
+    import CharacterWithTicker from "./Characters/CharacterWithTicker.vue";
+    import MapsMixin from "../mixins/maps.js";
+    import exists from "../../js/env/tools/exists.js";
+    import MapEditor from "./maps/MapEditor.vue";
     import helper from "../../js/utils/helper.js";
+    import MapCreateDialog from "./maps/MapCreateDialog.vue";
+    import MapCreateSimpleDialog from "./maps/MapCreateSimpleDialog.vue";
+
+    const TRANSITION_TIMEOUT = 150;
 
     export default {
         name: "Maps",
         components: {
-            ContextMenu, ContextMenuItem, MapsEditDialog, MapsEditDialogSimple
+            // ContextMenu,
+            // ContextMenuItem,
+            WdTable,
+            TableCell,
+            TableHeaderCell,
+            CharacterWithTicker,
+            MapEditor,
+            MapCreateDialog,
+            MapCreateSimpleDialog
         },
-        props: [],
-        data: function () {
+        mixins: [MapsMixin],
+        data () {
             return {
-                maps: [],
-                groups: [],
-
-                loaded: false,
-                mapContextMenuEnable: false,
-                contextOffsetX: 0,
-                contextOffsetY: 0,
+                isEditingMap: false,
+                isEditingMapLoading: false,
+                selectedMapId: null,
+                selectedMaps: [],
+                activeRows: [],
+                showCreateDialog: false,
+                showCreateSimpleDialog: false,
             }
         },
-        mounted: function () {
-            this._loadData();
+        beforeDestroy() {
+            exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
+            this._loadingTimeout = null;
+        },
+        mounted () {
+
+        },
+        computed: {
+            loaded () {
+                return this.loadedMaps;
+            },
+            hasMaps () {
+                return this.mapsList.length > 0;
+            },
+            showMaps () {
+                return this.loaded && this.hasMaps;
+            },
+            showEmptyMaps () {
+                return this.loaded && !this.hasMaps /*true*/;
+            }
         },
         methods: {
-            close: function () {
+            onMapCreated (data) {
+                this.mapsList.push(data);
+            },
+            onRowClicked (event) {
+                if (this.selectedMapId === event.data.id)
+                    return;
 
-            },
-            refresh: function () {
+                this.activeRows = [this.mapsList.searchByObjectKey("id", event.data.id)];
 
-            },
-            _loadData: function ( ) {
-                let prarr = [];
+                if (this.isEditingMap && !this.isEditingFormLoading) {
+                    this.isEditingMap = false;
+                    this.isEditingFormLoading = true;
 
-                prarr.push(api.eve.group.list());
-                prarr.push(api.eve.map.list());
-
-                Promise.all(prarr)
-                    .then(
-                        arr => {
-                            this.loaded = true;
-                            this.groups = arr[0];
-                            this.maps = arr[1];
-                        },
-                        err => helper.errorHandler(this, err)
-                    );
+                    this._loadingTimeout = setTimeout(() => this.updateEditingMap(event), TRANSITION_TIMEOUT);
+                } else {
+                    this.updateEditingMap(event);
+                }
             },
-            edit: function (_mapId) {
-                let mapItem = this.maps.searchByObjectKey("id", _mapId);
-                // let groupItem = this.groups.searchByObjectKey("id", mapItem.guestGroup);
-
-                this.$refs.mapsEditDialogRef.show({
-                    mapId : mapItem.id,
-                    name : mapItem.name,
-                    description : mapItem.description,
-                    groups : mapItem.groups,
-                }).then(function(_options){
-                    mapItem.name = _options.name;
-                    mapItem.description = _options.description;
-                    mapItem.groups = _options.groups;
-                }.bind(this), function(){
-                    // do nothing
-                }.bind(this));
-            },
-            add: function () {
-                this.$refs.mapsEditDialogRef.show().then(function(_options){
-                    this.maps.push({
-                        id          : _options.id,
-                        name        : _options.name,
-                        owner       : _options.owner,
-                        description : _options.description,
-                        groups      : _options.groups,
-                    });
-                }.bind(this), function(){
-                    // do nothing
-                }.bind(this));
-            },
-            addSimple: function () {
-                this.$refs.mapsEditDialogSimpleRef.show().then(function(_options){
-                    this.maps.push({
-                        id          : _options.id,
-                        name        : _options.name,
-                        owner       : _options.owner,
-                        description : _options.description,
-                        groups      : _options.groups,
-                    });
-                }.bind(this), function(){
-                    // do nothing
-                }.bind(this));
-            },
-            onMapRowClick: function (_mapId/*, _event*/) {
-                this.edit(_mapId);
-            },
-            onContextMenu: function (_mapId, _event) {
-                _event.stopPropagation();
-                _event.preventDefault();
-
-                this.mapContextMenuCurrentMap = _mapId;
-                this.mapContextMenuEnable = true;
-                this.contextOffsetX = _event.x + 10;
-                this.contextOffsetY = _event.y + 10;
-            },
-            onMapContextMenuEdit: function () {
-                this.edit(this.mapContextMenuCurrentMap);
-            },
-            onMapContextMenuRemove: function () {
-                api.eve.map.remove(this.mapContextMenuCurrentMap)
+            onRemoveMaps () {
+                Promise.all(this.selectedMaps.map(x => api.eve.map.remove(x.id)))
                     .then(
                         () => {
-                            this.maps.eraseByObjectKey("id", this.mapContextMenuCurrentMap);
-                            this.mapContextMenuCurrentMap = null;
+                            this.selectedMaps.map(x => this.mapsList.eraseByObjectKey("id", x.id));
+                            if(this.selectedMaps.includes(this.selectedMapId)) {
+                                this.selectedMapId = null;
+                                this.isEditingMap = false;
+                                this.isEditingFormLoading = false;
+                            }
                         },
-                        error => helper.errorHandler(this, error)
-                    );
-            }
+                        err => helper.errorHandler(this, err)
+                    )
+            },
+            onMapEdited (data) {
+                let obj = this.mapsList.searchByObjectKey("id", this.selectedMapId);
+                obj.name = data.name;
+                obj.description = data.description;
+            },
+            updateEditingMap (event) {
+                exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
+                this._loadingTimeout = null;
+
+                this.selectedMapId = event.data.id;
+                this.isEditingFormLoading = false;
+                this.isEditingMap = true;
+            },
+            // _loadData: function ( ) {
+            //     let prarr = [];
+            //
+            //     prarr.push(api.eve.group.list());
+            //     prarr.push(api.eve.map.list());
+            //
+            //     Promise.all(prarr)
+            //         .then(
+            //             arr => {
+            //                 this.loaded = true;
+            //                 this.groups = arr[0];
+            //                 this.maps = arr[1];
+            //             },
+            //             err => helper.errorHandler(this, err)
+            //         );
+            // },
+            // edit: function (_mapId) {
+            //     let mapItem = this.maps.searchByObjectKey("id", _mapId);
+            //     // let groupItem = this.groups.searchByObjectKey("id", mapItem.guestGroup);
+            //
+            //     this.$refs.mapsEditDialogRef.show({
+            //         mapId : mapItem.id,
+            //         name : mapItem.name,
+            //         description : mapItem.description,
+            //         groups : mapItem.groups,
+            //     }).then(function(_options){
+            //         mapItem.name = _options.name;
+            //         mapItem.description = _options.description;
+            //         mapItem.groups = _options.groups;
+            //     }.bind(this), function(){
+            //         // do nothing
+            //     }.bind(this));
+            // },
+            // add: function () {
+            //     this.$refs.mapsEditDialogRef.show().then(function(_options){
+            //         this.maps.push({
+            //             id          : _options.id,
+            //             name        : _options.name,
+            //             owner       : _options.owner,
+            //             description : _options.description,
+            //             groups      : _options.groups,
+            //         });
+            //     }.bind(this), function(){
+            //         // do nothing
+            //     }.bind(this));
+            // },
+            // addSimple: function () {
+            //     this.$refs.mapsEditDialogSimpleRef.show().then(function(_options){
+            //         this.maps.push({
+            //             id          : _options.id,
+            //             name        : _options.name,
+            //             owner       : _options.owner,
+            //             description : _options.description,
+            //             groups      : _options.groups,
+            //         });
+            //     }.bind(this), function(){
+            //         // do nothing
+            //     }.bind(this));
+            // },
+            // onMapRowClick: function (_mapId/*, _event*/) {
+            //     this.edit(_mapId);
+            // },
+            // onContextMenu: function (_mapId, _event) {
+            //     _event.stopPropagation();
+            //     _event.preventDefault();
+            //
+            //     this.mapContextMenuCurrentMap = _mapId;
+            //     this.mapContextMenuEnable = true;
+            //     this.contextOffsetX = _event.x + 10;
+            //     this.contextOffsetY = _event.y + 10;
+            // },
+            // onMapContextMenuEdit: function () {
+            //     this.edit(this.mapContextMenuCurrentMap);
+            // },
+            // onMapContextMenuRemove: function () {
+            //     api.eve.map.remove(this.mapContextMenuCurrentMap)
+            //         .then(
+            //             () => {
+            //                 this.maps.eraseByObjectKey("id", this.mapContextMenuCurrentMap);
+            //                 this.mapContextMenuCurrentMap = null;
+            //             },
+            //             error => helper.errorHandler(this, error)
+            //         );
+            // }
         }
     }
 </script>
 
 
 <style lang="scss">
-    @import "src/css/variables";
+    @import "./src/css/variables";
+    $edit-part-width: 400;
+    $threshold: 850;
 
-    .wd-maps {
+    .wd-groups {
         display: flex;
-        flex-direction: column;
+        width: 100%;
 
-        & > .maps-toolbar {
-            padding-bottom: 10px;
-            padding-top: 5px;
+
+        .wd-groups__info {
+            transition: width 350ms, height 350ms;
+            background-color: $bg-secondary;
+
+            .wd-wgi-container {
+                display: flex;
+                flex-direction: column;
+
+                & > * {
+                    height: 50%;
+                };
+            }
         }
 
-        & > .maps-content {
-            .maps-table {
-                height: calc(100vh - 118px);
+        .wd-groups__table {
+            transition: width 350ms, height 350ms;
+            width: 100%;
+            height: 100%;
+        }
 
-                .md-content.md-table-content {
-                    height: initial !important;
-                    max-height: initial !important;;
+        @media screen and (max-width: #{$threshold}px) {
+            flex-direction: column;
+
+            .wd-groups__table {
+                transition: width 350ms, height 350ms;
+                height: 30%;
+            }
+
+            .wd-groups__info {
+                height: 70%;
+            }
+        }
+
+        @for $i from 0 through 3 {
+            @media screen and (min-width: #{$threshold + 1 + 300 * $i}px) {
+                .wd-groups__table {
+                    transition: width 350ms, height 350ms;
+                    width: calc(100% - #{$edit-part-width + 150 * $i}px);
                 }
 
-                &.md-card.md-table,
-                &.md-table.md-theme-default .md-table-content,
-                &.md-table.md-theme-default .md-table-alternate-header {
-                    background-color: $bg-primary;
-                }
-
-                .md-table-fixed-header {
-                    padding-right: 0 !important;
-                }
-
-                .md-table-head,
-                .md-table-cell {
-                    &:nth-child(2) {
-                        .md-table-cell-container {
-                            white-space: nowrap;
-                        }
-                    }
-
-                    &:nth-child(3) {
-                        width: 100%;
-                    }
+                .wd-groups__info {
+                    width: #{$edit-part-width + 150 * $i}px;
                 }
             }
         }
     }
+
 </style>

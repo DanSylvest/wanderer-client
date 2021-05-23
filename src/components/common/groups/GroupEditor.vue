@@ -9,13 +9,11 @@
                                 <label>Name</label>
                                 <md-input v-model="name" @input="onEditFormChange" @change="onEditFormChange"></md-input>
 
-                                <transition name="fade">
+                                <transition name="fade" mode="out-in">
                                     <span class="md-helper-text wd-hint-negative" v-show="!isValidName">
                                         * Group name should contain at least 3 symbols and begins with a symbol
                                     </span>
-                                </transition>
 
-                                <transition name="fade">
                                     <span class="md-helper-text wd-hint-positive" v-show="isValidName">Valid</span>
                                 </transition>
                             </md-field>
@@ -26,7 +24,7 @@
 
                                 <transition name="fade">
                                     <span class="wd-hint-positive md-helper-text" v-if="isDescriptionEmpty">
-                                        This field can be empty
+                                        You can leave this field empty
                                     </span>
                                 </transition>
                             </md-field>
@@ -43,6 +41,10 @@
                         <wd-tab id="tab-alliances" wd-label="Alliances" class="wd-tab wd-tab-alliances wd fs box-sizing">
                             <EveSearcher :items="alliances" @changed="onListsChanged('alliances', $event)" type="alliance" editing />
                         </wd-tab>
+
+<!--                        <wd-tab id="tab-moderators" wd-label="Moderators" class="wd-tab wd-tab-moderators wd fs box-sizing">-->
+<!--                            <EveSearcher :items="moderators" @changed="onListsChanged('moderators', $event)" type="character" editing />-->
+<!--                        </wd-tab>-->
 
                     </wd-tabs>
                 </div>
@@ -85,6 +87,7 @@
                 characters: [],
                 corporations: [],
                 alliances: [],
+                // moderators: [],
                 isDirty: false,
                 valid: false,
 
@@ -139,6 +142,7 @@
                     characters: this.characters,
                     corporations: this.corporations,
                     alliances: this.alliances,
+                    // moderators: this.moderators,
                 };
 
                 let pr;
@@ -202,3 +206,14 @@
         return !!_nickname.match(/[A-Za-z_][A-Za-z_\- ]*?/m);
     };
 </script>
+
+<style scoped lang="scss">
+    .md-autocomplete.md-field {
+        margin: 0;
+    }
+
+    .wd-eve-search {
+        display: grid;
+        grid-template-rows: auto calc(100% - 68px);
+    }
+</style>

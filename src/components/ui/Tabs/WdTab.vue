@@ -1,6 +1,6 @@
 <template>
     <div class="wd-ui-tab wd fs">
-        <transition name="fade" @after-enter="onAfterShow" @after-leave="onAfterHide">
+        <transition name="fade-fast" @after-enter="onAfterShow" @after-leave="onAfterHide">
             <div v-if="lShow" class="wd fs">
                 <slot />
             </div>
