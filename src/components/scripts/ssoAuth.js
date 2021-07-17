@@ -54,7 +54,7 @@ const register = function () {
     api.user.register(data.code)
         .then(
             event => {
-                cookie.set("token", event.token);
+                cookie.set("token", event.token, {expires: 60 * 60 * 24 * 30});
 
                 let page = query.toString({
                     page: "home",

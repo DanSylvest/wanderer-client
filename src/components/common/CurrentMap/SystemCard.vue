@@ -35,6 +35,7 @@
     import environment from "../../../js/core/map/environment";
     import Local from "./SolarSystem/Local.vue";
     import SolarSystemMixin from "../../mixins/solarSystem.js";
+    import eveHelper from "../../../js/eveHelper.js";
 
     export default {
         name: "SystemCard",
@@ -81,39 +82,23 @@
                 return this.$store.state.solarSystems[this.solarSystemId];
             },
             getTypeName () {
-                switch (this.info.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        return this.info.security;
-                    case 3: // WH
-                    case 4: // Thera
-                        return this.info.typeName;
-                    case 5: // abyss
-                    case 6: // penalty?
-                    case 7: // Pochven?
-                        return this.info.security;
+                if (eveHelper.isWormholeSpace(this.info.systemClass)) {
+                    return this.info.classTitle;
+                } else {
+                    return this.info.security;
                 }
-                return "";
             },
             getTypeNameClasses () {
-                switch (this.info.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        return environment.securityForegroundClasses[this.info.security];
-                    case 3: // WH
-                    case 4: // Thera
-                        return environment.typeClasses[this.info.typeName];
-                    case 5: // abyss
-                    case 6: // penalty?
-                    case 7: // Pochven?
-                        return environment.kindClassed[this.info.systemType];
+                if (eveHelper.isKnownSpace(this.info.systemClass)) {
+                    return environment.securityForegroundClasses[this.info.security];
+                } else if (eveHelper.isWormholeSpace(this.info.systemClass)) {
+                    return environment.wormholeClassStyles[this.info.systemClass];
+                } else {
+                    return environment.systemClassStyles[this.info.systemClass];
                 }
-                return "";
             },
             getEffectClass () {
-                return environment.effects[this.info.effectType];
+                return environment.effects[this.info.effectName];
             },
             hasEffect() {
                 return this.info.effectName !== "";

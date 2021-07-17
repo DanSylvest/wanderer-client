@@ -13,14 +13,13 @@ const SolarSystemStore = {
         solarSystemName: null,
         constellationName: null,
         regionName: null,
-        systemType: null,
         typeDescription: null,
-        typeName: null,
+        classTitle: null,
         isShattered: null,
-        effectType: null,
         effectName: null,
-        effectData: null,
+        effectPower: null,
         statics: null,
+        wanderers: null,
         solarSystemNameLC: null,
         triglavianInvasionStatus: null,
     }),
@@ -34,14 +33,13 @@ const SolarSystemStore = {
            state.solarSystemName = data.solarSystemName;
            state.constellationName = data.constellationName;
            state.regionName = data.regionName;
-           state.systemType = data.systemType;
            state.typeDescription = data.typeDescription;
-           state.typeName = data.typeName;
+           state.classTitle = data.classTitle;
            state.isShattered = data.isShattered;
-           state.effectType = data.effectType;
            state.effectName = data.effectName;
-           state.effectData = data.effectData;
+           state.effectPower = data.effectPower;
            state.statics = data.statics;
+           state.wanderers = data.wanderers
            state.solarSystemNameLC = data.solarSystemNameLC;
            state.triglavianInvasionStatus = data.triglavianInvasionStatus;
         }
@@ -57,14 +55,13 @@ const SolarSystemStore = {
                 solarSystemName: data.solarSystemName,
                 constellationName: data.constellationName,
                 regionName: data.regionName,
-                systemType: data.systemType,
                 typeDescription: data.typeDescription,
-                typeName: data.typeName,
+                classTitle: data.classTitle,
                 isShattered: data.isShattered,
-                effectType: data.effectType,
                 effectName: data.effectName,
-                effectData: data.effectData,
+                effectPower: data.effectPower,
                 statics: data.statics,
+                wanderers: data.wanderers,
                 solarSystemNameLC: data.solarSystemNameLC,
                 triglavianInvasionStatus: data.triglavianInvasionStatus,
             })

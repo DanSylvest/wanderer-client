@@ -1,5 +1,13 @@
 /* eslint-disable no-useless-escape*/
 
+/**
+ *
+ * @param name
+ * @param value
+ * @param options
+ * @param options.expires {number} in seconds
+ * @returns {any}
+ */
 const cookie = function(name, value, options) {
 
     if (value === undefined) {

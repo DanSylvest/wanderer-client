@@ -14,10 +14,12 @@
                     </div>
                     <div class="wd-character-content">
                         <system-card :solar-system-id="location" />
-                        <div class="wd-character-name">{{info.name}}</div>&nbsp;
-                        <div class="wd-character-corporation" v-if="hasCorporation">{{info.corporation}}</div>&nbsp;
-                        <div class="wd-character-alliance" v-if="hasAlliance">{{info.alliance}}</div>
                         <ship :ship-id="ship"/>
+                        <div>
+                            <span class="wd-character-name">{{info.name}}</span>&nbsp;
+                            <span class="wd-character-corporation" v-if="hasCorporation">{{info.corporation}}</span>&nbsp;
+                        </div>
+                        <div class="wd-character-alliance" v-if="hasAlliance">{{info.alliance}}</div>
                     </div>
                 </div>
                 <div class="wd-toolbar">

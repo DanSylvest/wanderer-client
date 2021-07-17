@@ -6,11 +6,13 @@ import extend from "../../env/tools/extend";
 import _ui from "../../env/ui";
 import MouseObserver from "../../env/mouseObserver";
 import exists from "../../env/tools/exists";
-import printf from "../../env/tools/printf";
+// import printf from "../../env/tools/printf";
 import environment from "./environment";
 import ActionObserver from "../../env/actionObserver.js";
+import eveHelper from "../../eveHelper.js";
+import eveData from "../../eveData.js";
 
-class Marker extends Emitter{
+class Marker extends Emitter {
     constructor (_options) {
         super();
 
@@ -73,26 +75,26 @@ class Marker extends Emitter{
 
     /**
      *
-     * @param _data {Object}
-     * @param _data.tag {string}
-     * @param _data.isLocked {boolean}
-     * @param _data.name {string}
-     * @param _data.security {string}
-     * @param _data.systemType {number}
-     * @param _data.onlineCount {number}
-     * @param _data.effectType {number}
-     * @param _data.typeName {number}
-     * @param _data.statics {Array}
+     * @param {Object} _data
+     * @param {string} _data.tag
+     * @param {boolean} _data.isLocked
+     * @param {string} _data.name
+     * @param {string} _data.security
+     * @param {number} _data.systemClass
+     * @param {number} _data.onlineCount
+     * @param {number} _data.effectType
+     * @param {number} _data.classTitle
+     * @param {Array} _data.statics
      */
     update (_data) {
         let markerData = this.data;
         let markerEl = this.wrapper;
 
-        if(!exists(_data.position) && !exists(markerData.position)) {
+        if (!exists(_data.position) && !exists(markerData.position)) {
             markerEl.classAdd("hidden");
         }
 
-        if(exists(_data.position)) {
+        if (exists(_data.position)) {
             markerEl.classRemove("hidden")
         }
 
@@ -113,34 +115,34 @@ class Marker extends Emitter{
             _data.onlineCount === 0 ? onlineEl.classAdd("hidden") : onlineEl.classRemove("hidden");
         }
 
-        if(exists(_data.status)) {
+        if (exists(_data.status)) {
             markerEl.classRemove.apply(markerEl, environment.statuses.map(x => `system-status-${x.id}`));
             markerEl.classAdd(`system-status-${environment.statuses[_data.status].id}`);
         }
 
-        if(exists(_data.isHub)) {
+        if (exists(_data.isHub)) {
             let hubEl = _ui.fromElement(markerEl.el.querySelector(".marked-as-hub"));
             _data.isHub ? hubEl.classRemove("hidden") : hubEl.classAdd("hidden");
         }
 
-        if(_data.effectType !== "") {
-            if (exists(_data.systemType) && _data.systemType === 3) {
+        if (_data.effectName && _data.effectName !== "") {
+            if (exists(_data.systemClass) && eveHelper.isWormholeSpace(_data.systemClass)) {
                 let effectEl = _ui.fromElement(markerEl.el.querySelector(".effect-color"));
-                effectEl.classAdd(printf("eve-wh-effect-color-%s", _data.effectType));
+                effectEl.classAdd(environment.effectsBackground[_data.effectName]);
                 effectEl.classRemove("hidden");
             }
 
             let bodyEl;
-            switch(_data.effectType) {
-                case "dazhLiminalityLocus":
+            switch (_data.effectName) {
+                case eveData.effects.dazhLiminalityLocus:
                     bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
                     bodyEl.classRemove("edencom");
                     bodyEl.classAdd("triglavian");
                     break;
-                case "imperialStellarObservatory":
-                case "stateStellarObservatory":
-                case "republicStellarObservatory":
-                case "federalStellarObservatory":
+                case eveData.effects.imperialStellarObservatory:
+                case eveData.effects.stateStellarObservatory:
+                case eveData.effects.republicStellarObservatory:
+                case eveData.effects.federalStellarObservatory:
                     bodyEl = _ui.fromElement(markerEl.el.querySelector(".eve-marker-body"));
                     bodyEl.classRemove("triglavian");
                     bodyEl.classAdd("edencom");
@@ -153,29 +155,21 @@ class Marker extends Emitter{
             _data.isLocked ? lockedEl.classRemove("hidden") : lockedEl.classAdd("hidden")
         }
 
-        if (exists(_data.systemType) && _data.systemType !== markerData.systemType) {
+        if (exists(_data.systemClass) && _data.systemClass !== markerData.systemClass) {
             let systemTypeEl = _ui.fromElement(markerEl.el.querySelector(".system-type"));
             let colorClass = "";
-            switch (_data.systemType) {
-                case 0:
-                case 1:
-                case 2:
-                    colorClass = environment.securityForegroundClasses[_data.security];
-                    break;
-                case 3:
-                case 4:
-                    colorClass = environment.typeClasses[_data.typeName];
-                    _data.statics && this._createStatics(_data.statics)
-                    break;
-                case 5:
-                case 6:
-                case 7:
-                    colorClass = environment.kindClassed[_data.systemType];
-                    break;
+
+            if (eveHelper.isKnownSpace(_data.systemClass)) {
+                colorClass = environment.securityForegroundClasses[_data.security];
+            } else if (eveHelper.isWormholeSpace(_data.systemClass)) {
+                colorClass = environment.wormholeClassStyles[_data.systemClass];
+                _data.statics && this._createStatics(_data.statics)
+            } else {
+                colorClass = environment.systemClassStyles[_data.systemClass];
             }
 
             systemTypeEl.classAdd(colorClass);
-            systemTypeEl.text(_data.typeName);
+            systemTypeEl.text(_data.classTitle);
         }
 
         extend(this.data, _data);
@@ -186,14 +180,23 @@ class Marker extends Emitter{
      * @private
      */
     _createStatics (_statics) {
-        let systemTypeEl = _ui.fromElement(this.wrapper.el.querySelector(".wormhole-statics"));
+        let el = _ui.fromElement(this.wrapper.el.querySelector(".wormhole-statics"));
 
-        for (let a = 0; a < _statics.length; a++) {
-            let staticData = _statics[a];
-            let colorClass = environment.typeClasses[staticData.type]
-            let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${staticData.type}</div>`)
-            systemTypeEl.append(staticEl);
-        }
+        let staticsData = eveHelper.getStaticsData(_statics);
+        staticsData.map(staticData=> {
+            let colorClass = environment.wormholeClassStyles[eveData.wormholeClassesNames[staticData.dest]]
+            let wormholeClass = window.eveStaticData.wormholeClasses[staticData.dest];
+            let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${wormholeClass.shortName}</div>`)
+            el.append(staticEl);
+        })
+
+        // for (let a = 0; a < _statics.length; a++) {
+        //     let staticData = window.eveStaticData.wormholes[_statics[a]];
+        //     let colorClass = environment.wormholeClassStyles[eveData.wormholeClassesNames[staticData.dest]]
+        //     let wormholeClass = window.eveStaticData.wormholeClasses[staticData.dest];
+        //     let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${wormholeClass.shortName}</div>`)
+        //     el.append(staticEl);
+        // }
     }
     select (_isSelect) {
         if (!this.data.isLocked) {

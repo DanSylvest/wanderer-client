@@ -21,7 +21,7 @@
 
                         <template slot="md-autocomplete-item" slot-scope="{ item, term }">
                             <div class="wd-char-item wd flex flex-align-center font-size-medium">
-                                <div :class="getClassBySystemData(item)">{{item.typeName}}</div>
+                                <div :class="getClassBySystemData(item)">{{item.classTitle}}</div>
                                 <md-highlight-text :md-fuzzy-search="false" :md-term="term">{{ item.solarSystemName }}</md-highlight-text>
                                 <div class="constellation-name">{{item.constellationName}}</div>
                                 <div class="region-name">{{item.regionName}}</div>
@@ -53,6 +53,7 @@
     import SpamFilter from "../../../js/env/spamFilter.js";
     import environment from "../../../js/core/map/environment.js";
     import helper from "../../../js/utils/helper.js";
+    import eveHelper from "../../../js/eveHelper.js";
 
     export default {
         name: "MapsEditDialogSimple",
@@ -135,24 +136,18 @@
                     this.systems = [];
                 }
             },
-            getStaticClassColor: function (_staticClass) {
-                return environment.typeClasses[_staticClass];
-            },
+            // getStaticClassColor: function (_staticClass) {
+            //     return environment.typeClasses[_staticClass];
+            // },
             getClassBySystemData (data) {
                 let colorClass = "";
-                switch (data.systemType) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        colorClass = environment.securityForegroundClasses[data.security];
-                        break;
-                    case 3:
-                    case 4:
-                        colorClass = environment.typeClasses[data.typeName];
-                        break;
-                    case 5:
-                        break;
+
+                if(eveHelper.isKnownSpace(data.systemClass)) {
+                    colorClass = environment.securityForegroundClasses[data.security];
+                } else if(eveHelper.isWormholeSpace(data.systemClass)) {
+                    colorClass = environment.wormholeClassStyles[data.systemClass];
                 }
+
                 return colorClass;
             },
             onEditDialogOpened: function () {

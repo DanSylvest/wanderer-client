@@ -22,24 +22,41 @@
                     <md-card-content>
                         <div class="wd-system-overview-content wd flex flex-justify-sb">
                             <div class="wd-system-info wd f-width">
-                                <div class="wd-system-info__system-item" >
-                                    <span class="wd fg-contrast" >Type</span>
-                                    <div class="wd fg-contrast" >
-                                        <span :class="typeDescriptionClass">{{info.typeDescription}}</span> <span v-if="hasType">(<span :class="typeClass">{{typeName}}</span>)</span>
+
+                                <div class="wd-system-info__system-item wd-solar-system-item" >
+                                    <div class="wd fg-contrast wd-solar-system-item__title">Type</div>
+                                    <div class="wd fg-contrast wd-solar-system-item__content">
+                                        <span :class="typeDescriptionClass">{{info.typeDescription}}</span>
                                     </div>
                                 </div>
-                                <div class="wd-system-info__system-item" v-if="status !== 0" >
-                                    <span class="wd fg-contrast" >Status</span>
-                                    <div class="wd fg-contrast" >
+
+                                <div class="wd-system-info__system-item wd-solar-system-item" v-if="status !== 0" >
+                                    <div class="wd fg-contrast wd-solar-system-item__title">Status</div>
+                                    <div class="wd fg-contrast wd-solar-system-item__content">
                                         <span :class="statusClass">{{statusName}}</span>
                                     </div>
                                 </div>
-                                <div class="wd-system-info__system-item" v-if="info.statics.length > 0">
-                                    <span class="wd fg-contrast">Statics</span>
-                                    <div class="text-right wd fg-contrast">
-                                        <div v-for="item in info.statics" :key="item.id">
-                                            <span>{{item.id}}</span>
-                                            (<span :class="getStaticClassColor(item.type)">{{item.fullName}}</span>)
+
+                                <div class="wd-system-info__system-item wd-solar-system-item" v-if="info.statics.length > 0">
+                                    <div class="wd fg-contrast wd-solar-system-item__title">Static</div>
+                                    <div class="text-right wd fg-contrast wd-statics wd-solar-system-item__content" >
+                                        <div class="wd-static-item" v-for="item in getStaticsData(info.statics)" :key="item.wormholeClassID">
+                                            <div class="wd-static-item__wormhole-id">{{item.name}}</div>
+                                            <div class="wd-static-item__wormhole-class" :class="getStaticClassColor(item.wormholeClassID)">
+                                                {{getWormholeData(item.dest).shortName}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="wd-system-info__system-item wd-solar-system-item" v-if="info.wanderers.length > 0">
+                                    <div class="wd fg-contrast wd-solar-system-item__title">Wandering</div>
+                                    <div class="text-right wd fg-contrast wd-statics wd-solar-system-item__content" >
+                                        <div class="wd-static-item" v-for="item in getStaticsData(info.wanderers)" :key="item.wormholeClassID">
+                                            <div class="wd-static-item__wormhole-id">{{item.name}}</div>
+                                            <div class="wd-static-item__wormhole-class" :class="getStaticClassColor(item.wormholeClassID)">
+                                                {{getWormholeData(item.dest).shortName}}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +77,10 @@
 
                 <md-card-content>
                     <div class="effect-bonuses-list">
-                        <div :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" v-for="item in effectData" :key="item.description">{{item.description}}</div>
+                        <div v-for="item in effectData" :key="item.name">
+                            <span>{{item.name}}</span>:
+                            <span :class="item.positive ? 'wd-effect-positive' : 'wd-effect-negative'" >{{item.power}}</span>
+                        </div>
                     </div>
                 </md-card-content>
             </md-card>
@@ -102,6 +122,7 @@
     import api from "../../../../js/api.js";
     import helper from "../../../../js/utils/helper.js";
     import SolarSystemMixin from "../../../mixins/solarSystem.js";
+    import eveHelper from "../../../../js/eveHelper.js";
 
     export default {
         name: "Overview",
@@ -159,64 +180,40 @@
                 return this.info.effectName !== "";
             },
             effectClass () {
-                return environment.effects[this.info.effectType];
+                return environment.effects[this.info.effectName];
             },
             typeDescriptionClass () {
-                return environment.kindClassed[this.info.systemType];
+                return environment.wormholeClassStyles[this.info.systemClass];
             },
             effectData () {
-                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-                return this.info.effectData.sort((x, y) => {
-                    return (x.positive === y.positive) ? 0 : x.positive ? -1 : 1;
-                });
+                return eveHelper.extractEffects(this.info.effectName, this.info.effectPower)
             },
             securityClass () {
                 return environment.securityForegroundClasses[this.info.security];
             },
 
             solarSystemLink () {
-                switch (this.info.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
-                    case 3: // WH
-                    case 4: // Thera
-                        return "http://anoik.is/systems/" + this.info.solarSystemName;
-                    default:
-                        return "";
+                if(eveHelper.isKnownSpace(this.info.systemClass)) {
+                    return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
+                } else if(eveHelper.isWormholeSpace(this.info.systemClass)) {
+                    return "http://anoik.is/systems/" + this.info.solarSystemName;
+                } else {
+                    return "";
                 }
             },
             hasType () {
-                switch (this.info.systemType) {
-                    case 3: // WH
-                    case 4: // Thera
-                    case 5: // abyss
-                        return true;
-                    default:
-                        return false;
-                }
+                return eveHelper.isWormholeSpace(this.info.systemClass) || eveHelper.isAbyssSpace(this.info.systemClass);
             },
-            typeName () {
-                switch (this.info.systemType) {
-                    case 3: // WH
-                    case 4: // Thera
-                    case 5: // abyss
-                        return this.info.typeName;
-                    default:
-                        return "";
-                }
+            classTitle () {
+                return this.info.classTitle;
             },
             typeClass () {
-                switch (this.info.systemType) {
-                    case 3: // WH
-                    case 4: // Thera
-                        return environment.typeClasses[this.info.typeName];
-                    default:
-                        return "";
+                if(eveHelper.isWormholeSpace(this.info.systemClass)) {
+                    return environment.wormholeClassStyles[this.info.systemClass];
+                } else {
+                    return "";
                 }
             },
-
             gridClass () {
                 let full = !this.lIsCompact;
                 let effect = this.hasEffect;
@@ -233,6 +230,8 @@
             }
         },
         methods: {
+            getStaticsData: statics => eveHelper.getStaticsData(statics),
+            getWormholeData: id => eveHelper.getWormholeData(id),
             watchAttrsUpdatedSolarSystem () {
                 this._sfInput.stop();
                 this._descIE.stop();
@@ -259,7 +258,7 @@
                 }
             },
             getStaticClassColor: function (_staticClass) {
-                return environment.typeClasses[_staticClass];
+                return environment.wormholeClassStyles[_staticClass];
             },
 
             onHighlightRoute (route) {
@@ -295,6 +294,57 @@
 
     .md-card {
         height: 100%;
+    }
+
+    .wd-statics {
+        display: flex;
+        flex-wrap: wrap;
+
+        .wd-static-item {
+            white-space: nowrap;
+            display: flex;
+
+            .wd-static-item__wormhole-id {
+                font-size: 13px;
+            }
+
+            .wd-static-item__wormhole-class {
+                margin-left: 2px;
+                font-size: 11px;
+                display: flex;
+                align-items: flex-start;
+                margin-top: -1px;
+            }
+
+            &:not(:last-child) {
+                margin-right: 5px;
+            }
+        }
+
+    }
+
+    .wd-solar-system-item {
+        display: flex;
+        flex-direction: column;
+        border-left: 2px solid $border-color-primary-3;
+        padding-left: 5px;
+
+        & * {
+            line-height: 1.3;
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+
+        .wd-solar-system-item__title {
+            color: $fg-primary-1;
+            font-size: 11px;
+        }
+
+        .wd-solar-system-item__content {
+            /*font-size: 13px;*/
+        }
     }
 
     .wd-content {
@@ -492,11 +542,11 @@
                 color: $fg-contrast;
             }
 
-            & > .wd-effect-positive {
+            & .wd-effect-positive {
                 color: $fg-positive;
             }
 
-            & > .wd-effect-negative {
+            & .wd-effect-negative {
                 color: $fg-negative;
             }
         }

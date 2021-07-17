@@ -37,6 +37,7 @@
     import AppMenu from "../ui/App/AppMenu";
     import AppMenuItem from "../ui/App/AppMenuItem";
     import ServerStatusMixin from "../mixins/serverStatus.js";
+    import eveStaticData from "../../js/eveStaticData.js";
 
     export default {
         name: "Home",
@@ -56,14 +57,18 @@
             }
         },
         mounted: function () {
-
             this._tid = -1;
 
-            let page = _getSubPage();
+            eveStaticData.get()
+                .then(data => {
+                    window.eveStaticData = data;
 
-            setTimeout(() => {
-                this._load(page === null ? "currentMap" : page);
-            }, 1300);
+                    let page = _getSubPage();
+
+                    setTimeout(() => {
+                        this._load(page === null ? "currentMap" : page);
+                    }, 1300);
+                });
         },
         computed: {
             classColor () {

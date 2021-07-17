@@ -14,14 +14,13 @@ import {SolarSystemsStore, SolarSystemStore} from "../../../store/modules/univer
  * @property {String} $solarSystemName
  * @property {String} $constellationName
  * @property {String} $regionName
- * @property {String} $systemType
  * @property {String} $typeDescription
- * @property {String} $typeName
+ * @property {String} $classTitle
  * @property {String} $isShattered
- * @property {String} $effectType
  * @property {String} $effectName
- * @property {String} $effectData
+ * @property {String} $effectPower
  * @property {String} $statics
+ * @property {String} $wanderers
  * @property {String} $solarSystemNameLC
  * @property {String} $triglavianInvasionStatus
 
@@ -42,14 +41,13 @@ class SolarSystem extends RequestProvider {
         this._addAccessData("solarSystemName");
         this._addAccessData("constellationName");
         this._addAccessData("regionName");
-        this._addAccessData("systemType");
         this._addAccessData("typeDescription");
-        this._addAccessData("typeName");
+        this._addAccessData("classTitle");
         this._addAccessData("isShattered");
-        this._addAccessData("effectType");
         this._addAccessData("effectName");
-        this._addAccessData("effectData");
+        this._addAccessData("effectPower");
         this._addAccessData("statics");
+        this._addAccessData("wanderers");
         this._addAccessData("solarSystemNameLC");
         this._addAccessData("triglavianInvasionStatus");
     }

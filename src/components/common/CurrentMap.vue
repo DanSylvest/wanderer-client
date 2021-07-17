@@ -152,6 +152,7 @@
     import ChainContextMenu from "./CurrentMap/ContextMenu/ChainContextMenu.vue";
     import AppToolbar from "../ui/App/AppToolbar.vue";
     import CharacterCard from "./CurrentMap/CharacterCard.vue";
+    import eveHelper from "../../js/eveHelper.js";
 
     export default {
         name: "CurrentMap",
@@ -454,22 +455,11 @@
                 this.systemCMActive = true;
                 let systemInfo = this.mapController.getSystem(solarSystemId).data();
 
-                let isSystemInKSpace = false;
-                switch (systemInfo.systemType) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        isSystemInKSpace = true;
-                        break;
-                    default:
-                        isSystemInKSpace = false;
-                }
-
                 this.solarSystemContextData = {
                     offset: {x: x + 10, y: y + 10},
                     tag: systemInfo.tag,
                     status: systemInfo.status,
-                    isSystemInKSpace: isSystemInKSpace,
+                    isSystemInKSpace: eveHelper.isKnownSpace(systemInfo.systemClass),
                     markAsHub: this.mapController.hubs.indexOf(this._currentContextSystem) === -1,
                     isLocked: systemInfo.isLocked,
                     mapId: this.mapController.mapId,

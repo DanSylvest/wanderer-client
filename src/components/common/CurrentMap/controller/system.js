@@ -69,19 +69,14 @@ class System extends Emitter {
         }
     }
 
-    _onDynamicDataChanged (/*data*/) {
+    _onDynamicDataChanged (event) {
         this._data = extend(this._data, this._getMapSolarSystemProvider().data());
 
-        // this._data.onlineCount = Number.randomInt(1, 255); // for tests
-
-        if(exists(this.markerId))
-            this.map.updateMarker(this.markerId, this._data);
+        if (exists(this.markerId))
+            this.map.updateMarker(this.markerId, event ? event.data : this._data);
     }
 
     _onStaticDataChanged (/*event*/) {
-        // this._data = extend(this._data, event);
-
-        // this._data = extend(this._data, newData);
         this._data = extend(this._data, this._getStaticSolarSystemProvider().data());
 
         if(exists(this.markerId))
@@ -90,7 +85,7 @@ class System extends Emitter {
 
     setIsHub (isHub) {
         this._data = extend(this._data, {isHub});
-        this._onDynamicDataChanged()
+        this._onDynamicDataChanged({data: {isHub}})
     }
 
     data () {

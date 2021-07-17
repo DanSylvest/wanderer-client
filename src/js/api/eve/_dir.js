@@ -1,7 +1,3 @@
-/**
- * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 5/29/20.
- */
-
 import alliance         from "./alliance/_dir";
 import character        from "./character/_dir";
 import corporation      from "./corporation/_dir";

@@ -55,7 +55,7 @@
                     <table-header-cell sortable id="name">name</table-header-cell>
                     <table-header-cell sortable id="jumps" width-policy="55px">jumps</table-header-cell>
                     <table-header-cell id="path" width-policy="1fr">path</table-header-cell>
-                    <table-header-cell id="buttonbar" width-policy="45px"></table-header-cell>
+                    <table-header-cell id="buttonbar" width-policy="55px"></table-header-cell>
                 </template>
 
                 <template v-slot:row="{row}">
@@ -100,7 +100,7 @@
                             </template>
                         </div>
                     </table-cell>
-                    <table-cell id="buttonbar" class="wd-list-margins wd padding-horizontal-primary">
+                    <table-cell id="buttonbar" class="wd-list-margins wd padding-horizontal-primary wd-route-actions">
                         <div class="wd-icon-button" @click="onHighlightRoute(row.systems)">
                             <md-tooltip>Highlight this route at map</md-tooltip>
                             <md-icon>gps_fixed</md-icon>
@@ -145,6 +145,7 @@
     import extend from "../../../../../js/env/tools/extend.js";
     import RoutesSettings from "./Routes/RoutesSettings.vue";
     import cookie from "../../../../../js/env/cookie.js";
+    import eveHelper from "../../../../../js/eveHelper.js";
 
     export default {
         name: "Routes",
@@ -204,7 +205,7 @@
         computed : {
             processedRoutes () {
                 return this.routes.map(row => ({
-                    status: row.systems.last().typeName,
+                    status: row.systems.last().classTitle,
                     statusClass: this.getSystemTypeClass(row.systems.last()),
                     name: row.systems.last().solarSystemName,
                     hasConnection: row.hasConnection,
@@ -387,60 +388,33 @@
                 this.$emit("highlight-route", systems.map(x => x.solarSystemId))
             },
 
-            //typeName systemType, security
-            getSystemTypeClass (data){
-                switch (data.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        return environment.securityForegroundClasses[data.security];
-                    case 3: // WH
-                    case 4: // Thera
-                        return environment.typeClasses[data.typeName];
-                    case 5: // abyss
-                    case 6: // penalty?
-                    case 7: // Pochven?
-                        return environment.kindClassed[data.systemType];
+            getSystemTypeClass (data) {
+                if (eveHelper.isKnownSpace(data.systemClass)) {
+                    return environment.securityForegroundClasses[data.security];
+                } else if (eveHelper.isWormholeSpace(data.systemClass)) {
+                    return environment.wormholeClassStyles[data.systemClass];
+                } else {
+                    return environment.systemClassStyles[data.systemClass];
                 }
             },
             getBackgroundClass (data){
-                switch (data.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        return environment.securityBackgroundClasses[data.security];
-                    case 3: // WH
-                    case 4: // Thera
-                        return environment.typeBackgroundClasses[data.typeName];
-                    case 5: // abyss
-                    case 6: // penalty?
-                    case 7: // Pochven?
-                        return environment.kindBackgroundClasses[data.systemType];
+                if (eveHelper.isKnownSpace(data.systemClass)) {
+                    return environment.securityBackgroundClasses[data.security];
+                } else if (eveHelper.isWormholeSpace(data.systemClass)) {
+                    return environment.wormholeClassBackgroundStyles[data.systemClass];
+                } else {
+                    return environment.systemClassBackgroundStyles[data.systemClass];
                 }
             },
             getShapeClass (data) {
-                switch (data.systemType) {
-                    case 0: // high-sec
-                    case 1: // low-sec
-                    case 2: // null-sec
-                        switch (data.triglavianInvasionStatus) {
-                            case "Normal":
-                                return ""
-                            case "Final":
-                            case "Edencom":
-                            case "Triglavian":
-                                return "wd-route-system-shape-triangle";
-                        }
-                        return "";
-                    case 3: // WH
-                    case 4: // Thera
-                        return "wd-route-system-shape-circle";
-                    case 5: // abyss
-                    case 6: // penalty?
-                        return "";
-                    case 7: // Pochven?
-                        return "wd-route-system-shape-triangle";
+                if(eveHelper.isPochvenSpace(data.systemClass) || (eveHelper.isKnownSpace(data.systemClass) && eveHelper.isTriglavianInvasion(data.triglavianInvasionStatus))) {
+                    return "wd-route-system-shape-triangle";
                 }
+
+                if(eveHelper.isWormholeSpace(data.systemClass)) {
+                    return "wd-route-system-shape-circle";
+                }
+
                 return "";
             }
         }
@@ -456,6 +430,10 @@
         align-items: center;
         box-sizing: border-box;
         padding: 20px;
+    }
+
+    .wd-route-actions {
+        min-width: 40px;
     }
 
     .wd-route {

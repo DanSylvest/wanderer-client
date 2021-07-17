@@ -84,9 +84,9 @@
                 v-if="showEmptyMaps"
                 md-icon="layers"
                 md-label="Create your map!"
-                md-description="Map description."
+                md-description="Map allow track your characters also a lot of different settings allow give a access to your map."
             >
-                <md-button class="md-dense md-primary md-raised" @click="false">
+                <md-button class="md-dense md-primary md-raised" @click="showCreateSimpleDialog = true">
                     <span style="vertical-align: middle">Create</span>
                 </md-button>
             </md-empty-state>
@@ -98,11 +98,7 @@
 </template>
 
 <script>
-    // import ContextMenu from "../ui/ContextMenu/ContextMenu";
-    // import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
-    //
     import api from "../../js/api";
-    // import helper from "../../js/utils/helper.js";
     import WdTable from "../ui/Table/WdTable.vue";
     import TableCell from "../ui/Table/TableCell.vue";
     import TableHeaderCell from "../ui/Table/TableHeaderCell.vue";
@@ -119,8 +115,6 @@
     export default {
         name: "Maps",
         components: {
-            // ContextMenu,
-            // ContextMenuItem,
             WdTable,
             TableCell,
             TableHeaderCell,
@@ -208,90 +202,6 @@
                 this.isEditingFormLoading = false;
                 this.isEditingMap = true;
             },
-            // _loadData: function ( ) {
-            //     let prarr = [];
-            //
-            //     prarr.push(api.eve.group.list());
-            //     prarr.push(api.eve.map.list());
-            //
-            //     Promise.all(prarr)
-            //         .then(
-            //             arr => {
-            //                 this.loaded = true;
-            //                 this.groups = arr[0];
-            //                 this.maps = arr[1];
-            //             },
-            //             err => helper.errorHandler(this, err)
-            //         );
-            // },
-            // edit: function (_mapId) {
-            //     let mapItem = this.maps.searchByObjectKey("id", _mapId);
-            //     // let groupItem = this.groups.searchByObjectKey("id", mapItem.guestGroup);
-            //
-            //     this.$refs.mapsEditDialogRef.show({
-            //         mapId : mapItem.id,
-            //         name : mapItem.name,
-            //         description : mapItem.description,
-            //         groups : mapItem.groups,
-            //     }).then(function(_options){
-            //         mapItem.name = _options.name;
-            //         mapItem.description = _options.description;
-            //         mapItem.groups = _options.groups;
-            //     }.bind(this), function(){
-            //         // do nothing
-            //     }.bind(this));
-            // },
-            // add: function () {
-            //     this.$refs.mapsEditDialogRef.show().then(function(_options){
-            //         this.maps.push({
-            //             id          : _options.id,
-            //             name        : _options.name,
-            //             owner       : _options.owner,
-            //             description : _options.description,
-            //             groups      : _options.groups,
-            //         });
-            //     }.bind(this), function(){
-            //         // do nothing
-            //     }.bind(this));
-            // },
-            // addSimple: function () {
-            //     this.$refs.mapsEditDialogSimpleRef.show().then(function(_options){
-            //         this.maps.push({
-            //             id          : _options.id,
-            //             name        : _options.name,
-            //             owner       : _options.owner,
-            //             description : _options.description,
-            //             groups      : _options.groups,
-            //         });
-            //     }.bind(this), function(){
-            //         // do nothing
-            //     }.bind(this));
-            // },
-            // onMapRowClick: function (_mapId/*, _event*/) {
-            //     this.edit(_mapId);
-            // },
-            // onContextMenu: function (_mapId, _event) {
-            //     _event.stopPropagation();
-            //     _event.preventDefault();
-            //
-            //     this.mapContextMenuCurrentMap = _mapId;
-            //     this.mapContextMenuEnable = true;
-            //     this.contextOffsetX = _event.x + 10;
-            //     this.contextOffsetY = _event.y + 10;
-            // },
-            // onMapContextMenuEdit: function () {
-            //     this.edit(this.mapContextMenuCurrentMap);
-            // },
-            // onMapContextMenuRemove: function () {
-            //     api.eve.map.remove(this.mapContextMenuCurrentMap)
-            //         .then(
-            //             () => {
-            //                 this.maps.eraseByObjectKey("id", this.mapContextMenuCurrentMap);
-            //                 this.mapContextMenuCurrentMap = null;
-            //             },
-            //             error => helper.errorHandler(this, error)
-            //         );
-            // }
         }
     }
 </script>

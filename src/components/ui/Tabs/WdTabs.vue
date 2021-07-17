@@ -122,8 +122,6 @@
     @import "src/css/variables";
 
     .wd-ui-tabs {
-        /*display: flex;*/
-        /*flex-direction: column;*/
         display: grid;
         grid-template-rows: 42px calc(100% - 42px);
 
