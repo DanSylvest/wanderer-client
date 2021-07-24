@@ -15,7 +15,7 @@
     }
 </script>
 
-<style scoped lang="postcss">
+<style scoped>
 
     .Loader {
         padding-top: 10px;
