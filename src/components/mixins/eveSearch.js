@@ -68,7 +68,7 @@ const EveSearchMixin = {
                 this.elements.push(this._seletedItem);
                 this.buttonDisabled = true;
                 this.currentValue = "";
-                this.$emit("changed", this.elements.map(x => x.id));
+                this.$emit("changed", this.elements.map(x => parseInt(x.id)));
             }
         },
         onRowsSelected: function (_selectedGroups) {

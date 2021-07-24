@@ -34,7 +34,7 @@
                         <character-with-ticker :character-id="row.id" />
                     </table-cell>
                     <table-cell id="status" class="wd padding-horizontal-primary">
-                        <md-switch v-model="row.track" class="md-primary wd-small-switch"></md-switch>
+                        <md-switch v-model="row.track" class="md-primary wd-small-switch" @change="isDirty = true"></md-switch>
                     </table-cell>
                 </template>
             </wd-table>
