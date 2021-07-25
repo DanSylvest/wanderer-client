@@ -139,7 +139,7 @@
                 let options = {
                     name: this.name,
                     description: this.description,
-                    characters: this.characters.map(x => parseInt(x)),
+                    characters: this.characters.map(x => x.toString()),
                     corporations: this.corporations,
                     alliances: this.alliances,
                     // moderators: this.moderators,
