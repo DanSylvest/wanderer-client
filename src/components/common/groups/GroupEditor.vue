@@ -140,8 +140,8 @@
                     name: this.name,
                     description: this.description,
                     characters: this.characters.map(x => x.toString()),
-                    corporations: this.corporations,
-                    alliances: this.alliances,
+                    corporations: this.corporations.map(x => x.toString()),
+                    alliances: this.alliances.map(x => x.toString()),
                     // moderators: this.moderators,
                 };
 
