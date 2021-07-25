@@ -13,7 +13,7 @@
 
                     </div>
                     <div class="wd-character-content">
-                        <system-card :solar-system-id="location" />
+                        <system-card :solar-system-id="location" :is-show-effect="false" />
                         <ship :ship-id="ship"/>
                         <div>
                             <span class="wd-character-name">{{info.name}}</span>&nbsp;

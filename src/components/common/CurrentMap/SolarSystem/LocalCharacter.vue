@@ -1,6 +1,6 @@
 <template>
     <div class="solar-system-local-character" v-if="loadedCharacter">
-        <span :class="classes">{{info.name}}</span>&nbsp;&nbsp;
+        <span :class="classes">{{info.name}}</span>
         <template v-if="hasAlliance">
             <span class="solar-system-local-character__ticker">[{{info.allianceTicker}}]</span>
         </template>

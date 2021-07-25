@@ -9,7 +9,7 @@
             <div class="wd-system-card__header">
                 <div :class="getTypeNameClasses">{{getTypeName}}</div>
                 <div class="solar-system-name">{{info.solarSystemName}}</div>
-                <div class="solar-system-effect wd-color-primary-2" v-if="hasEffect">
+                <div class="solar-system-effect wd-color-primary-2" v-if="isShowEffect && hasEffect">
                     [<span :class="getEffectClass">{{info.effectName}}</span>]
                 </div>
                 <div class="constellation-name">{{info.constellationName}}</div>
@@ -42,6 +42,10 @@
         mixins: [SolarSystemMixin],
         components: {Local},
         props: {
+            isShowEffect: {
+                type: Boolean,
+                default: true
+            },
             isLoadCharData: {
                 type: Boolean,
                 default: true
