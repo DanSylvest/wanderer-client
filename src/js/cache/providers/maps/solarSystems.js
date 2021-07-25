@@ -68,7 +68,9 @@ class SolarSystem extends SubscriptionProvider {
                 break;
         }
 
-        store.dispatch(`maps/${this.mapId}/solarSystems/${this._id}/update`, data);
+        if (event.type !== 'multipleEvents') {
+            store.dispatch(`maps/${this.mapId}/solarSystems/${this._id}/update`, data);
+        }
     }
 
     _createSubscriber() {

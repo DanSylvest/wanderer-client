@@ -72,6 +72,11 @@ class System extends Emitter {
     _onDynamicDataChanged (event) {
         this._data = extend(this._data, this._getMapSolarSystemProvider().data());
 
+        if(event.type === "multipleEvents") {
+            event.list.map(e => this._onDynamicDataChanged(e));
+            return;
+        }
+
         if (exists(this.markerId))
             this.map.updateMarker(this.markerId, event ? event.data : this._data);
     }
