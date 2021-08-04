@@ -1,7 +1,7 @@
 <template>
     <div v-if="loadedShip" class="wd-ship-type">
-        <span class="wd-ship-type__name">{{shipInfo.typeName}}</span>&nbsp;
-        <span class="wd-ship-type__group">{{shipInfo.groupName}}</span>
+        <div class="wd-ship-type__name">{{shipInfo.typeName}}</div>
+        <div class="wd-ship-type__group" v-if="enableShipClass">{{shipInfo.groupName}}</div>
     </div>
 </template>
 
@@ -11,6 +11,12 @@
     export default {
         name: "Ship",
         mixins: [ShipMixin],
+        props: {
+            enableShipClass: {
+                type: Boolean,
+                default: true
+            }
+        }
     }
 </script>
 
@@ -20,15 +26,18 @@
     $character-color-1: md-get-palette-color(orange, 500);
 
     .wd-ship-type {
+        line-height: 1;
+        display: flex;
 
         .wd-ship-type__name {
-            font-size: 14px;
+            font-size: 13px;
             color: $fg-primary;
+            padding-right: 3px;
         }
 
         .wd-ship-type__group {
-            font-size: 11px;
-            color: $fg-primary-2;
+            font-size: 10px;
+            color: $fg-primary-3;
         }
     }
 

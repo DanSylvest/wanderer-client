@@ -1,14 +1,16 @@
 <template>
     <div class="solar-system-local-character" v-if="loadedCharacter">
-        <span :class="classes">{{info.name}}</span>
-        <template v-if="hasAlliance">
-            <span class="solar-system-local-character__ticker">[{{info.allianceTicker}}]</span>
-        </template>
-        <template v-else-if="hasCorporation">
-            <span class="solar-system-local-character__ticker">[{{info.corporationTicker}}]</span>
-        </template>
+        <div class="ss-character-part">
+            <span :class="classes">{{info.name}}</span>
+            <template v-if="hasAlliance">
+                <span class="solar-system-local-character__ticker">[{{info.allianceTicker}}]</span>
+            </template>
+            <template v-else-if="hasCorporation">
+                <span class="solar-system-local-character__ticker">[{{info.corporationTicker}}]</span>
+            </template>
+        </div>
 
-        <ship class="solar-system-local-character__ship" :ship-id="info.ship" />
+        <ship class="solar-system-local-character__ship" :ship-id="ship" :enable-ship-class="false" />
     </div>
 </template>
 
@@ -25,23 +27,12 @@
                 loadDynamicCharacterData: true
             }
         },
-        mounted: function () {
-
-        },
-        beforeDestroy() {
-
-        },
         computed : {
             classes () {
                 return {
                     'solar-system-local-name':true,
                     'solar-system-local-name-own': this.info.isOwn
                 }
-            }
-        },
-        methods: {
-            _onLoaded () {
-                CharacterMixin.methods._onLoaded.call(this);
             }
         }
     }
@@ -55,8 +46,12 @@
     .solar-system-local-character {
         white-space: nowrap;
         display: flex;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
+
+        .ss-character-part {
+            padding-right: 20px;
+        }
 
         .solar-system-local-character__ticker {
             margin-left: 3px;

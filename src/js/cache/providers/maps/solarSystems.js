@@ -80,7 +80,7 @@ class SolarSystem extends SubscriptionProvider {
     _emulateEvent() {
         return {
             type: "bulk",
-            list: extend({}, this._data)
+            data: extend({}, this._data)
         };
     }
 
