@@ -40,16 +40,7 @@ const CharacterMixin = {
         },
         ship () {
             return this.$store.state.characters[this.lCharacterId].ship.value;
-        },
-        info () {
-            return this.$store.state.characters[this.lCharacterId].info;
-        },
-        hasAlliance () {
-            return this.info.alliance !== null;
-        },
-        hasCorporation () {
-            return this.info.corporation !== null;
-        },
+        }
     },
     methods: {
         _onLoadedCharacter () {
@@ -94,11 +85,6 @@ const unsubscribeData = function () {
             delete this.characterData.unsubscriberShip;
         }
     }
-
-    if (exists(this.characterData.unsubscriberInfo)) {
-        this.characterData.unsubscriberInfo();
-        delete this.characterData.unsubscriberInfo;
-    }
 }
 
 const subscribeData = function () {
@@ -110,13 +96,10 @@ const subscribeData = function () {
         this.characterData.unsubscriberShip = cache.characters.list.get(this.lCharacterId).ship.subscribe();
     }
 
-    this.characterData.unsubscriberInfo = cache.characters.list.get(this.lCharacterId).info.subscribe();
-
     let prarr = [
         this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).online.readyPromise(),
         this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).location.readyPromise(),
-        this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).ship.readyPromise(),
-        cache.characters.list.get(this.lCharacterId).info.readyPromise(),
+        this.loadDynamicCharacterData && cache.characters.list.get(this.lCharacterId).ship.readyPromise()
     ];
 
     Promise.all(prarr)

@@ -3,19 +3,7 @@
         <AppToolbar>
             <div class="wd-map-toolbar">
                 <transition name="fade">
-                    <div v-show="!loadingMap" class="wd-map-toolbar__characters">
-                        <div
-                            class="wd-characters-icons wd-bg-default"
-                            :class="{'character-online': item.online}"
-                            v-for="item in charactersStatuses"
-                            :style="getCharImageUrlStyle(item.charId)"
-                            :key="item.charId"
-                        >
-                            <tooltip placement="bottom" :customPosition="false" class="wd wd-layout-secondary md-elevation-2" >
-                                <character-card :map-id="selectedMap" :character-id="item.charId" />
-                            </tooltip>
-                        </div>
-                    </div>
+                    <user-characters v-show="!loadingMap" :map-id="selectedMap"/>
                 </transition>
             </div>
         </AppToolbar>
@@ -103,14 +91,14 @@
                 </context-menu>
 
                 <tooltip
-                    :offset-x="item.x"
-                    :offset-y="item.y"
+                    v-for="{x, y, systemId, mapId} in systemsTooltipDisplayed"
+                    :offset-x="x"
+                    :offset-y="y"
                     :activated="true"
-                    :key="item.systemId"
-                    v-for="item in systemsTooltipDisplayed"
+                    :key="systemId"
                     class="wd-layout-secondary"
                 >
-                    <system-card :solar-system-id="item.systemId" :map-id="item.mapId" :exists-on-map="true"/>
+                    <system-card :solar-system-id="systemId" :map-id="mapId" :exists-on-map="true"/>
                 </tooltip>
 
                 <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
@@ -130,44 +118,44 @@
 </template>
 
 <script>
-    import CustomPromise from "../../js/env/promise";
-    import cookie from "../../js/env/cookie";
-    import query from "../../js/env/query";
-    import api from "../../js/api";
-    import MapController from "./CurrentMap/controller/mapController";
-    import Map from "../../js/core/map/map";
-    import exists from "../../js/env/tools/exists";
-    import environment from "../../js/core/map/environment.js";
-    import SolarSystemContextMenu from "./CurrentMap/ContextMenu/SolarSystemContextMenu.vue";
+    import CustomPromise from "../../../js/env/promise";
+    import cookie from "../../../js/env/cookie";
+    import query from "../../../js/env/query";
+    import api from "../../../js/api";
+    import MapController from "./controller/mapController";
+    import Map from "../../../js/core/map/map";
+    import exists from "../../../js/env/tools/exists";
+    import environment from "../../../js/core/map/environment.js";
+    import SolarSystemContextMenu from "./ContextMenu/SolarSystemContextMenu.vue";
 
-    import ContextMenu from "../ui/ContextMenu/ContextMenu";
-    import ContextMenuItem from "../ui/ContextMenu/ContextMenuItem";
-    import Tooltip from "../ui/Tooltip";
-    import AreaSelection from "../ui/AreaSelection";
-    import SystemPanel from "./CurrentMap/SystemPanel";
-    import SystemCard from "./CurrentMap/SystemCard";
-    import SystemAddDialog from "./CurrentMap/SystemAddDialog.vue";
-    import copyToClipboard from "../../js/env/copyToClipboard.js";
-    import helper from "../../js/utils/helper.js";
-    import ChainContextMenu from "./CurrentMap/ContextMenu/ChainContextMenu.vue";
-    import AppToolbar from "../ui/App/AppToolbar.vue";
-    import CharacterCard from "./CurrentMap/CharacterCard.vue";
-    import eveHelper from "../../js/eveHelper.js";
+    import ContextMenu from "../../ui/ContextMenu/ContextMenu";
+    import ContextMenuItem from "../../ui/ContextMenu/ContextMenuItem";
+    import AreaSelection from "../../ui/AreaSelection";
+    import SystemPanel from "./SystemPanel";
+    import Tooltip from "../../ui/Tooltip";
+    import SystemCard from "./SystemCard";
+    import SystemAddDialog from "./SystemAddDialog.vue";
+    import copyToClipboard from "../../../js/env/copyToClipboard.js";
+    import helper from "../../../js/utils/helper.js";
+    import ChainContextMenu from "./ContextMenu/ChainContextMenu.vue";
+    import AppToolbar from "../../ui/App/AppToolbar.vue";
+    import eveHelper from "../../../js/eveHelper.js";
+    import UserCharacters from "./UserCharacters/UserCharacters";
 
     export default {
         name: "CurrentMap",
         components: {
+            UserCharacters,
             ContextMenu,
             ContextMenuItem,
-            Tooltip,
             AreaSelection,
             SystemPanel,
+            Tooltip,
             SystemCard,
             SystemAddDialog,
             SolarSystemContextMenu,
             ChainContextMenu,
             AppToolbar,
-            CharacterCard
         },
         props: [
 
@@ -200,7 +188,6 @@
                 systemContextMenuMarkAsHub: true,
                 isAutoAlignment: false,
                 characters: [],
-                charactersStatuses: [],
 
                 rootCMActive: false,
                 rootCMOffsetX: 0,
@@ -320,7 +307,6 @@
                     this.mapController.on("markerOut", this._onMapMarkerOut.bind(this));
                     this.mapController.on("removed", this._onMapRemoved.bind(this));
                     this.mapController.on("error", this._onMapError.bind(this));
-                    this.mapController.on("allowedCharactersUpdated", this._onAllowedCharactersUpdated.bind(this));
 
                     let offset = cookie.get(`offset_${_mapId}`);
                     if(offset) {
@@ -413,9 +399,6 @@
             },
             _onMapError (errData) {
                 helper.errorHandler(this, errData)
-            },
-            _onAllowedCharactersUpdated (data) {
-                this.charactersStatuses = data;
             },
             _onSystemChange (_data) {
                 switch (_data.type) {
@@ -691,9 +674,6 @@
             getRandomAdvice() {
                 return environment.advices[Number.randomInt(0, environment.advices.length - 1)].description;
             },
-            getCharImageUrlStyle(characterId) {
-                return {"background-image": `url("https://images.evetech.net/characters/${characterId}/portrait")`};
-            },
             showSystemPanel() {
                 this.systemPanelShow = true;
                 this.systemPanelMapId = this.mapController.mapId;
@@ -707,7 +687,7 @@
 </script>
 
 <style lang="scss">
-    @import "./src/css/variables";
+    @import "../../../css/variables";
     .wd-map-loader {
         display: flex;
         justify-content: center;
@@ -747,20 +727,6 @@
         padding: 5px 5px;
         box-sizing: border-box;
         color: $fg-primary;
-
-
-        .wd-map-toolbar__characters {
-            width: 100%;
-            height: 100%;
-            padding-right: 5px;
-
-            display: flex;
-            justify-content: flex-end;
-
-            *:not(:last-child) {
-                margin-right: 5px;
-            }
-        }
     }
 
     .wd-characters-icons {

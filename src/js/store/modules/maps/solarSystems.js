@@ -2,6 +2,14 @@ import NamespacedStore from "../../base/namespacedStore.js";
 import MultipleValuesStore from "../../base/multipleValuesStore.js";
 import SingleValueStore from "../../base/singleValueStore.js";
 
+// export let OnlineCharactersStore = MultipleValuesStore.extend({
+//     state: () => ([]),
+// }).create();
+//
+// export let UserCharactersStore = MultipleValuesStore.extend({
+//     state: () => ([]),
+// }).create();
+
 let SolarSystemsStore = NamespacedStore.create();
 let SolarSystemStore = MultipleValuesStore.extend({
     state: () => ({

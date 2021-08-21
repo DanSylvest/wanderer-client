@@ -28,6 +28,7 @@
     .wd-ship-type {
         line-height: 1;
         display: flex;
+        align-items: flex-end;
 
         .wd-ship-type__name {
             font-size: 13px;
@@ -36,7 +37,7 @@
         }
 
         .wd-ship-type__group {
-            font-size: 10px;
+            font-size: 11px;
             color: $fg-primary-3;
         }
     }

@@ -13,6 +13,7 @@ import edit from "./edit";
 import list from "./list";
 import remove from "./remove";
 import info from "./info";
+import subscribeOnlineCharacters from "./subscribeOnlineCharacters";
 import subscribeMapExistence from "./subscribeMapExistence";
 import subscribeAllowedMaps from "./subscribeAllowedMaps";
 import subscribeAllowedCharacters from "./subscribeAllowedCharacters";
@@ -32,6 +33,7 @@ export default {
     list,
     remove,
     info,
+    subscribeOnlineCharacters,
     subscribeMapExistence,
     subscribeAllowedMaps,
     subscribeAllowedCharacters,

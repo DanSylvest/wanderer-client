@@ -2,29 +2,35 @@ import NamespacedStore from "../../base/namespacedStore.js";
 import SingleValueStore from "../../base/singleValueStore.js";
 import MultipleValuesStore from "../../base/multipleValuesStore.js";
 
-let CharacterStore = NamespacedStore.create();
-let CharactersStore = NamespacedStore.create();
-let OnlineStore = SingleValueStore.create();
-let ShipStore = SingleValueStore.create();
-let LocationStore = SingleValueStore.create();
-let InfoStore = MultipleValuesStore.extend({
+export let CharacterStore = NamespacedStore.create();
+export let CharactersStore = NamespacedStore.create();
+export let OnlineStore = SingleValueStore.create();
+export let ShipStore = SingleValueStore.create();
+export let LocationStore = SingleValueStore.create();
+
+export let InfoStore = MultipleValuesStore.extend({
     state: () => ({
-        name: "",
+        // name: "",
         addDate: null,
-        corporation: null,
-        corporationId: null,
-        alliance: null,
-        allianceId: null,
-        corporationTicker: null,
-        allianceTicker: null,
+        // corporation: null,
+        // corporationId: null,
+        // alliance: null,
+        // allianceId: null,
+        // corporationTicker: null,
+        // allianceTicker: null,
     }),
 }).create();
 
-export {
-    CharacterStore,
-    CharactersStore,
-    OnlineStore,
-    ShipStore,
-    LocationStore,
-    InfoStore
-}
+export let PublicInfoStore = MultipleValuesStore.extend({
+    state: () => ({
+        allianceId: undefined,
+        corporationId: undefined,
+        ancestryId: null,
+        raceId: null,
+        bloodlineId: null,
+        birthday: null,
+        description: null,
+        gender: null,
+        name: "",
+    }),
+}).create();

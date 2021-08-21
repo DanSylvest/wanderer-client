@@ -2,9 +2,9 @@
     <div class="wd-character-with-ticker">
         <transition name="fade">
             <div v-if="loadedCharacter" class="wd-character-content">
-                <div class="wd-character-name">{{info.name}}</div>&nbsp;
-                <div class="wd-character-alliance" v-if="hasAlliance">[{{info.allianceTicker}}]</div>
-                <div class="wd-character-corporation" v-else-if="hasCorporation">[{{info.corporationTicker}}]</div>&nbsp;
+                <div class="wd-character-name">{{characterName}}</div>&nbsp;
+                <div class="wd-character-alliance" v-if="hasAlliance">[{{allianceTicker}}]</div>
+                <div class="wd-character-corporation" v-else-if="hasCorporation">[{{corporationTicker}}]</div>&nbsp;
             </div>
         </transition>
 
@@ -15,21 +15,20 @@
 </template>
 
 <script>
-    import CharacterMixin from "../../mixins/character.js";
+    // import CharacterMixin from "../../mixins/character.js";
+    import CharacterPublicInfoMixin from "../../mixins/character/publicInfo";
+    import AlliancePublicInfoMixin from "../../mixins/alliance/publicInfo";
+    import CorporationPublicInfoMixin from "../../mixins/corporation/publicInfo";
+    import {CharacterInfoHelperMixin} from "../../mixins/characterInfoHelper";
 
     export default {
         name: "CharacterWithTicker",
-        components: {},
-        mixins: [CharacterMixin],
-        methods: {
-            // _onLoadedCharacter () {
-            //     this.loadedCharacter = true
-            //
-            //     // setTimeout(() => {this.loadedCharacter = true}, 0)
-            //     // eslint-disable-next-line no-debugger
-            //     setTimeout(() => {debugger}, 50)
-            // },
-        }
+        mixins: [
+            CharacterPublicInfoMixin,
+            AlliancePublicInfoMixin,
+            CorporationPublicInfoMixin,
+            CharacterInfoHelperMixin
+        ],
     }
 </script>
 

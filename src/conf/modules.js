@@ -20,7 +20,7 @@ const modules = {
         isProtected: true,
         isComponent: true,
         componentName: "CurrentMap",
-        path: "common/CurrentMap"
+        path: "common/CurrentMap/CurrentMap"
     },
     characters: {
         isProtected: true,

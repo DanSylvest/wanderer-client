@@ -1,37 +1,58 @@
 <template>
     <div class="solar-system-local-character" v-if="loadedCharacter">
         <div class="ss-character-part">
-            <span :class="classes">{{info.name}}</span>
+            <span :class="classes">{{characterName}}</span>
             <template v-if="hasAlliance">
-                <span class="solar-system-local-character__ticker">[{{info.allianceTicker}}]</span>
+                <span class="solar-system-local-character__ticker">[{{allianceTicker}}]</span>
             </template>
             <template v-else-if="hasCorporation">
-                <span class="solar-system-local-character__ticker">[{{info.corporationTicker}}]</span>
+                <span class="solar-system-local-character__ticker">[{{corporationTicker}}]</span>
             </template>
         </div>
 
-        <ship class="solar-system-local-character__ship" :ship-id="ship" :enable-ship-class="false" />
+<!--        <ship class="solar-system-local-character__ship" :ship-id="ship" :enable-ship-class="false" />-->
     </div>
 </template>
 
 <script>
-    import CharacterMixin from "../../../mixins/character.js";
-    import Ship from "../../universe/Ship.vue";
+    // import CharacterMixin from "../../../mixins/character.js";
+    // import Ship from "../../universe/Ship.vue";
+    import CharacterPublicInfoMixin from "../../../mixins/character/publicInfo";
+    import CorporationPublicInfoMixin from "../../../mixins/corporation/publicInfo";
+    import AlliancePublicInfoMixin from "../../../mixins/alliance/publicInfo";
+    import {CharacterInfoHelperMixin} from "../../../mixins/characterInfoHelper";
+
 
     export default {
         name: "LocalCharacter",
-        components: {Ship},
-        mixins: [CharacterMixin],
-        data: function () {
+        // components: {Ship},
+        mixins: [
+            CharacterPublicInfoMixin,
+            CorporationPublicInfoMixin,
+            AlliancePublicInfoMixin,
+            CharacterInfoHelperMixin
+        ],
+        props: {
+            isOwn: {
+                type: Boolean,
+                default: false
+            },
+            locationId: {
+                type: String,
+                default: ""
+            }
+        },
+        data () {
             return {
-                loadDynamicCharacterData: true
+                isOwn_: this.isOwn,
+                locationId_: this.locationId,
             }
         },
         computed : {
             classes () {
                 return {
-                    'solar-system-local-name':true,
-                    'solar-system-local-name-own': this.info.isOwn
+                    'solar-system-local-name': true,
+                    'solar-system-local-name-own': this.isOwn_
                 }
             }
         }
@@ -71,7 +92,7 @@
     .solar-system-local {
         .solar-system-local-name {
             font-weight: bold;
-            color: #9dd5bc;
+            color: #b1b1b1;
         }
         .solar-system-local-name.solar-system-local-name-own {
             color: $character-color-1;

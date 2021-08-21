@@ -1,6 +1,7 @@
 import NamespacedStore from "./namespacedStore.js";
 
 const SingleValueStore = NamespacedStore.extend({
+    namespaced: false,
     state: () => ({
         value: null
     }),

@@ -5,8 +5,6 @@
 import add from "./add";
 import list from "./list";
 import protectedInfo from "./protectedInfo";
-import publicInfo from "./publicInfo";
-import getName from "./getName";
 import fastSearch from "./fastSearch";
 import online from "./online";
 import remove from "./remove";
@@ -18,8 +16,6 @@ export default {
     add: add,
     list: list,
     protectedInfo: protectedInfo,
-    publicInfo: publicInfo,
-    getName: getName,
     fastSearch: fastSearch,
     online: online,
     byUser: byUser,

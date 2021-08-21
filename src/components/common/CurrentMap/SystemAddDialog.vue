@@ -17,7 +17,7 @@
                             ref="searchField"
                     >
 
-                        <label><md-icon>search</md-icon>Select a character</label>
+                        <label><md-icon>search</md-icon>type a system...</label>
 
                         <template slot="md-autocomplete-item" slot-scope="{ item, term }">
                             <div class="wd-char-item wd flex flex-align-center font-size-medium">

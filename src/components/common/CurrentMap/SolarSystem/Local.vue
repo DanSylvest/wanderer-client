@@ -1,37 +1,58 @@
 <template>
     <div class="solar-system-local">
-        <local-character :map-id="lMapId" :character-id="item" v-for="item in characters" :key="item"/>
+        <local-character v-for="item in systemLocal"
+                         :key="item.characterId"
+                         :map-id="mapId_"
+                         :character-id="item.characterId"
+                         :location-id="item.locationId"
+                         :is-own="item.isOwn"/>
     </div>
 </template>
 
 <script>
-    import LocalCharacter from "./LocalCharacter.vue";
-    import SolarSystemMixin from "../../../mixins/solarSystem.js";
+import LocalCharacter from "./LocalCharacter.vue";
+import SolarSystemMixin from "../../../mixins/solarSystem.js";
+import {UserCharactersMixin} from "../UserCharacters/mixins/userCharacters";
+import {OnlineCharactersMixin} from "./mixins/onlineCharacters";
 
 
-    export default {
-        name: "Local",
-        components: {LocalCharacter},
-        mixins: [SolarSystemMixin],
-        mounted: function () {
-
-        },
-        beforeDestroy() {
-
-        },
-        computed : {
-            characters () {
-                return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].onlineCharacters;
+export default {
+    name: "Local",
+    components: {LocalCharacter},
+    mixins: [
+        SolarSystemMixin,
+        UserCharactersMixin,
+        OnlineCharactersMixin
+    ],
+    computed: {
+        /**
+         *
+         * @returns {{isOwn: boolean, shipTypeId: number, locationId: string, characterId: string}[]|*[]}
+         */
+        systemLocal() {
+            if (!this.loadedUserCharacters || !this.loadedOnlineCharacters) {
+                return [];
             }
-        },
-        methods: {
 
+            const onlineUserCharacters = this.userCharactersList.filter(({online}) => online);
+
+            return this.onlineCharactersList
+                .filter(({locationId}) => locationId === this.solarSystemId)
+                .map(({characterId, shipTypeId, locationId}) => ({
+                    characterId,
+                    shipTypeId,
+                    locationId,
+                    isOwn: !!onlineUserCharacters.search('charId', characterId)
+                }))
+                .sort((a, b) => b.isOwn - a.isOwn);
         }
+
     }
+}
 </script>
 
 <style lang="scss">
-    @import "/src/css/variables";
-    @import "~vue-material/dist/theme/engine";
+@import "/src/css/variables";
+@import "~vue-material/dist/theme/engine";
 
 </style>

@@ -123,6 +123,9 @@
         mounted: function () {
 
         },
+        computed: {
+
+        },
         methods: {
             updateSwitchboxes: function () {
                 this.formIsCorporationShare = false;
