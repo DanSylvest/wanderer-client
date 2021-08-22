@@ -3,12 +3,12 @@
  */
 /* eslint-disable no-unused-vars */
 
-Array.prototype.removeByIndex = function removeByIndex(index) {
+Array.prototype.removeByIndex = function removeByIndex (index) {
     this[index] = this[this.length - 1];
     this.pop();
 };
 
-Array.prototype.removeByValue = function removeByValue(value) {
+Array.prototype.removeByValue = function removeByValue (value) {
     let index = this.indexOf(value);
     index !== -1 && this.removeByIndex(index);
 }
@@ -48,7 +48,7 @@ Array.prototype.search = Array.prototype.searchByObjectKey;
 Array.prototype.update = function (key, val, object) {
     for (var a = 0; a < this.length; a++) {
         if (exists(this[a][key]) && this[a][key] === val) {
-            this[a] = {...this[a], object};
+            this[a] = { ...this[a], ...object };
             return true;
         }
     }
