@@ -26,7 +26,7 @@ const SolarSystemMixin = {
         }
     },
     watch: {
-        lExistsOnMap (val) {
+        existsOnMap (val) {
             this.lExistsOnMap = val;
         },
         solarSystemId (val) {
@@ -49,7 +49,7 @@ const SolarSystemMixin = {
     },
     computed : {
         signatures () {
-            return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].signatures
+            return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].signatures;
         }
     },
     methods: {

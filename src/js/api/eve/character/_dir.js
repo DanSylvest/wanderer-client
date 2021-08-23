@@ -3,6 +3,7 @@
  */
 
 import add from "./add";
+import refresh from "./refresh";
 import list from "./list";
 import protectedInfo from "./protectedInfo";
 import fastSearch from "./fastSearch";
@@ -14,6 +15,7 @@ import subscribeShip from "./subscribeShip";
 
 export default {
     add: add,
+    refresh,
     list: list,
     protectedInfo: protectedInfo,
     fastSearch: fastSearch,

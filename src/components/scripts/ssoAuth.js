@@ -36,6 +36,9 @@ const auth = function () {
                     case "attach":
                         attach();
                         break;
+                    case "refresh":
+                        refresh();
+                        break;
                 }
             },
             err => {
@@ -76,6 +79,27 @@ const register = function () {
 
 const attach = function () {
     api.eve.character.add(data.code)
+        .then(
+            () => {
+                window.location = printf("%s%s?%s", window.location.origin, window.location.pathname, query.toString({
+                    page: "home",
+                    item: "characters"
+                }));
+            },
+            err => {
+                window.vueApp.showErrorModal({
+                    title: "Attention",
+                    message: helper.extractErrorReason(err),
+                    callback : () => {
+                        window.location = window.location.origin + window.location.pathname;
+                    }
+                });
+            }
+        );
+}
+
+const refresh = function () {
+    api.eve.character.refresh(data.code)
         .then(
             () => {
                 window.location = printf("%s%s?%s", window.location.origin, window.location.pathname, query.toString({

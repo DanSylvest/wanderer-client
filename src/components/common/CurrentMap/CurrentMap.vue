@@ -131,7 +131,7 @@
     import ContextMenu from "../../ui/ContextMenu/ContextMenu";
     import ContextMenuItem from "../../ui/ContextMenu/ContextMenuItem";
     import AreaSelection from "../../ui/AreaSelection";
-    import SystemPanel from "./SystemPanel";
+    import SystemPanel from "./SystemPanel/SystemPanel";
     import Tooltip from "../../ui/Tooltip";
     import SystemCard from "./SystemCard";
     import SystemAddDialog from "./SystemAddDialog.vue";

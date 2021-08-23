@@ -59,7 +59,7 @@ const destroyDelayedUpdater = function () {
 }
 
 const isValidAttrs = function () {
-    return exists(this.lShipId) && this.lShipId !== "";
+    return exists(this.lShipId);
 }
 
 const unsubscribeData = function () {

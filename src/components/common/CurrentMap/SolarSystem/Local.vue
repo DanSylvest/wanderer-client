@@ -1,11 +1,11 @@
 <template>
     <div class="solar-system-local">
-        <local-character v-for="item in systemLocal"
-                         :key="item.characterId"
+        <local-character v-for="{characterId, isOwn, shipTypeId} in systemLocal"
+                         :key="characterId"
                          :map-id="mapId_"
-                         :character-id="item.characterId"
-                         :location-id="item.locationId"
-                         :is-own="item.isOwn"/>
+                         :character-id="characterId"
+                         :ship-type-id="shipTypeId"
+                         :is-own="isOwn"/>
     </div>
 </template>
 
@@ -38,10 +38,9 @@ export default {
 
             return this.onlineCharactersList
                 .filter(({locationId}) => locationId === this.solarSystemId)
-                .map(({characterId, shipTypeId, locationId}) => ({
+                .map(({characterId, shipTypeId}) => ({
                     characterId,
                     shipTypeId,
-                    locationId,
                     isOwn: !!onlineUserCharacters.search('charId', characterId)
                 }))
                 .sort((a, b) => b.isOwn - a.isOwn);
