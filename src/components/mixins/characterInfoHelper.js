@@ -3,11 +3,19 @@ import CharacterPublicInfoMixin from "./character/publicInfo";
 export const CharacterInfoHelperMixin = {
     computed: {
         characterInfoLoaded () {
-            return this.loadedCharacter && this.loadedAlliance && this.loadedCorporation;
+            if (!this.loadedCharacter) {
+                return false;
+            }
+
+            if (this.characterPublicInfo.corporationId && !this.loadedCorporation) {
+                return false;
+            }
+
+            return !(this.characterPublicInfo.allianceId && !this.loadedAlliance);
         }
     },
     methods: {
-        _onLoadedCharacter() {
+        _onLoadedCharacter () {
             CharacterPublicInfoMixin.methods._onLoadedCharacter.call(this);
 
             if (this.characterPublicInfo.corporationId) {
