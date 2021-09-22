@@ -1,13 +1,13 @@
-import Emitter from "../../js/env/tools/emitter";
-import cache from "../../js/cache/cache";
-import CustomPromise from "../../js/env/promise";
+import Emitter from '../../js/env/tools/emitter';
+import cache from '../../js/cache/cache';
+import CustomPromise from '../../js/env/promise';
 
-export class CharacterSubscription extends Emitter{
+export class CorporationSubscription extends Emitter{
   /**
    *
    * @type {null|string}
    */
-  characterId = null;
+  corporationId = null;
 
   /**
    *
@@ -24,14 +24,14 @@ export class CharacterSubscription extends Emitter{
 
   /**
    *
-   * @param {string} characterId
+   * @param {string} corporationId
    * @param {function | undefined} [onLoad]
    */
-  constructor (characterId, onLoad) {
+  constructor (corporationId, onLoad) {
     super();
 
     this.onLoad = onLoad || undefined;
-    this.characterId = characterId;
+    this.corporationId = corporationId;
     this.subscribe();
   }
 
@@ -47,7 +47,7 @@ export class CharacterSubscription extends Emitter{
 
   subscribe () {
     this.loaded = false;
-    const publicInfo = cache.characters.list.get(this.characterId).publicInfo;
+    const publicInfo = cache.corporations.list.get(this.corporationId).publicInfo;
     this.unsubscribeHandler = publicInfo.subscribe();
     publicInfo.readyPromise().then(this.onLoaded.bind(this));
   }
@@ -62,21 +62,21 @@ export class CharacterSubscription extends Emitter{
 
 /**
  *
- * @param characterId
+ * @param corporationId
  * @returns {Promise<{
  *   name: string
  *   allianceId: number,
  *   corporationId: number
  * }>}
  */
-export const getCachedCharacterPublicInfo = async (characterId) => {
+export const getCachedCorporationPublicInfo = async (corporationId) => {
   let promise = new CustomPromise();
-  let subscription = new CharacterSubscription(characterId);
+  let subscription = new CorporationSubscription(corporationId);
   subscription.onLoad = () => {
-    const data = cache.characters.list.get(characterId).publicInfo.data();
+    const data = cache.corporations.list.get(corporationId).publicInfo.data();
     subscription.destructor();
     subscription = undefined;
     promise.resolve({ ...data });
-  }
+  };
   return promise.native;
-}
+};

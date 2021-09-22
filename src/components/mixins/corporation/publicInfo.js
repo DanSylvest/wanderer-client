@@ -36,6 +36,10 @@ const CorporationPublicInfoMixin = {
                 return null;
             }
 
+            if(!this.$store.state.corporations[this.lCorporationId]) {
+              return null;
+            }
+
             return this.$store.state.corporations[this.lCorporationId].publicInfo;
         },
         corporationName() {

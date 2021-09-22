@@ -1,13 +1,13 @@
-import Emitter from "../../js/env/tools/emitter";
-import cache from "../../js/cache/cache";
-import CustomPromise from "../../js/env/promise";
+import Emitter from '../../js/env/tools/emitter';
+import cache from '../../js/cache/cache';
+import CustomPromise from '../../js/env/promise';
 
-export class CharacterSubscription extends Emitter{
+export class AllianceSubscription extends Emitter{
   /**
    *
    * @type {null|string}
    */
-  characterId = null;
+  allianceId = null;
 
   /**
    *
@@ -24,14 +24,14 @@ export class CharacterSubscription extends Emitter{
 
   /**
    *
-   * @param {string} characterId
+   * @param {string} allianceId
    * @param {function | undefined} [onLoad]
    */
-  constructor (characterId, onLoad) {
+  constructor (allianceId, onLoad) {
     super();
 
     this.onLoad = onLoad || undefined;
-    this.characterId = characterId;
+    this.allianceId = allianceId;
     this.subscribe();
   }
 
@@ -47,7 +47,7 @@ export class CharacterSubscription extends Emitter{
 
   subscribe () {
     this.loaded = false;
-    const publicInfo = cache.characters.list.get(this.characterId).publicInfo;
+    const publicInfo = cache.alliances.list.get(this.allianceId).publicInfo;
     this.unsubscribeHandler = publicInfo.subscribe();
     publicInfo.readyPromise().then(this.onLoaded.bind(this));
   }
@@ -62,21 +62,20 @@ export class CharacterSubscription extends Emitter{
 
 /**
  *
- * @param characterId
+ * @param allianceId
  * @returns {Promise<{
  *   name: string
- *   allianceId: number,
- *   corporationId: number
+ *   allianceId: number
  * }>}
  */
-export const getCachedCharacterPublicInfo = async (characterId) => {
+export const getCachedAlliancePublicInfo = async (allianceId) => {
   let promise = new CustomPromise();
-  let subscription = new CharacterSubscription(characterId);
+  let subscription = new AllianceSubscription(allianceId);
   subscription.onLoad = () => {
-    const data = cache.characters.list.get(characterId).publicInfo.data();
+    const data = cache.alliances.list.get(allianceId).publicInfo.data();
     subscription.destructor();
     subscription = undefined;
     promise.resolve({ ...data });
-  }
+  };
   return promise.native;
-}
+};

@@ -1,6 +1,6 @@
 import extend from "./tools/extend"
 
-var parseQuery = function (_query) {
+export const parseQuery = function (_query) {
     var out = Object.create(null);
 
     var variablesArr = _query.split("&");
@@ -12,7 +12,7 @@ var parseQuery = function (_query) {
     return out;
 };
 
-var queryToString = function (_object) {
+export const queryToString = function (_object) {
     var res_arr = [];
     for(var k in _object){
         var val = _object[k];
@@ -22,7 +22,7 @@ var queryToString = function (_object) {
     return res_arr.join("&");
 };
 
-var searchObject = function () {
+export const searchObject = function () {
     var out = Object.create(null);
 
     if(window.location.search !== "") {
