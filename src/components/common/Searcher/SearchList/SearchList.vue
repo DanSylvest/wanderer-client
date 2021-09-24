@@ -37,7 +37,7 @@
         </wd-table>
       </div>
 
-      <div class="wd f-width absolute top" v-show="convertedItems.length === 0" key="second">
+      <div class="wd fs absolute top" v-show="convertedItems.length === 0" key="second">
         <md-empty-state
           :md-icon="emptyStateIcon"
           :md-label="emptyStateLabel"
