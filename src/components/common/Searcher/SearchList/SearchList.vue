@@ -1,5 +1,5 @@
 <template>
-  <div class="wd f-width relative wd-search-list">
+  <div class="wd fs relative wd-search-list">
     <transition-group name="fade">
       <div v-if="convertedItems.length > 0" class="wd fs" key="first">
         <wd-table
