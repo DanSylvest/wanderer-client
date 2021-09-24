@@ -49,6 +49,10 @@
     display: flex;
     flex-direction: column;
 
+    .wd-character-searcher_autocomplete {
+      margin-right: 7px;
+    }
+
     .wd-search-list {
       overflow: hidden;
     }
