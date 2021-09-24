@@ -1,5 +1,5 @@
 <template>
-  <div class="wd f-width relative">
+  <div class="wd f-width relative wd-search-list">
     <transition-group name="fade">
       <div v-if="convertedItems.length > 0" class="wd fs" key="first">
         <wd-table
@@ -49,69 +49,69 @@
 </template>
 
 <script>
-import WdTable from '../../../ui/Table/WdTable';
-import TableHeaderCell from '../../../ui/Table/TableHeaderCell';
-import TableCell from '../../../ui/Table/TableCell';
-import CharacterSearchItem from '../SearchItem/CharacterSearchItem';
-import CorporationSearchItem from '../SearchItem/CorporationSearchItem';
-import { isAlliance, isCharacter, isCorporation } from '../utils/helper';
-import AllianceSearchItem from '../SearchItem/AllianceSearchItem';
+  import WdTable from '../../../ui/Table/WdTable';
+  import TableHeaderCell from '../../../ui/Table/TableHeaderCell';
+  import TableCell from '../../../ui/Table/TableCell';
+  import CharacterSearchItem from '../SearchItem/CharacterSearchItem';
+  import CorporationSearchItem from '../SearchItem/CorporationSearchItem';
+  import { isAlliance, isCharacter, isCorporation } from '../utils/helper';
+  import AllianceSearchItem from '../SearchItem/AllianceSearchItem';
 
-const emptyStateIcons = {
-  character: 'group_add',
-  corporation: 'group_add',
-  alliance: 'public',
-};
+  const emptyStateIcons = {
+    character: 'group_add',
+    corporation: 'group_add',
+    alliance: 'public',
+  };
 
-export default {
-  name: 'SearchList',
-  components: { AllianceSearchItem, CorporationSearchItem, CharacterSearchItem, TableCell, TableHeaderCell, WdTable },
-  props: {
-    items: {
-      type: Array,
-      default: () => [],
+  export default {
+    name: 'SearchList',
+    components: { AllianceSearchItem, CorporationSearchItem, CharacterSearchItem, TableCell, TableHeaderCell, WdTable },
+    props: {
+      items: {
+        type: Array,
+        default: () => [],
+      },
+      type: {
+        type: String,
+        default: 'character',
+      },
     },
-    type: {
-      type: String,
-      default: 'character',
+    watch: {
+      items (val) {
+        this.items_ = val;
+      },
     },
-  },
-  watch: {
-    items (val) {
-      this.items_ = val;
+    data () {
+      return {
+        type_: this.type,
+        items_: this.items,
+        selected: [],
+      };
     },
-  },
-  data () {
-    return {
-      type_: this.type,
-      items_: this.items,
-      selected: [],
-    };
-  },
-  computed: {
-    isCharacter,
-    isCorporation,
-    isAlliance,
-    convertedItems () {
-      return this.items_.map(id => ({ id }));
+    computed: {
+      isCharacter,
+      isCorporation,
+      isAlliance,
+      convertedItems () {
+        return this.items_.map(id => ({ id }));
+      },
+      emptyStateIcon () {
+        return emptyStateIcons[this.type_];
+      },
+      emptyStateLabel () {
+        return `Add ${ this.type_ }s`;
+      },
+      emptyStateDescription () {
+        return `In this group is not added any ${ this.type_ }. Here you can search ${ this.type_ } and attach them to group.`;
+      },
     },
-    emptyStateIcon () {
-      return emptyStateIcons[this.type_];
+    methods: {
+      onClickDelete () {
+        this.items_ = this.items_.filter(id => this.selected.search('id', id) == null);
+        this.$emit('changed', [...this.items_]);
+      },
     },
-    emptyStateLabel () {
-      return `Add ${ this.type_ }s`;
-    },
-    emptyStateDescription () {
-      return `In this group is not added any ${ this.type_ }. Here you can search ${ this.type_ } and attach them to group.`;
-    },
-  },
-  methods: {
-    onClickDelete () {
-      this.items_ = this.items_.filter(id => this.selected.search('id', id) == null);
-      this.$emit('changed', [...this.items_]);
-    },
-  },
-};
+  };
 </script>
 
 <style scoped lang="scss"></style>

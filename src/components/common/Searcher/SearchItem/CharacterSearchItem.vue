@@ -23,36 +23,36 @@
 </template>
 
 <script>
-import './styles.scss';
-import CharacterPublicInfoMixin from '../../../mixins/character/publicInfo';
-import AlliancePublicInfoMixin from '../../../mixins/alliance/publicInfo';
-import CorporationPublicInfoMixin from '../../../mixins/corporation/publicInfo';
-import { CharacterInfoHelperMixin } from '../../../mixins/characterInfoHelper';
-import { getCharacterPortraitUrl } from '../../../utils/eveResources';
+  import './styles.scss';
+  import CharacterPublicInfoMixin from '../../../mixins/character/publicInfo';
+  import AlliancePublicInfoMixin from '../../../mixins/alliance/publicInfo';
+  import CorporationPublicInfoMixin from '../../../mixins/corporation/publicInfo';
+  import { CharacterInfoHelperMixin } from '../../../mixins/characterInfoHelper';
+  import { getCharacterPortraitUrl } from '../../../utils/eveResources';
 
-export default {
-  name: 'CharacterSearchItem',
-  props: {
-    match: {
-      type: String,
-      default: '',
+  export default {
+    name: 'CharacterSearchItem',
+    props: {
+      match: {
+        type: String,
+        default: '',
+      },
     },
-  },
-  data () {
-    return {
-      beforeMatch_: '',
-      match_: '',
-      afterMatch_: '',
-    };
-  },
-  mixins: [
-    CharacterPublicInfoMixin,
-    AlliancePublicInfoMixin,
-    CorporationPublicInfoMixin,
-    CharacterInfoHelperMixin,
-  ],
-  methods: {
-    getCharacterLogo: id => getCharacterPortraitUrl({ id, size: 32 }),
-  },
-};
+    data () {
+      return {
+        beforeMatch_: '',
+        match_: '',
+        afterMatch_: '',
+      };
+    },
+    mixins: [
+      CharacterPublicInfoMixin,
+      AlliancePublicInfoMixin,
+      CorporationPublicInfoMixin,
+      CharacterInfoHelperMixin,
+    ],
+    methods: {
+      getCharacterLogo: id => getCharacterPortraitUrl({ id, size: 32 }),
+    },
+  };
 </script>
