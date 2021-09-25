@@ -2,8 +2,7 @@
   <div class="wd-character-profile-card wd wd-layout-secondary md-elevation-2">
     <template v-if="!characterInfoLoaded">
       <div class="wd-loader">
-        <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="60"
-                             md-mode="indeterminate"></md-progress-spinner>
+        <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="60" md-mode="indeterminate" />
       </div>
     </template>
 
@@ -12,11 +11,10 @@
         <div class="wd-content">
           <div class="wd-character-avatar f-width f-height wd-bg-default wd relative"
                :class="{'character-online':online}" :style="getCharImageUrlStyle(this.lCharacterId)">
-
           </div>
           <div class="wd-character-content">
-            <system-card :solar-system-id="location" :is-show-effect="false"/>
-            <ship :ship-id="ship"/>
+            <system-card :solar-system-id="location" :is-show-effect="false" />
+            <ship :ship-id="ship" />
             <div class="wd-characters-info">
               <div class="wd-character-name">{{ characterName }}</div>
               <div class="wd-character-corporation" v-if="hasCorporation">{{ corporationName }}</div>
@@ -43,160 +41,160 @@
 </template>
 
 <script>
-import SystemCard from "../CurrentMap/SystemCard.vue";
-import Ship from "../universe/Ship.vue";
-import CharacterMixin from "../../mixins/character.js";
-import api from "../../../js/api.js";
-import helper from "../../../js/utils/helper.js";
-import CharacterPublicInfoMixin from "../../mixins/character/publicInfo";
-import CorporationPublicInfoMixin from "../../mixins/corporation/publicInfo";
-import AlliancePublicInfoMixin from "../../mixins/alliance/publicInfo";
-import {CharacterInfoHelperMixin} from "../../mixins/characterInfoHelper";
-import {getCharImageUrlStyle} from "../../utils/eveResources";
-import cookie from "../../../js/env/cookie";
-import authRequest from "../../../js/utils/authRequest";
-import query from "../../../js/env/query";
+  import SystemCard from '../CurrentMap/SystemCard.vue';
+  import Ship from '../universe/Ship.vue';
+  import CharacterMixin from '../../mixins/character.js';
+  import api from '../../../js/api.js';
+  import helper from '../../../js/utils/helper.js';
+  import CharacterPublicInfoMixin from '../../mixins/character/publicInfo';
+  import CorporationPublicInfoMixin from '../../mixins/corporation/publicInfo';
+  import AlliancePublicInfoMixin from '../../mixins/alliance/publicInfo';
+  import { CharacterInfoHelperMixin } from '../../mixins/characterInfoHelper';
+  import { getCharImageUrlStyle } from '../../utils/eveResources';
+  import cookie from '../../../js/env/cookie';
+  import authRequest from '../../../js/utils/authRequest';
+  import query from '../../../js/env/query';
 
-export default {
-  name: "CharacterCard",
-  components: { SystemCard, Ship },
-  mixins: [
-    CharacterMixin,
-    CharacterPublicInfoMixin,
-    CorporationPublicInfoMixin,
-    AlliancePublicInfoMixin,
-    CharacterInfoHelperMixin
-  ],
-  data: function () {
-    return {
-      loadDynamicCharacterData: true
-    }
-  },
-  methods: {
-    getCharImageUrlStyle,
-    onRemoveClick: function () {
-      api.eve.character.remove()
-        .then(
-          () => this.$emit("removed"),
-          err => helper.errorHandler(this, err)
-        );
+  export default {
+    name: 'CharacterCard',
+    components: { SystemCard, Ship },
+    mixins: [
+      CharacterMixin,
+      CharacterPublicInfoMixin,
+      CorporationPublicInfoMixin,
+      AlliancePublicInfoMixin,
+      CharacterInfoHelperMixin,
+    ],
+    data: function () {
+      return {
+        loadDynamicCharacterData: true,
+      };
     },
-    onRefreshClick () {
-      api.user.getAuthToken("refresh")
-        .then(
-          token => {
-            cookie.set("authToken", token);
-            authRequest(query.toString({ page: "ssoAuth" }));
-          },
-          error => helper.errorHandler(this, error)
-        )
+    methods: {
+      getCharImageUrlStyle,
+      onRemoveClick: function () {
+        api.eve.character.remove()
+          .then(
+            () => this.$emit('removed'),
+            err => helper.errorHandler(this, err),
+          );
+      },
+      onRefreshClick () {
+        api.user.getAuthToken('refresh')
+          .then(
+            token => {
+              cookie.set('authToken', token);
+              authRequest(query.toString({ page: 'ssoAuth' }));
+            },
+            error => helper.errorHandler(this, error),
+          );
+      },
     },
-  }
-}
+  };
 </script>
 
 <style lang="scss">
-@import "/src/css/variables";
-@import "~vue-material/dist/theme/engine";
+  @import "/src/css/variables";
+  @import "~vue-material/dist/theme/engine";
 
-$character-color-1: md-get-palette-color(orange, 500);
+  $character-color-1: md-get-palette-color(orange, 500);
 
-.small-image {
-  width: 48px;
-  height: 48px;
+  .small-image {
+    width: 48px;
+    height: 48px;
 
-  border-radius: 10%;
-  border-width: 2px;
-  border-style: solid;
-  border-color: $border-color-primary-5-2;
-  background-color: $bg-transparent;
-}
-
-.wd-character-profile-card {
-  width: 356px;
-  height: 150px;
-  border-radius: 5px;
-
-  & > .wd-loader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
+    border-radius: 10%;
+    border-width: 2px;
+    border-style: solid;
+    border-color: $border-color-primary-5-2;
+    background-color: $bg-transparent;
   }
 
-  .wd-character-profile-card__content {
-    user-select: none;
-    padding: 10px 10px;
+  .wd-character-profile-card {
+    width: 356px;
+    height: 150px;
+    border-radius: 5px;
 
-    width: 100%;
-    height: 100%;
-
-    & > .wd-content {
+    & > .wd-loader {
       display: flex;
-      justify-content: flex-start;
-      box-sizing: border-box;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
 
+    .wd-character-profile-card__content {
+      user-select: none;
+      padding: 10px 10px;
 
-      & > *:not(:last-child) {
-        margin-right: 10px;
-      }
+      width: 100%;
+      height: 100%;
 
-      .wd-character-social {
+      & > .wd-content {
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        margin-right: -5px !important;
-        align-items: center;
+        justify-content: flex-start;
+        box-sizing: border-box;
 
-      }
 
-      .wd-character-avatar {
-        transition: border-color 250ms, opacity 250ms;
-
-        width: 100px;
-        min-width: 100px;
-        min-height: 100px;
-        border-radius: 50%;
-        border-width: 3px;
-        border-style: solid;
-        border-color: $border-color-primary-5-2;
-        background-color: $bg-transparent;
-      }
-
-      .wd-character-content {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        padding-top: 10px;
-
-        & > * {
-          white-space: nowrap;
+        & > *:not(:last-child) {
+          margin-right: 10px;
         }
 
-        .wd-characters-info {
+        .wd-character-social {
           display: flex;
           flex-direction: column;
+          justify-content: space-between;
+          margin-right: -5px !important;
+          align-items: center;
+
         }
 
-        & > * {
-          padding: initial;
-          line-height: initial !important;
-          font-size: 12px;
-          margin-bottom: 3px;
-          color: $fg-primary-2;
+        .wd-character-avatar {
+          transition: border-color 250ms, opacity 250ms;
+
+          width: 100px;
+          min-width: 100px;
+          min-height: 100px;
+          border-radius: 50%;
+          border-width: 3px;
+          border-style: solid;
+          border-color: $border-color-primary-5-2;
+          background-color: $bg-transparent;
         }
 
-        .wd-character-name {
-          font-size: 14px;
-          color: $fg-theme-primary-solid;
-        }
+        .wd-character-content {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding-top: 10px;
 
-        .wd-character-alliance {
-          color: $fg-primary-3;
+          & > * {
+            white-space: nowrap;
+          }
+
+          .wd-characters-info {
+            display: flex;
+            flex-direction: column;
+          }
+
+          & > * {
+            padding: initial;
+            line-height: initial !important;
+            font-size: 12px;
+            margin-bottom: 3px;
+            color: $fg-primary-2;
+          }
+
+          .wd-character-name {
+            font-size: 14px;
+            color: $fg-theme-primary-solid;
+          }
+
+          .wd-character-alliance {
+            color: $fg-primary-3;
+          }
         }
       }
     }
   }
-}
 </style>
