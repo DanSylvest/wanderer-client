@@ -109,6 +109,7 @@
         this.lastSelected = null;
       },
       onOpen () {
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 10);
         this.loadList(this.chosen);
       },
       /**

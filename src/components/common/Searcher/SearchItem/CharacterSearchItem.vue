@@ -7,8 +7,7 @@
           :src="getCharacterLogo(lCharacterId)"
           style="margin-right: 10px;"
           alt=""
-          loading="lazy"
-        />
+          loading="lazy" />
         <md-highlight-text :md-fuzzy-search="true" :md-term="match">{{ characterName }}</md-highlight-text>
         <div class="wd-character-alliance" v-if="hasAlliance">[{{ allianceTicker }}]</div>
         <div class="wd-character-corporation" v-else-if="hasCorporation">[{{ corporationTicker }}]</div>&nbsp;
@@ -16,8 +15,7 @@
     </transition>
 
     <div v-show="!loadedCharacter" class="wd-loader">
-      <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="20"
-                           md-mode="indeterminate"></md-progress-spinner>
+      <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="20" md-mode="indeterminate" />
     </div>
   </div>
 </template>

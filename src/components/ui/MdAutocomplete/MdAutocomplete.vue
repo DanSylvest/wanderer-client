@@ -71,7 +71,7 @@ export default {
     },
     mdLoading: {
       type: Boolean,
-      default: true
+      default: false
     },
     mdOpenOnFocus: {
       type: Boolean,

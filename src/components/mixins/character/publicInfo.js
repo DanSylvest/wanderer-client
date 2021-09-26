@@ -33,15 +33,31 @@ const CharacterPublicInfoMixin = {
   },
   computed: {
     characterPublicInfo () {
+      if (!this.loadedCharacter) {
+        return null;
+      }
+
       return this.$store.state.characters[this.lCharacterId].publicInfo;
     },
     characterName () {
+      if (!this.loadedCharacter) {
+        return null;
+      }
+
       return this.characterPublicInfo.name;
     },
     hasAlliance () {
+      if (!this.loadedCharacter) {
+        return false;
+      }
+
       return !!this.characterPublicInfo.allianceId;
     },
     hasCorporation () {
+      if (!this.loadedCharacter) {
+        return false;
+      }
+
       return !!this.characterPublicInfo.corporationId;
     },
   },

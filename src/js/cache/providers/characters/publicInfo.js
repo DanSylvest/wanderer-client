@@ -1,15 +1,15 @@
-import RequestProvider from "../base/requestProvider";
-import {PublicInfoStore} from "../../../store/modules/characters/charactersStore";
-import store from "../../../store";
-import axios from "axios";
-import extend from "../../../env/tools/extend";
+import RequestProvider from '../base/requestProvider';
+import { PublicInfoStore } from '../../../store/modules/characters/charactersStore';
+import store from '../../../store';
+import axios from 'axios';
+import extend from '../../../env/tools/extend';
 
 export default class PublicInfo extends RequestProvider{
   constructor (id) {
     super();
 
     this._id = id;
-    this._vuexModulePath = ["characters", this._id, "publicInfo"];
+    this._vuexModulePath = ['characters', this._id, 'publicInfo'];
     this._vuexTemplate = PublicInfoStore;
 
     this._addAccessData('allianceId');
@@ -25,8 +25,8 @@ export default class PublicInfo extends RequestProvider{
 
   _emulateEvent () {
     return {
-      type: "bulk",
-      data: extend({}, this._data)
+      type: 'bulk',
+      data: extend({}, this._data),
     };
   }
 
@@ -66,15 +66,15 @@ export default class PublicInfo extends RequestProvider{
       gender,
       name,
       raceId,
-    }
+    };
 
-    store.dispatch(`characters/${this._id}/publicInfo/update`, processed);
+    store.dispatch(`characters/${ this._id }/publicInfo/update`, processed);
     this._data = processed;
   }
 
   async _createRequest () {
     try {
-      const res = await axios.get(`https://esi.evetech.net/latest/characters/${this._id}/?datasource=tranquility`);
+      const res = await axios.get(`https://esi.evetech.net/latest/characters/${ this._id }/?datasource=tranquility`);
       return res.data;
     } catch (e) {
       console.error(e);
