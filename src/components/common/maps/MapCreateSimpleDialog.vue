@@ -7,7 +7,7 @@
       <div class="wd box-sizing wd-dialog-content off-user-select">
         <md-field md-clearable>
           <label>Name</label>
-          <md-input v-model="formName" @input="onEditFormChange" @change="onEditFormChange"></md-input>
+          <md-input v-model="formName" @input="onEditFormChange" @change="onEditFormChange" />
           <transition name="fade">
             <span class="wd-hint-negative md-helper-text" v-if="!isValidName">* Map name should contain at least 3 symbols and begins with a symbol</span>
             <span class="wd-hint-positive md-helper-text" v-if="isValidName">Name is valid</span>
@@ -16,7 +16,7 @@
 
         <md-field md-clearable>
           <label>Description</label>
-          <md-input v-model="formDescription" @input="onEditFormChange" @change="onEditFormChange"></md-input>
+          <md-input v-model="formDescription" @input="onEditFormChange" @change="onEditFormChange" />
           <span class="wd-hint-positive md-helper-text">You can leave this field empty</span>
         </md-field>
 
@@ -68,13 +68,13 @@
         <md-button
           class="md-primary md-raised"
           @click="onEditSubmit"
-          :disabled="formButtonDisabled">Confirm
+          :disabled="formButtonDisabled">
+          Confirm
         </md-button>
       </md-dialog-actions>
     </md-dialog>
 
-    <character-provider v-if="!!selectedCharacterId"
-                        :character-id="selectedCharacterId"
+    <character-provider v-if="!!selectedCharacterId" :character-id="selectedCharacterId"
                         v-slot="{data: {allianceId, corporationId}}">
       {{ effectSelectedCharacter({ allianceId, corporationId }) }}
     </character-provider>
@@ -225,7 +225,6 @@
         this.formIsAllianceShare = false;
         this.enableCorporations = false;
         this.enableAlliances = false;
-
       },
     },
   };
@@ -250,7 +249,6 @@
   @import "./src/css/variables";
 
   .wd-char-item {
-
     & > img {
       margin-right: 10px !important;
       height: 30px;
@@ -262,7 +260,6 @@
     .md-dialog-title {
       padding: 20px 20px 0;
     }
-
 
     .wd-dialog-content {
       height: 70%;

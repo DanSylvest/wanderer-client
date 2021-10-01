@@ -1,441 +1,954 @@
 @import "variables";
 @import "~vue-material/dist/theme/engine";
+
 $selected-color: md-get-palette-color(orange, 500);
 $active-color: #7be1ff;
 
 .eve-marker-root-container {
-    user-select: none;
-    overflow: hidden;
-    line-height: initial;
-    font-family: sans-serif;
-    font-size: 12px;
+  user-select: none;
+  overflow: hidden;
+  line-height: initial;
+  font-family: sans-serif;
+  font-size: 12px;
 
 
-    & > .eve-marker-container {
-        position: absolute;
-        left: 0;
-        top: 0;
+  & > .eve-marker-container {
+    position: absolute;
+    left: 0;
+    top: 0;
 
-        .eve-marker {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 120px;
-            height: 37px;
-            padding: 2px;
+    .eve-marker {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 140px;
+      height: 37px;
+      padding: 2px;
 
-            box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.2);
-            box-sizing: border-box;
-            border-radius: 7px;
-            border: 1px solid $border-color-primary-5;
-            background-color: $bg-secondary;
-            transition: opacity 400ms;
-            opacity: 1;
+      box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
+      border-radius: 7px;
+      border: 1px solid $border-color-primary-5;
+      background-color: $bg-secondary;
+      transition: opacity 400ms;
+      opacity: 1;
 
-            &.hidden {
-                display: initial !important;
-                opacity: 0 !important;
-            }
+      &.hidden {
+        display: initial !important;
+        opacity: 0 !important;
+      }
 
-            &.shaded {
-                opacity: 0.4;
-            }
+      &.shaded {
+        opacity: 0.4;
+      }
 
-            &.selected {
-                box-shadow: 0 0 5px 1px $selected-color;
-            }
+      &.selected {
+        box-shadow: 0 0 5px 1px $selected-color;
+      }
 
-            &.active:not(.selected) {
-                box-shadow: 0 0 5px 1px $active-color;
-            }
+      &.active:not(.selected) {
+        box-shadow: 0 0 5px 1px $active-color;
+      }
 
-            &.system-status-unknown {
+      &.system-status-unknown {
 
 
-            }
+      }
 
-            &.system-status-friendly {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
-                }
-            }
-            &.system-status-warning {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);
-                }
-            }
-            &.system-status-targetPrimary {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);
-                }
-            }
-            &.system-status-targetSecondary {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);
-                }
-            }
-            &.system-status-dangerousPrimary {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);
-                }
-            }
-            &.system-status-dangerousSecondary {
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);
-                }
-            }
-            &.system-status-lookingFor {
-                background-image: linear-gradient(45deg, #45ff8f5c, #457fff);
-                & > .eve-marker-body {
-                    //background-image: linear-gradient(45deg, $eve-solar-system-status-lookingFor, transparent);
-                }
-            }
-            &.system-status-home {
-                background-image: linear-gradient(-52deg, #ffd22ed1, #8bff34);
+      &.system-status-friendly {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
+        }
+      }
 
-                & > .eve-marker-body {
-                    background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
-                }
-            }
+      &.system-status-warning {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);
+        }
+      }
 
-            & > .eve-marker-body {
-                transition: background-color 200ms;
-                background-color: $bg-3;
-                width: 100%;
-                height: 100%;
-                box-sizing: border-box;
-                border-radius: 5px;
-                cursor: pointer;
+      &.system-status-targetPrimary {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);
+        }
+      }
 
-                &.triglavian {background-image: linear-gradient(223deg, #a5000052, transparent);}
-                &.edencom {background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);}
+      &.system-status-targetSecondary {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);
+        }
+      }
 
-                &:hover {
-                    background-color: $bg-3-major;
-                }
+      &.system-status-dangerousPrimary {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);
+        }
+      }
 
-                & > .eve-marker-first-row {
-                    height: 50%;
-                    display: flex;
-                    justify-content: flex-start;
-                    padding-left: 4px;
-                    padding-right: 4px;
-                    padding-top: 2px;
+      &.system-status-dangerousSecondary {
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);
+        }
+      }
 
-                    & > *:not(:last-child) {
-                        margin-right: 3px;
-                    }
+      &.system-status-lookingFor {
+        background-image: linear-gradient(45deg, #45ff8f5c, #457fff);
 
-                    .effect-color {
-                        width: 8px;
-                        height: 8px;
-                        margin-top: 3px;
-                        box-sizing: border-box;
-                        border-radius: 2px;
-                    }
+        & > .eve-marker-body {
+          //background-image: linear-gradient(45deg, $eve-solar-system-status-lookingFor, transparent);
+        }
+      }
 
-                    .system-type {
-                        font-weight: bold;
-                    }
+      &.system-status-home {
+        background-image: linear-gradient(-52deg, #ffd22ed1, #8bff34);
 
-                    .system-name {
-                        color: $fg-contrast;
-                        font-weight: bold;
-                    }
+        & > .eve-marker-body {
+          background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
+        }
+      }
 
-                    .system-tag {
-                        color: $fg-contrast;
-                        text-shadow: 0 0 3px $fg-contrast;
-                        font-weight: bold;
-                    }
-                }
+      & > .eve-marker-body {
+        transition: background-color 200ms;
+        background-color: $bg-3;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-radius: 5px;
+        cursor: pointer;
 
-                & > .eve-marker-second-row {
-                    height: 50%;
-                    display: flex;
-                    justify-content: space-between;
-                    padding-bottom: 2px;
-                    padding-right: 4px;
-                    padding-left: 4px;
-
-                    .extra {
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: flex-end;
-                    }
-
-                    .locked {
-                        background-image: url("./../images/svg/lock.svg");
-                        background-repeat: no-repeat;
-                        background-size: contain;
-                        width: 12px;
-                        height: 12px;
-                        position: relative;
-                    }
-
-                    .marked-as-hub {
-                        background-image: url("/img/my_location_black_24dp.svg");
-                        background-size: contain;
-                        background-repeat: no-repeat;
-
-                        width: 12px;
-                        height: 12px;
-                        margin-right: 2px;
-                    }
-
-                    .online {
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: flex-end;
-
-                        .online-icon {
-                            background-image: url("/img/people_white_24dp.svg");
-                            background-size: contain;
-                            background-repeat: no-repeat;
-
-                            width: 13px;
-                            height: 13px;
-                            position: relative;
-                            top: 1px;
-                        }
-
-                        .online-count {
-                            font-size: 11px;
-                            color: $fg-contrast;
-                            margin-left: 2px;
-                        }
-                    }
-
-                    .wormhole-statics {
-                        display: flex;
-                        justify-content: flex-end;
-
-                        & > .static {
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: flex-start;
-                        }
-
-                        & > .static:not(:last-child) {
-                            margin-right: 2px;
-                        }
-                    }
-                }
-
-            }
+        &.triglavian {
+          background-image: linear-gradient(223deg, #a5000052, transparent);
         }
 
+        &.edencom {
+          background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);
+        }
 
+        &:hover {
+          background-color: $bg-3-major;
+        }
+
+        & > .eve-marker-first-row {
+          height: 50%;
+          display: flex;
+          justify-content: flex-start;
+          padding-left: 4px;
+          padding-right: 4px;
+          padding-top: 2px;
+
+          & > *:not(:last-child) {
+            margin-right: 3px;
+          }
+
+          .effect-color {
+            width: 8px;
+            height: 8px;
+            margin-top: 3px;
+            box-sizing: border-box;
+            border-radius: 2px;
+          }
+
+          .system-type {
+            font-weight: bold;
+          }
+
+          .system-name {
+            color: $fg-contrast;
+            font-weight: bold;
+          }
+
+          .system-tag {
+            color: $fg-contrast;
+            text-shadow: 0 0 3px $fg-contrast;
+            font-weight: bold;
+          }
+        }
+
+        & > .eve-marker-second-row {
+          height: 50%;
+          display: flex;
+          justify-content: space-between;
+          padding-bottom: 2px;
+          padding-right: 4px;
+          padding-left: 4px;
+
+          .extra {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+          }
+
+          .locked {
+            background-image: url("./../images/svg/lock.svg");
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 12px;
+            height: 12px;
+            position: relative;
+          }
+
+          .marked-as-hub {
+            background-image: url("/img/my_location_black_24dp.svg");
+            background-size: contain;
+            background-repeat: no-repeat;
+
+            width: 12px;
+            height: 12px;
+            margin-right: 2px;
+          }
+
+          .online {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+
+            .online-icon {
+              background-image: url("/img/people_white_24dp.svg");
+              background-size: contain;
+              background-repeat: no-repeat;
+
+              width: 13px;
+              height: 13px;
+              position: relative;
+              top: 1px;
+            }
+
+            .online-count {
+              font-size: 11px;
+              color: $fg-contrast;
+              margin-left: 2px;
+            }
+          }
+
+          .wormhole-statics {
+            display: flex;
+            justify-content: flex-end;
+
+            & > .static {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+            }
+
+            & > .static:not(:last-child) {
+              margin-right: 2px;
+            }
+          }
+
+          .region {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            color: $fg-primary-1;
+            font-size: 10px;
+          }
+        }
+
+      }
     }
 
-    .hidden {
-        display: none !important;
-    }
 
-    .eve-zInd-top {
-        z-index: 1;
-    }
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .eve-zInd-top {
+    z-index: 1;
+  }
 }
 
 .с-tooltip {
-    pointer-events: none;
-    user-select: none;
+  pointer-events: none;
+  user-select: none;
 }
 
 .c-hidden-input {
-    outline: none;
-    appearance: none;
-    border: none;
-    position: absolute;
-    left: -10000px;
+  outline: none;
+  appearance: none;
+  border: none;
+  position: absolute;
+  left: -10000px;
 }
 
 
 .map-link {
-    stroke: $eve-link-color-default;
-    transition: opacity 200ms;
-    opacity: 1;
+  stroke: $eve-link-color-default;
+  transition: opacity 200ms;
+  opacity: 1;
 
-    &.shaded {
-        fill-opacity: 0.1;
-        opacity: 0.1;
-    }
+  &.shaded {
+    fill-opacity: 0.1;
+    opacity: 0.1;
+  }
 }
 
-.map-link.link-top { pointer-events: none; }
-.map-link.link-top.ship-size-0  { stroke-width: 4px; }                                                                   /* frig */
-.map-link.link-top.ship-size-1  { stroke-width: 4px; }                                                                   /* M\L */
-.map-link.link-top.ship-size-2  { stroke-width: 7px; }                                                                   /* Capital */
-.map-link.link-top.mass-state-0 { stroke: $eve-link-color-top-mass-0; }                                                  /* normal */
-.map-link.link-top.mass-state-1 { stroke: $eve-link-color-top-mass-1; }                                                  /* less than half */
-.map-link.link-top.mass-state-2 { stroke: $eve-link-color-top-mass-2; }                                                  /* verge */
-.map-link.link-top.time-state-0 {  }                                                                                     /* normal */
-.map-link.link-top.time-state-1 {  }                                                                                     /* end of life */
-.map-link.link-top.mass-state-1.time-state-1 { stroke: $eve-link-color-top-mass-1-time-1; }
-.map-link.link-top.mass-state-2.time-state-1 { stroke: $eve-link-color-top-mass-2-time-1; }
-.map-link.link-top.temp-chain { stroke-width: 4px; stroke: $eve-link-color-temp; }
+.map-link.link-top {
+  pointer-events: none;
+}
 
 .map-link.link-top.ship-size-0 {
-    //stroke: aliceblue;
-
-    &.time-state-1 {
-        stroke: $eve-link-color-middle-time-1;
-    }
+  stroke-width: 4px;
 }
 
-.map-link.link-middle { pointer-events: none; }
-.map-link.link-middle.ship-size-0 { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7;}
-.map-link.link-middle.ship-size-1 { stroke-width: 7px; }
-.map-link.link-middle.ship-size-2 { stroke-width: 11px; }
-.map-link.link-middle.mass-state-0 { stroke: $eve-link-color-middle-mass-0; }
-.map-link.link-middle.mass-state-1 { stroke: $eve-link-color-middle-mass-1; }
-.map-link.link-middle.mass-state-2 { stroke: $eve-link-color-middle-mass-2; }
-.map-link.link-middle.time-state-0 { stroke: $eve-link-color-middle-time-0; }
-.map-link.link-middle.time-state-1 { stroke: $eve-link-color-middle-time-1; }
-.map-link.link-top.temp-chain { stroke-width: 7px; stroke-linecap: round; stroke-dasharray: 10, 7; }
+/* frig */
+.map-link.link-top.ship-size-1 {
+  stroke-width: 4px;
+}
+
+/* M\L */
+.map-link.link-top.ship-size-2 {
+  stroke-width: 7px;
+}
+
+/* Capital */
+.map-link.link-top.mass-state-0 {
+  stroke: $eve-link-color-top-mass-0;
+}
+
+/* normal */
+.map-link.link-top.mass-state-1 {
+  stroke: $eve-link-color-top-mass-1;
+}
+
+/* less than half */
+.map-link.link-top.mass-state-2 {
+  stroke: $eve-link-color-top-mass-2;
+}
+
+/* verge */
+.map-link.link-top.time-state-0 {
+}
+
+/* normal */
+.map-link.link-top.time-state-1 {
+}
+
+/* end of life */
+.map-link.link-top.mass-state-1.time-state-1 {
+  stroke: $eve-link-color-top-mass-1-time-1;
+}
+
+.map-link.link-top.mass-state-2.time-state-1 {
+  stroke: $eve-link-color-top-mass-2-time-1;
+}
+
+.map-link.link-top.temp-chain {
+  stroke-width: 4px;
+  stroke: $eve-link-color-temp;
+}
+
+.map-link.link-top.ship-size-0 {
+  //stroke: aliceblue;
+
+  &.time-state-1 {
+    stroke: $eve-link-color-middle-time-1;
+  }
+}
+
+.map-link.link-middle {
+  pointer-events: none;
+}
 
 .map-link.link-middle.ship-size-0 {
-    stroke: $eve-link-color-middle-time-1-border;
-
-    &.time-state-1 {
-        stroke: $eve-link-color-middle-time-1-border;
-    }
+  stroke-width: 7px;
+  stroke-linecap: round;
+  stroke-dasharray: 10, 7;
 }
 
-.map-link.link-bottom { }
-.map-link.link-bottom.ship-size-0  { stroke-width: 5px; }
-.map-link.link-bottom.ship-size-1  { stroke-width: 8px; }
-.map-link.link-bottom.ship-size-2  { stroke-width: 11px; }
-.map-link.link-bottom.mass-state-0 { }
-.map-link.link-bottom.mass-state-1 { }
-.map-link.link-bottom.mass-state-2 { }
-.map-link.link-bottom.time-state-0 {  }
-.map-link.link-bottom.time-state-1 {  }
-.map-link.link-top.temp-chain { stroke-width: 5px; }
+.map-link.link-middle.ship-size-1 {
+  stroke-width: 7px;
+}
 
-.eve-wh-effect-color-pulsar { fill: $eve-effect-pulsar; background-color: $eve-effect-pulsar; }
-.eve-wh-effect-color-magnetar { fill: $eve-effect-magnetar; background-color: $eve-effect-magnetar; }
-.eve-wh-effect-color-wolfRayet { fill: $eve-effect-wolfRayet; background-color: $eve-effect-wolfRayet; }
-.eve-wh-effect-color-blackHole { fill: $eve-effect-blackHole; background-color: $eve-effect-blackHole; }
-.eve-wh-effect-color-cataclysmicVariable { fill: $eve-effect-cataclysmicVariable; background-color: $eve-effect-cataclysmicVariable; }
-.eve-wh-effect-color-redGiant { fill: $eve-effect-redGiant; background-color: $eve-effect-redGiant; }
+.map-link.link-middle.ship-size-2 {
+  stroke-width: 11px;
+}
 
-.text-eve-wh-effect-color-pulsar { color: $eve-effect-pulsar; }
-.text-eve-wh-effect-color-magnetar { color: $eve-effect-magnetar; }
-.text-eve-wh-effect-color-wolfRayet { color: $eve-effect-wolfRayet; }
-.text-eve-wh-effect-color-blackHole { color: $fg-contrast; }
-.text-eve-wh-effect-color-cataclysmicVariable { color: $eve-effect-cataclysmicVariable; }
-.text-eve-wh-effect-color-redGiant { color: $eve-effect-redGiant; }
-.text-eve-wh-effect-color-dazhLiminalityLocus { color: $eve-effect-dazhLiminalityLocus; }
-.text-eve-wh-effect-color-imperialStellarObservatory { color: $eve-effect-imperialStellarObservatory; }
-.text-eve-wh-effect-color-stateStellarObservatory { color: $eve-effect-stateStellarObservatory; }
-.text-eve-wh-effect-color-republicStellarObservatory { color: $eve-effect-republicStellarObservatory; }
-.text-eve-wh-effect-color-federalStellarObservatory { color: $eve-effect-federalStellarObservatory; }
+.map-link.link-middle.mass-state-0 {
+  stroke: $eve-link-color-middle-mass-0;
+}
 
-.eve-security-color-10 { color: $eve-security-color-10 !important; fill: $eve-security-color-10; }
-.eve-security-color-09 { color: $eve-security-color-09 !important; fill: $eve-security-color-09; }
-.eve-security-color-08 { color: $eve-security-color-08 !important; fill: $eve-security-color-08; }
-.eve-security-color-07 { color: $eve-security-color-07 !important; fill: $eve-security-color-07; }
-.eve-security-color-06 { color: $eve-security-color-06 !important; fill: $eve-security-color-06; }
-.eve-security-color-05 { color: $eve-security-color-05 !important; fill: $eve-security-color-05; }
-.eve-security-color-04 { color: $eve-security-color-04 !important; fill: $eve-security-color-04; }
-.eve-security-color-03 { color: $eve-security-color-03 !important; fill: $eve-security-color-03; }
-.eve-security-color-02 { color: $eve-security-color-02 !important; fill: $eve-security-color-02; }
-.eve-security-color-01 { color: $eve-security-color-01 !important; fill: $eve-security-color-01; }
-.eve-security-color-00 { color: $eve-security-color-00 !important; fill: $eve-security-color-00; }
-.eve-security-color-m-01 { color: $eve-security-color-m-01 !important; fill: $eve-security-color-m-01; }
-.eve-security-color-m-02 { color: $eve-security-color-m-02 !important; fill: $eve-security-color-m-02; }
-.eve-security-color-m-03 { color: $eve-security-color-m-03 !important; fill: $eve-security-color-m-03; }
-.eve-security-color-m-04 { color: $eve-security-color-m-04 !important; fill: $eve-security-color-m-04; }
-.eve-security-color-m-05 { color: $eve-security-color-m-05 !important; fill: $eve-security-color-m-05; }
-.eve-security-color-m-06 { color: $eve-security-color-m-06 !important; fill: $eve-security-color-m-06; }
-.eve-security-color-m-07 { color: $eve-security-color-m-07 !important; fill: $eve-security-color-m-07; }
-.eve-security-color-m-08 { color: $eve-security-color-m-08 !important; fill: $eve-security-color-m-08; }
-.eve-security-color-m-09 { color: $eve-security-color-m-09 !important; fill: $eve-security-color-m-09; }
-.eve-security-color-m-10 { color: $eve-security-color-m-10 !important; fill: $eve-security-color-m-10; }
+.map-link.link-middle.mass-state-1 {
+  stroke: $eve-link-color-middle-mass-1;
+}
 
-.eve-security-background-10 { background-color: $eve-security-color-10; fill: $eve-security-color-10; }
-.eve-security-background-09 { background-color: $eve-security-color-09; fill: $eve-security-color-09; }
-.eve-security-background-08 { background-color: $eve-security-color-08; fill: $eve-security-color-08; }
-.eve-security-background-07 { background-color: $eve-security-color-07; fill: $eve-security-color-07; }
-.eve-security-background-06 { background-color: $eve-security-color-06; fill: $eve-security-color-06; }
-.eve-security-background-05 { background-color: $eve-security-color-05; fill: $eve-security-color-05; }
-.eve-security-background-04 { background-color: $eve-security-color-04; fill: $eve-security-color-04; }
-.eve-security-background-03 { background-color: $eve-security-color-03; fill: $eve-security-color-03; }
-.eve-security-background-02 { background-color: $eve-security-color-02; fill: $eve-security-color-02; }
-.eve-security-background-01 { background-color: $eve-security-color-01; fill: $eve-security-color-01; }
-.eve-security-background-00 { background-color: $eve-security-color-00; fill: $eve-security-color-00; }
-.eve-security-background-m-01 { background-color: $eve-security-color-m-01; fill: $eve-security-color-m-01; }
-.eve-security-background-m-02 { background-color: $eve-security-color-m-02; fill: $eve-security-color-m-02; }
-.eve-security-background-m-03 { background-color: $eve-security-color-m-03; fill: $eve-security-color-m-03; }
-.eve-security-background-m-04 { background-color: $eve-security-color-m-04; fill: $eve-security-color-m-04; }
-.eve-security-background-m-05 { background-color: $eve-security-color-m-05; fill: $eve-security-color-m-05; }
-.eve-security-background-m-06 { background-color: $eve-security-color-m-06; fill: $eve-security-color-m-06; }
-.eve-security-background-m-07 { background-color: $eve-security-color-m-07; fill: $eve-security-color-m-07; }
-.eve-security-background-m-08 { background-color: $eve-security-color-m-08; fill: $eve-security-color-m-08; }
-.eve-security-background-m-09 { background-color: $eve-security-color-m-09; fill: $eve-security-color-m-09; }
-.eve-security-background-m-10 { background-color: $eve-security-color-m-10; fill: $eve-security-color-m-10; }
+.map-link.link-middle.mass-state-2 {
+  stroke: $eve-link-color-middle-mass-2;
+}
 
-.eve-wh-type-color-high { color: $eve-wh-type-color-high; fill: $eve-wh-type-color-high; font-weight: bold !important; }
-.eve-wh-type-color-low { color: $eve-wh-type-color-low; fill: $eve-wh-type-color-low; font-weight: bold !important; }
-.eve-wh-type-color-null { color: $eve-wh-type-color-null; fill: $eve-wh-type-color-null; font-weight: bold !important;}
-.eve-wh-type-color-c1 { color: $eve-wh-type-color-c1 !important; fill: $eve-wh-type-color-c1; font-weight: bold !important; }
-.eve-wh-type-color-c2 { color: $eve-wh-type-color-c2 !important; fill: $eve-wh-type-color-c2; font-weight: bold !important; }
-.eve-wh-type-color-c3 { color: $eve-wh-type-color-c3 !important; fill: $eve-wh-type-color-c3; font-weight: bold !important; }
-.eve-wh-type-color-c4 { color: $eve-wh-type-color-c4 !important; fill: $eve-wh-type-color-c4; font-weight: bold !important; }
-.eve-wh-type-color-c5 { color: $eve-wh-type-color-c5 !important; fill: $eve-wh-type-color-c5; font-weight: bold !important; }
-.eve-wh-type-color-c6 { color: $eve-wh-type-color-c6 !important; fill: $eve-wh-type-color-c6; font-weight: bold !important; }
-.eve-wh-type-color-c13 { color: $eve-wh-type-color-c13 !important; fill: $eve-wh-type-color-c13;  }
-.eve-wh-type-color-drifter { color: $eve-wh-type-color-drifter !important; fill: $eve-wh-type-color-drifter; }
-.eve-wh-type-color-thera { color: $eve-wh-type-color-thera !important; fill: $eve-wh-type-color-thera; }
+.map-link.link-middle.time-state-0 {
+  stroke: $eve-link-color-middle-time-0;
+}
 
-.eve-wh-type-background-high { background-color: $eve-wh-type-color-high; }
-.eve-wh-type-background-low { background-color: $eve-wh-type-color-low; }
-.eve-wh-type-background-null { background-color: $eve-wh-type-color-null; }
-.eve-wh-type-background-c1 { background-color: $eve-wh-type-color-c1; }
-.eve-wh-type-background-c2 { background-color: $eve-wh-type-color-c2; }
-.eve-wh-type-background-c3 { background-color: $eve-wh-type-color-c3; }
-.eve-wh-type-background-c4 { background-color: $eve-wh-type-color-c4; }
-.eve-wh-type-background-c5 { background-color: $eve-wh-type-color-c5; }
-.eve-wh-type-background-c6 { background-color: $eve-wh-type-color-c6; }
-.eve-wh-type-background-c13 { background-color: $eve-wh-type-color-c13; }
-.eve-wh-type-background-drifter { background-color: $eve-wh-type-color-drifter; }
-.eve-wh-type-background-thera { background-color: $eve-wh-type-color-thera; }
+.map-link.link-middle.time-state-1 {
+  stroke: $eve-link-color-middle-time-1;
+}
+
+.map-link.link-top.temp-chain {
+  stroke-width: 7px;
+  stroke-linecap: round;
+  stroke-dasharray: 10, 7;
+}
+
+.map-link.link-middle.ship-size-0 {
+  stroke: $eve-link-color-middle-time-1-border;
+
+  &.time-state-1 {
+    stroke: $eve-link-color-middle-time-1-border;
+  }
+}
+
+.map-link.link-bottom {
+}
+
+.map-link.link-bottom.ship-size-0 {
+  stroke-width: 5px;
+}
+
+.map-link.link-bottom.ship-size-1 {
+  stroke-width: 8px;
+}
+
+.map-link.link-bottom.ship-size-2 {
+  stroke-width: 11px;
+}
+
+.map-link.link-bottom.mass-state-0 {
+}
+
+.map-link.link-bottom.mass-state-1 {
+}
+
+.map-link.link-bottom.mass-state-2 {
+}
+
+.map-link.link-bottom.time-state-0 {
+}
+
+.map-link.link-bottom.time-state-1 {
+}
+
+.map-link.link-top.temp-chain {
+  stroke-width: 5px;
+}
+
+.eve-wh-effect-color-pulsar {
+  fill: $eve-effect-pulsar;
+  background-color: $eve-effect-pulsar;
+}
+
+.eve-wh-effect-color-magnetar {
+  fill: $eve-effect-magnetar;
+  background-color: $eve-effect-magnetar;
+}
+
+.eve-wh-effect-color-wolfRayet {
+  fill: $eve-effect-wolfRayet;
+  background-color: $eve-effect-wolfRayet;
+}
+
+.eve-wh-effect-color-blackHole {
+  fill: $eve-effect-blackHole;
+  background-color: $eve-effect-blackHole;
+}
+
+.eve-wh-effect-color-cataclysmicVariable {
+  fill: $eve-effect-cataclysmicVariable;
+  background-color: $eve-effect-cataclysmicVariable;
+}
+
+.eve-wh-effect-color-redGiant {
+  fill: $eve-effect-redGiant;
+  background-color: $eve-effect-redGiant;
+}
+
+.text-eve-wh-effect-color-pulsar {
+  color: $eve-effect-pulsar;
+}
+
+.text-eve-wh-effect-color-magnetar {
+  color: $eve-effect-magnetar;
+}
+
+.text-eve-wh-effect-color-wolfRayet {
+  color: $eve-effect-wolfRayet;
+}
+
+.text-eve-wh-effect-color-blackHole {
+  color: $fg-contrast;
+}
+
+.text-eve-wh-effect-color-cataclysmicVariable {
+  color: $eve-effect-cataclysmicVariable;
+}
+
+.text-eve-wh-effect-color-redGiant {
+  color: $eve-effect-redGiant;
+}
+
+.text-eve-wh-effect-color-dazhLiminalityLocus {
+  color: $eve-effect-dazhLiminalityLocus;
+}
+
+.text-eve-wh-effect-color-imperialStellarObservatory {
+  color: $eve-effect-imperialStellarObservatory;
+}
+
+.text-eve-wh-effect-color-stateStellarObservatory {
+  color: $eve-effect-stateStellarObservatory;
+}
+
+.text-eve-wh-effect-color-republicStellarObservatory {
+  color: $eve-effect-republicStellarObservatory;
+}
+
+.text-eve-wh-effect-color-federalStellarObservatory {
+  color: $eve-effect-federalStellarObservatory;
+}
+
+.eve-security-color-10 {
+  color: $eve-security-color-10 !important;
+  fill: $eve-security-color-10;
+}
+
+.eve-security-color-09 {
+  color: $eve-security-color-09 !important;
+  fill: $eve-security-color-09;
+}
+
+.eve-security-color-08 {
+  color: $eve-security-color-08 !important;
+  fill: $eve-security-color-08;
+}
+
+.eve-security-color-07 {
+  color: $eve-security-color-07 !important;
+  fill: $eve-security-color-07;
+}
+
+.eve-security-color-06 {
+  color: $eve-security-color-06 !important;
+  fill: $eve-security-color-06;
+}
+
+.eve-security-color-05 {
+  color: $eve-security-color-05 !important;
+  fill: $eve-security-color-05;
+}
+
+.eve-security-color-04 {
+  color: $eve-security-color-04 !important;
+  fill: $eve-security-color-04;
+}
+
+.eve-security-color-03 {
+  color: $eve-security-color-03 !important;
+  fill: $eve-security-color-03;
+}
+
+.eve-security-color-02 {
+  color: $eve-security-color-02 !important;
+  fill: $eve-security-color-02;
+}
+
+.eve-security-color-01 {
+  color: $eve-security-color-01 !important;
+  fill: $eve-security-color-01;
+}
+
+.eve-security-color-00 {
+  color: $eve-security-color-00 !important;
+  fill: $eve-security-color-00;
+}
+
+.eve-security-color-m-01 {
+  color: $eve-security-color-m-01 !important;
+  fill: $eve-security-color-m-01;
+}
+
+.eve-security-color-m-02 {
+  color: $eve-security-color-m-02 !important;
+  fill: $eve-security-color-m-02;
+}
+
+.eve-security-color-m-03 {
+  color: $eve-security-color-m-03 !important;
+  fill: $eve-security-color-m-03;
+}
+
+.eve-security-color-m-04 {
+  color: $eve-security-color-m-04 !important;
+  fill: $eve-security-color-m-04;
+}
+
+.eve-security-color-m-05 {
+  color: $eve-security-color-m-05 !important;
+  fill: $eve-security-color-m-05;
+}
+
+.eve-security-color-m-06 {
+  color: $eve-security-color-m-06 !important;
+  fill: $eve-security-color-m-06;
+}
+
+.eve-security-color-m-07 {
+  color: $eve-security-color-m-07 !important;
+  fill: $eve-security-color-m-07;
+}
+
+.eve-security-color-m-08 {
+  color: $eve-security-color-m-08 !important;
+  fill: $eve-security-color-m-08;
+}
+
+.eve-security-color-m-09 {
+  color: $eve-security-color-m-09 !important;
+  fill: $eve-security-color-m-09;
+}
+
+.eve-security-color-m-10 {
+  color: $eve-security-color-m-10 !important;
+  fill: $eve-security-color-m-10;
+}
+
+.eve-security-background-10 {
+  background-color: $eve-security-color-10;
+  fill: $eve-security-color-10;
+}
+
+.eve-security-background-09 {
+  background-color: $eve-security-color-09;
+  fill: $eve-security-color-09;
+}
+
+.eve-security-background-08 {
+  background-color: $eve-security-color-08;
+  fill: $eve-security-color-08;
+}
+
+.eve-security-background-07 {
+  background-color: $eve-security-color-07;
+  fill: $eve-security-color-07;
+}
+
+.eve-security-background-06 {
+  background-color: $eve-security-color-06;
+  fill: $eve-security-color-06;
+}
+
+.eve-security-background-05 {
+  background-color: $eve-security-color-05;
+  fill: $eve-security-color-05;
+}
+
+.eve-security-background-04 {
+  background-color: $eve-security-color-04;
+  fill: $eve-security-color-04;
+}
+
+.eve-security-background-03 {
+  background-color: $eve-security-color-03;
+  fill: $eve-security-color-03;
+}
+
+.eve-security-background-02 {
+  background-color: $eve-security-color-02;
+  fill: $eve-security-color-02;
+}
+
+.eve-security-background-01 {
+  background-color: $eve-security-color-01;
+  fill: $eve-security-color-01;
+}
+
+.eve-security-background-00 {
+  background-color: $eve-security-color-00;
+  fill: $eve-security-color-00;
+}
+
+.eve-security-background-m-01 {
+  background-color: $eve-security-color-m-01;
+  fill: $eve-security-color-m-01;
+}
+
+.eve-security-background-m-02 {
+  background-color: $eve-security-color-m-02;
+  fill: $eve-security-color-m-02;
+}
+
+.eve-security-background-m-03 {
+  background-color: $eve-security-color-m-03;
+  fill: $eve-security-color-m-03;
+}
+
+.eve-security-background-m-04 {
+  background-color: $eve-security-color-m-04;
+  fill: $eve-security-color-m-04;
+}
+
+.eve-security-background-m-05 {
+  background-color: $eve-security-color-m-05;
+  fill: $eve-security-color-m-05;
+}
+
+.eve-security-background-m-06 {
+  background-color: $eve-security-color-m-06;
+  fill: $eve-security-color-m-06;
+}
+
+.eve-security-background-m-07 {
+  background-color: $eve-security-color-m-07;
+  fill: $eve-security-color-m-07;
+}
+
+.eve-security-background-m-08 {
+  background-color: $eve-security-color-m-08;
+  fill: $eve-security-color-m-08;
+}
+
+.eve-security-background-m-09 {
+  background-color: $eve-security-color-m-09;
+  fill: $eve-security-color-m-09;
+}
+
+.eve-security-background-m-10 {
+  background-color: $eve-security-color-m-10;
+  fill: $eve-security-color-m-10;
+}
+
+.eve-wh-type-color-high {
+  color: $eve-wh-type-color-high;
+  fill: $eve-wh-type-color-high;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-low {
+  color: $eve-wh-type-color-low;
+  fill: $eve-wh-type-color-low;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-null {
+  color: $eve-wh-type-color-null;
+  fill: $eve-wh-type-color-null;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c1 {
+  color: $eve-wh-type-color-c1 !important;
+  fill: $eve-wh-type-color-c1;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c2 {
+  color: $eve-wh-type-color-c2 !important;
+  fill: $eve-wh-type-color-c2;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c3 {
+  color: $eve-wh-type-color-c3 !important;
+  fill: $eve-wh-type-color-c3;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c4 {
+  color: $eve-wh-type-color-c4 !important;
+  fill: $eve-wh-type-color-c4;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c5 {
+  color: $eve-wh-type-color-c5 !important;
+  fill: $eve-wh-type-color-c5;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c6 {
+  color: $eve-wh-type-color-c6 !important;
+  fill: $eve-wh-type-color-c6;
+  font-weight: bold !important;
+}
+
+.eve-wh-type-color-c13 {
+  color: $eve-wh-type-color-c13 !important;
+  fill: $eve-wh-type-color-c13;
+}
+
+.eve-wh-type-color-drifter {
+  color: $eve-wh-type-color-drifter !important;
+  fill: $eve-wh-type-color-drifter;
+}
+
+.eve-wh-type-color-thera {
+  color: $eve-wh-type-color-thera !important;
+  fill: $eve-wh-type-color-thera;
+}
+
+.eve-wh-type-background-high {
+  background-color: $eve-wh-type-color-high;
+}
+
+.eve-wh-type-background-low {
+  background-color: $eve-wh-type-color-low;
+}
+
+.eve-wh-type-background-null {
+  background-color: $eve-wh-type-color-null;
+}
+
+.eve-wh-type-background-c1 {
+  background-color: $eve-wh-type-color-c1;
+}
+
+.eve-wh-type-background-c2 {
+  background-color: $eve-wh-type-color-c2;
+}
+
+.eve-wh-type-background-c3 {
+  background-color: $eve-wh-type-color-c3;
+}
+
+.eve-wh-type-background-c4 {
+  background-color: $eve-wh-type-color-c4;
+}
+
+.eve-wh-type-background-c5 {
+  background-color: $eve-wh-type-color-c5;
+}
+
+.eve-wh-type-background-c6 {
+  background-color: $eve-wh-type-color-c6;
+}
+
+.eve-wh-type-background-c13 {
+  background-color: $eve-wh-type-color-c13;
+}
+
+.eve-wh-type-background-drifter {
+  background-color: $eve-wh-type-color-drifter;
+}
+
+.eve-wh-type-background-thera {
+  background-color: $eve-wh-type-color-thera;
+}
 
 
-.eve-kind-color-high { color: $eve-wh-type-color-high; fill: $eve-wh-type-color-high; }
-.eve-kind-color-low { color: $eve-wh-type-color-low; fill: $eve-wh-type-color-low; font-weight: bold; }
-.eve-kind-color-null { color: $eve-wh-type-color-null; fill: $eve-wh-type-color-null; }
-.eve-kind-color-wh { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
-.eve-kind-color-thera { color: $eve-wh-type-color-thera; fill: $eve-wh-type-color-thera; }
-.eve-kind-color-abyss { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
-.eve-kind-color-penalty { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
-.eve-kind-color-pochven { color: $eve-wh-type-color-c6; fill: $eve-wh-type-color-c6; }
+.eve-kind-color-high {
+  color: $eve-wh-type-color-high;
+  fill: $eve-wh-type-color-high;
+}
 
-.eve-kind-background-high { background-color: $eve-wh-type-color-high; }
-.eve-kind-background-low { background-color: $eve-wh-type-color-low; }
-.eve-kind-background-null { background-color: $eve-wh-type-color-null; }
-.eve-kind-background-wh { background-color: $eve-wh-type-color-c6; }
-.eve-kind-background-thera { background-color: $eve-wh-type-color-thera; }
-.eve-kind-background-abyss { background-color: $eve-wh-type-color-c6; }
-.eve-kind-background-penalty { background-color: $eve-wh-type-color-c6; }
-.eve-kind-background-pochven { background-color: $eve-wh-type-color-c6; }
+.eve-kind-color-low {
+  color: $eve-wh-type-color-low;
+  fill: $eve-wh-type-color-low;
+  font-weight: bold;
+}
 
-.eve-system-status-color-unknown { }
-.eve-system-status-color-friendly {color: $eve-solar-system-status-color-friendly !important;}
-.eve-system-status-color-warning {color: $eve-solar-system-status-color-warning !important;}
-.eve-system-status-color-targetPrimary {color: $eve-solar-system-status-color-targetPrimary !important;}
-.eve-system-status-color-targetSecondary {color: $eve-solar-system-status-color-targetSecondary !important;}
-.eve-system-status-color-dangerousPrimary {color: $eve-solar-system-status-color-dangerousPrimary !important;}
-.eve-system-status-color-dangerousSecondary {color: $eve-solar-system-status-color-dangerousSecondary !important;}
-.eve-system-status-color-lookingFor {color: $eve-solar-system-status-color-lookingFor !important;}
-.eve-system-status-color-home {color: $eve-solar-system-status-color-home !important;}
+.eve-kind-color-null {
+  color: $eve-wh-type-color-null;
+  fill: $eve-wh-type-color-null;
+}
+
+.eve-kind-color-wh {
+  color: $eve-wh-type-color-c6;
+  fill: $eve-wh-type-color-c6;
+}
+
+.eve-kind-color-thera {
+  color: $eve-wh-type-color-thera;
+  fill: $eve-wh-type-color-thera;
+}
+
+.eve-kind-color-abyss {
+  color: $eve-wh-type-color-c6;
+  fill: $eve-wh-type-color-c6;
+}
+
+.eve-kind-color-penalty {
+  color: $eve-wh-type-color-c6;
+  fill: $eve-wh-type-color-c6;
+}
+
+.eve-kind-color-pochven {
+  color: $eve-wh-type-color-c6;
+  fill: $eve-wh-type-color-c6;
+}
+
+.eve-kind-background-high {
+  background-color: $eve-wh-type-color-high;
+}
+
+.eve-kind-background-low {
+  background-color: $eve-wh-type-color-low;
+}
+
+.eve-kind-background-null {
+  background-color: $eve-wh-type-color-null;
+}
+
+.eve-kind-background-wh {
+  background-color: $eve-wh-type-color-c6;
+}
+
+.eve-kind-background-thera {
+  background-color: $eve-wh-type-color-thera;
+}
+
+.eve-kind-background-abyss {
+  background-color: $eve-wh-type-color-c6;
+}
+
+.eve-kind-background-penalty {
+  background-color: $eve-wh-type-color-c6;
+}
+
+.eve-kind-background-pochven {
+  background-color: $eve-wh-type-color-c6;
+}
+
+.eve-system-status-color-unknown {
+}
+
+.eve-system-status-color-friendly {
+  color: $eve-solar-system-status-color-friendly !important;
+}
+
+.eve-system-status-color-warning {
+  color: $eve-solar-system-status-color-warning !important;
+}
+
+.eve-system-status-color-targetPrimary {
+  color: $eve-solar-system-status-color-targetPrimary !important;
+}
+
+.eve-system-status-color-targetSecondary {
+  color: $eve-solar-system-status-color-targetSecondary !important;
+}
+
+.eve-system-status-color-dangerousPrimary {
+  color: $eve-solar-system-status-color-dangerousPrimary !important;
+}
+
+.eve-system-status-color-dangerousSecondary {
+  color: $eve-solar-system-status-color-dangerousSecondary !important;
+}
+
+.eve-system-status-color-lookingFor {
+  color: $eve-solar-system-status-color-lookingFor !important;
+}
+
+.eve-system-status-color-home {
+  color: $eve-solar-system-status-color-home !important;
+}
 
 
 .wd-route-system-shape-triangle {
-    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
 }
+
 .wd-route-system-shape-circle {
-    border-radius: 40%;
-    //margin-left: 1px;
+  border-radius: 40%;
+  //margin-left: 1px;
 }
