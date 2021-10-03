@@ -132,7 +132,7 @@
           return;
         }
 
-        if (searchString.match(/[^A-Za-z0-9 _-]+/im)) {
+        if (searchString.match(/[^A-Za-z0-9. _-]+/im)) {
           this.resultList_ = [];
           this.loading = false;
           return;
