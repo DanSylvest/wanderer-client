@@ -1,13 +1,12 @@
 <template>
-  <div class="wd-character-profile-card wd wd-layout-secondary md-elevation-2">
-    <template v-if="!characterInfoLoaded">
-      <div class="wd-loader">
-        <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="60" md-mode="indeterminate" />
-      </div>
-    </template>
+  <div class="wd-character-profile-card wd wd-layout-secondary md-elevation-2 relative">
+    <div class="wd-loader" key="first" v-if="!characterInfoLoaded">
+      <md-progress-spinner class="md-accent" :md-stroke="2" :md-diameter="60" md-mode="indeterminate" />
+    </div>
 
     <transition name="fade">
-      <div class="wd-character-profile-card__content wd flex-col-sb" v-if="characterInfoLoaded">
+      <div class="wd-character-profile-card__content wd flex-col-sb absolute left top" key="second"
+           v-if="characterInfoLoaded">
         <div class="wd-content">
           <div class="wd-character-avatar f-width f-height wd-bg-default wd relative"
                :class="{'character-online':online}" :style="getCharImageUrlStyle(this.lCharacterId)">
