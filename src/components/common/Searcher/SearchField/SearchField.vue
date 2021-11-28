@@ -11,6 +11,7 @@
       @md-changed="loadList"
       @md-opened="onOpen"
       @md-selected="onSelected"
+      :is-not-filter-if-empty-model="showListIfEmpty"
     >
       <template v-if="true">
         <label class="wd-search-placeholder">
@@ -27,9 +28,13 @@
       </template>
 
       <template slot="md-autocomplete-item" slot-scope="{ item, term }">
-        <character-search-item :match="term" :character-id="item.itemId.toString()" v-if="isCharacter" />
-        <corporation-search-item :match="term" :corporation-id="item.itemId.toString()" v-if="isCorporation" />
-        <alliance-search-item :match="term" :alliance-id="item.itemId.toString()" v-if="isAlliance" />
+        <slot v-if="hasSearchItemSlot" name="search-item" :data="{item, term}" />
+
+        <template v-else>
+          <character-search-item :match="term" :character-id="item.itemId.toString()" v-if="isCharacter" />
+          <corporation-search-item :match="term" :corporation-id="item.itemId.toString()" v-if="isCorporation" />
+          <alliance-search-item :match="term" :alliance-id="item.itemId.toString()" v-if="isAlliance" />
+        </template>
       </template>
 
       <template slot="md-autocomplete-empty" slot-scope="{ term }">
@@ -42,8 +47,10 @@
       </template>
 
       <div class="md-searcher-button">
-        <md-button class="md-raised md-dense md-accent md-icon-button" :disabled="isDisabledAddButton"
-                   @click="handleAddItem">
+        <md-button
+          class="md-raised md-dense md-accent md-icon-button" :disabled="isDisabledAddButton"
+          @click="handleAddItem"
+        >
           <md-icon>add</md-icon>
         </md-button>
       </div>
@@ -77,6 +84,14 @@
         type: String,
         default: 'character',
       },
+      searchFunction: {
+        type: [Function, undefined],
+        default: undefined,
+      },
+      showListIfEmpty: {
+        type: Boolean,
+        default: false
+      }
     },
     data () {
       return {
@@ -94,12 +109,15 @@
       this._searchCaller.destructor();
     },
     computed: {
-      isDisabledAddButton () {
-        return this.lastSelected === null;
-      },
       isCharacter,
       isCorporation,
       isAlliance,
+      isDisabledAddButton () {
+        return this.lastSelected === null;
+      },
+      hasSearchItemSlot () {
+        return !!this.$slots['search-item'] || !!this.$scopedSlots['search-item'];
+      },
     },
     methods: {
       handleAddItem () {
@@ -122,6 +140,11 @@
         this.lastSelected = { itemId, name };
       },
       loadList (searchString) {
+        if (this.showListIfEmpty && searchString === '') {
+          this._searchCaller.call(searchString);
+          return;
+        }
+
         if (this.lastSelected && this.lastSelected.name !== searchString) {
           this.lastSelected = null;
         }
@@ -141,34 +164,20 @@
         this._searchCaller.call(searchString);
       },
 
-      async _makeSearch (searchString) {
-        this.loading = true;
-        const searchDate = +new Date;
-        this.lastSearchDate = searchDate;
+      async defaultSearch (searchString, type) {
+        const res = await getSearch({ search: searchString, categories: [type] });
 
-        const res = await getSearch({ search: searchString, categories: [this.type] });
-
-        const itemsIds = res && res[this.type];
+        const itemsIds = res && res[type];
         // todo it happens if response is not 200
         if (!itemsIds) {
-          return;
+          return null;
         }
 
         const filteredCount = itemsIds.slice(0, 15);
 
         // here we load cached info of characters/corporations/alliances
-        const itemsInfo = await Promise.all(filteredCount.map(itemId => loadCachedPublicInfo[this.type](itemId)));
+        const itemsInfo = await Promise.all(filteredCount.map(itemId => loadCachedPublicInfo[type](itemId)));
 
-        // We should be sure completely what last request is last;
-        // and if data loading start loading next data - we sure this request is not actual
-        if (this.lastSearchDate !== searchDate) {
-          return;
-        }
-
-        /**
-         * inject itemId and matchIndex
-         * @type {{allianceId: number, corporationId: number, itemId: number, name: string, matchIndex: number}[]}
-         */
         const updated = itemsInfo.map((info, i) => {
           const match = info.name.match(searchString);
           return {
@@ -178,10 +187,25 @@
           };
         });
 
-        this.resultList_ = updated.sort((a, b) => {
+        return updated.sort((a, b) => {
           const index = a.matchIndex - b.matchIndex;
           return index === 0 ? a.name === b.name ? 0 : a.name > b.name ? 1 : -1 : index;
         });
+      },
+
+      async _makeSearch (searchString) {
+        this.loading = true;
+        const searchDate = +new Date;
+        this.lastSearchDate = searchDate;
+
+        const searchFunction = this.searchFunction || this.defaultSearch;
+        const data = await searchFunction(searchString, this.type);
+
+        if (this.lastSearchDate !== searchDate) {
+          return;
+        }
+
+        this.resultList_ = data;
         this.loading = false;
       },
     },

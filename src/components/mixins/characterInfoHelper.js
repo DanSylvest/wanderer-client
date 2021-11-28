@@ -1,6 +1,15 @@
 import CharacterPublicInfoMixin from './character/publicInfo';
 
 export const CharacterInfoHelperMixin = {
+  // watch: {
+  //   characterId () {
+  //     CharacterPublicInfoMixin.watch.characterId.call(this);
+  //     // this.lCorporationId = null;
+  //     // this.lAllianceId = null;
+  //     // this.loadedAlliance = false;
+  //     // this.loadedCorporation = false;
+  //   },
+  // },
   computed: {
     characterInfoLoaded () {
       if (!this.loadedCharacter) {

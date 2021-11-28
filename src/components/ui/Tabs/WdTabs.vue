@@ -146,7 +146,7 @@ const removeTabsFromDom = function () {
       background-color: $bg-secondary;
       padding: 7px 10px;
       user-select: none;
-      border-radius: 5px;
+      border-radius: 3px;
       cursor: pointer;
       border: 1px solid $border-color-primary-5-2;
       box-sizing: border-box;

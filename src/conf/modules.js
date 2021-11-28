@@ -38,7 +38,7 @@ const modules = {
         isProtected: true,
         isComponent: true,
         componentName: "Maps",
-        path: "common/Maps"
+        path: "common/Maps/Maps"
     },
     groupsOwn: {
         isProtected: true,

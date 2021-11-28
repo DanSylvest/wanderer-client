@@ -7,10 +7,13 @@
           :src="getCharacterLogo(lCharacterId)"
           style="margin-right: 10px;"
           alt=""
-          loading="lazy" />
+          loading="lazy"
+        />
         <md-highlight-text :md-fuzzy-search="true" :md-term="match">{{ characterName }}</md-highlight-text>
-        <div class="wd-character-alliance" v-if="hasAlliance">[{{ allianceTicker }}]</div>
-        <div class="wd-character-corporation" v-else-if="hasCorporation">[{{ corporationTicker }}]</div>&nbsp;
+        <template v-if="!hideTicker">
+          <div class="wd-character-alliance" v-if="hasAlliance">[{{ allianceTicker }}]</div>
+          <div class="wd-character-corporation" v-else-if="hasCorporation">[{{ corporationTicker }}]</div>&nbsp;
+        </template>
       </div>
     </transition>
 
@@ -34,6 +37,10 @@
       match: {
         type: String,
         default: '',
+      },
+      hideTicker: {
+        type: Boolean,
+        default: false,
       },
     },
     data () {

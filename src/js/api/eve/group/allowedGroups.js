@@ -4,6 +4,10 @@
 
 import CustomPromise from "../../../env/promise";
 
+/**
+ *
+ * @return {Promise<{id: string, name: string, description: string}[]>}
+ */
 export default function () {
     let p = new CustomPromise();
 

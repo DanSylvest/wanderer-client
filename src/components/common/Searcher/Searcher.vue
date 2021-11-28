@@ -1,7 +1,25 @@
 <template>
   <div class="wd-character-searcher wd fs">
-    <search-field :type="type" @add-item="handleAddItem" />
-    <search-list :type="type" :items="items_" @changed="handleChangedList" />
+    <search-field
+      :type="type"
+      :search-function="searchFunction_"
+      :show-list-if-empty="showListIfEmpty"
+      @add-item="handleAddItem"
+    >
+      <template #search-item="{data: {item, term}}" v-if="hasSearchItemSlot">
+        <slot name="search-item" :data="{item, term}" />
+      </template>
+    </search-field>
+
+    <search-list :type="type" :items="items_" @changed="handleChangedList">
+      <template #selected-item="{itemId}" v-if="hasSearchItemSlot">
+        <slot name="selected-item" :item-id="itemId" />
+      </template>
+
+      <template #empty-state v-if="hasEmptyStateListSlot">
+        <slot name="empty-state-list" />
+      </template>
+    </search-list>
   </div>
 </template>
 
@@ -22,11 +40,33 @@
         type: String,
         default: 'character',
       },
+      searchFunction: {
+        type: [Function, undefined],
+        default: undefined,
+      },
+      showListIfEmpty: {
+        type: Boolean,
+        default: false,
+      },
     },
     data () {
       return {
+        searchFunction_: this.searchFunction,
         items_: this.items,
       };
+    },
+    watch: {
+      items (val) {
+        this.items_ = val;
+      },
+    },
+    computed: {
+      hasEmptyStateListSlot () {
+        return !!this.$slots['empty-state-list'];
+      },
+      hasSearchItemSlot () {
+        return !!this.$slots['search-item'] || !!this.$scopedSlots['search-item'];
+      },
     },
     methods: {
       handleChangedList (itemIds) {
@@ -67,6 +107,5 @@
     justify-content: flex-end;
     align-items: center;
   }
-
 
 </style>

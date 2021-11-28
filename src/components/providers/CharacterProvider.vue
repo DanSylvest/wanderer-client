@@ -4,14 +4,15 @@
     <slot
       :loaded="characterInfoLoaded"
       :data="{
-            allianceId: lAllianceId,
-            allianceName,
-            allianceTicker,
-            corporationId: lCorporationId,
-            corporationName,
-            corporationTicker,
-            characterName
-      }" />
+        allianceId: lAllianceId,
+        allianceName,
+        allianceTicker,
+        corporationId: lCorporationId,
+        corporationName,
+        corporationTicker,
+        characterName
+      }"
+    />
   </div>
 </template>
 

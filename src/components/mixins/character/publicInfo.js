@@ -19,6 +19,7 @@ const CharacterPublicInfoMixin = {
   watch: {
     characterId (val) {
       this.lCharacterId = val;
+      this.loadedCharacter = false;
       this.cpiData.delayedAttrUpdate.call();
     },
   },

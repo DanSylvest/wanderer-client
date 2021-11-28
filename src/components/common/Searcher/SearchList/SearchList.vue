@@ -6,7 +6,8 @@
           :rows="convertedItems"
           @selected="selected = $event"
           selectable
-          class="wd padding-primary fs">
+          class="wd padding-primary fs"
+        >
           <template v-slot:toolbar>
             <div class="md-toolbar-section-start wd-capital-letter">List of {{ type_ }}s</div>
           </template>
@@ -22,23 +23,28 @@
           </template>
 
           <template v-slot:header>
-            <table-header-cell sortable id="name" alignment="start" class="wd-capital-letter">
-              {{ type_ }} names
-            </table-header-cell>
+            <table-header-cell sortable id="name" alignment="start" class="wd-capital-letter">Description</table-header-cell>
           </template>
 
           <template v-slot:row="{row: {id}}">
             <table-cell id="name" class="wd fs padding-horizontal-primary" alignment="start">
-              <character-search-item :character-id="id.toString()" v-if="isCharacter" />
-              <corporation-search-item :corporation-id="id.toString()" v-if="isCorporation" />
-              <alliance-search-item :alliance-id="id.toString()" v-if="isAlliance" />
+              <slot v-if="hasSelectedItemSlot" name="selected-item" :itemId="id" />
+
+              <template v-else>
+                <character-search-item :character-id="id.toString()" v-if="isCharacter" />
+                <corporation-search-item :corporation-id="id.toString()" v-if="isCorporation" />
+                <alliance-search-item :alliance-id="id.toString()" v-if="isAlliance" />
+              </template>
             </table-cell>
           </template>
         </wd-table>
       </div>
 
       <div class="wd fs absolute top" v-show="convertedItems.length === 0" key="second">
+        <slot v-if="hasEmptyStateSlot" name="empty-state" />
+
         <md-empty-state
+          v-if="!hasEmptyStateSlot"
           :md-icon="emptyStateIcon"
           :md-label="emptyStateLabel"
           :md-description="emptyStateDescription"
@@ -103,6 +109,12 @@
       },
       emptyStateDescription () {
         return `In this group is not added any ${ this.type_ }. Here you can search ${ this.type_ } and attach them to group.`;
+      },
+      hasSelectedItemSlot () {
+        return !!this.$slots['selected-item'] || !!this.$scopedSlots['selected-item'];
+      },
+      hasEmptyStateSlot () {
+        return !!this.$slots['empty-state'];
       },
     },
     methods: {

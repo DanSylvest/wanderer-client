@@ -1,0 +1,1 @@
+export const setProps = (target, object) => Object.keys(object).forEach(x => target[x] = object[x]);

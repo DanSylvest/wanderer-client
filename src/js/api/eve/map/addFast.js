@@ -6,8 +6,11 @@ import CustomPromise from '../../../env/promise';
 
 /**
  * @typedef {Object} AddFastOptions
- * @property {string} name
- * @property {string} description
+ * @property {string} mapName
+ * @property {string} mapDescription
+ * @property {string} mapNote
+ * @property {string} groupName
+ * @property {string} groupDescription
  * @property {boolean} shareForCorporation
  * @property {boolean} shareForAlliance
  * @property {string} characterId
@@ -25,7 +28,16 @@ import CustomPromise from '../../../env/promise';
  * @param {AddFastOptions} _options
  * @returns {Promise<AddFastOptionsReturn>}
  */
-export default function ({ name, description, shareForCorporation, shareForAlliance, characterId }) {
+export default function ({
+  mapName,
+  mapDescription,
+  mapNote,
+  groupName,
+  groupDescription,
+  characterId,
+  shareForCorporation,
+  shareForAlliance,
+}) {
   let p = new CustomPromise();
 
   let id = this.add(function (_e) {
@@ -34,7 +46,14 @@ export default function ({ name, description, shareForCorporation, shareForAllia
   }.bind(this));
 
   this.send(id, ['api', 'eve', 'map', 'addFast'], {
-    name, description, shareForCorporation, shareForAlliance, characterId,
+    mapName,
+    mapDescription,
+    mapNote,
+    groupName,
+    groupDescription,
+    characterId,
+    shareForCorporation,
+    shareForAlliance,
   });
 
   return p.native;

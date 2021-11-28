@@ -18,14 +18,13 @@
 
               <div class="md-toolbar-section-end">
                 <md-button class="md-dense md-accent md-raised" @click="showCreateSimpleDialog = true">
-                  <md-icon>add</md-icon>
-                  <span style="vertical-align: middle">Add map</span>
+                  <div class="wd f-c-sb">
+                    <md-icon>library_add</md-icon>
+                    <div style="width: 5px;" />
+                    <span>Add map</span>
+                  </div>
                 </md-button>
 
-                <md-button class="md-dense md-primary md-raised" @click="showCreateDialog = true">
-                  <md-icon>add</md-icon>
-                  <span style="vertical-align: middle">Add map (advanced)</span>
-                </md-button>
               </div>
             </template>
 
@@ -44,16 +43,15 @@
 
             <template v-slot:header>
               <table-header-cell sortable id="name">Name</table-header-cell>
-              <table-header-cell sortable id="owner">Owner</table-header-cell>
+              <table-header-cell sortable id="note">Personal Note</table-header-cell>
               <table-header-cell sortable id="description">Description</table-header-cell>
             </template>
 
             <template v-slot:row="{row}">
-              <table-cell id="name" class="wd padding-vertical-small">{{ row.name }}</table-cell>
-              <table-cell id="owner" class="wd fs padding-horizontal-primary">
-                <character-with-ticker :character-id="row.owner" />
+              <table-cell id="name" class="wd padding-vertical-small table-text">{{ row.name }}</table-cell>
+              <table-cell id="note" class="wd padding-horizontal-primary table-text">{{ row.note }}</table-cell>
+              <table-cell id="description" class="wd padding-horizontal-primary table-text">{{ row.description }}
               </table-cell>
-              <table-cell id="description" class="wd padding-horizontal-primary">{{ row.description }}</table-cell>
             </template>
           </wd-table>
         </div>
@@ -87,28 +85,29 @@
         md-description="Map allow track your characters also a lot of different settings allow give a access to your map."
       >
         <md-button class="md-dense md-primary md-raised" @click="showCreateSimpleDialog = true">
-          <span style="vertical-align: middle">Create</span>
+          <div class="wd f-c-sb">
+            <md-icon>library_add</md-icon>
+            <div style="width: 5px;" />
+            <span>Add map</span>
+          </div>
         </md-button>
       </md-empty-state>
     </transition>
 
-    <map-create-dialog :show.sync="showCreateDialog" @success="onMapCreated" />
     <map-create-simple-dialog :show.sync="showCreateSimpleDialog" @success="onMapCreated" />
   </div>
 </template>
 
 <script>
-  import api from '../../js/api';
-  import WdTable from '../ui/Table/WdTable.vue';
-  import TableCell from '../ui/Table/TableCell.vue';
-  import TableHeaderCell from '../ui/Table/TableHeaderCell.vue';
-  import CharacterWithTicker from './Characters/CharacterWithTicker.vue';
-  import MapsMixin from '../mixins/maps.js';
-  import exists from '../../js/env/tools/exists.js';
-  import MapEditor from './maps/MapEditor.vue';
-  import helper from '../../js/utils/helper.js';
-  import MapCreateDialog from './maps/MapCreateDialog.vue';
-  import MapCreateSimpleDialog from './maps/MapCreateSimpleDialog.vue';
+  import api from '../../../js/api';
+  import WdTable from '../../ui/Table/WdTable.vue';
+  import TableCell from '../../ui/Table/TableCell.vue';
+  import TableHeaderCell from '../../ui/Table/TableHeaderCell.vue';
+  import MapsMixin from '../../mixins/maps.js';
+  import exists from '../../../js/env/tools/exists.js';
+  import MapEditor from './MapEditor/MapEditor';
+  import helper from '../../../js/utils/helper.js';
+  import MapCreateSimpleDialog from './MapCreateSimpleDialog/MapCreateSimpleDialog.vue';
 
   const TRANSITION_TIMEOUT = 150;
 
@@ -118,9 +117,7 @@
       WdTable,
       TableCell,
       TableHeaderCell,
-      CharacterWithTicker,
       MapEditor,
-      MapCreateDialog,
       MapCreateSimpleDialog,
     },
     mixins: [MapsMixin],
@@ -131,7 +128,6 @@
         selectedMapId: null,
         selectedMaps: [],
         activeRows: [],
-        showCreateDialog: false,
         showCreateSimpleDialog: false,
       };
     },
@@ -161,8 +157,9 @@
         this.mapsList.push(data);
       },
       onRowClicked (event) {
-        if (this.selectedMapId === event.data.id)
+        if (this.selectedMapId === event.data.id) {
           return;
+        }
 
         this.activeRows = [this.mapsList.searchByObjectKey('id', event.data.id)];
 
@@ -189,10 +186,11 @@
             err => helper.errorHandler(this, err),
           );
       },
-      onMapEdited (data) {
+      onMapEdited ({ name, description, note }) {
         let obj = this.mapsList.searchByObjectKey('id', this.selectedMapId);
-        obj.name = data.name;
-        obj.description = data.description;
+        obj.name = name;
+        obj.description = description;
+        obj.note = note;
       },
       updateEditingMap (event) {
         exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
@@ -206,12 +204,16 @@
   };
 </script>
 
-
-<style lang="scss">
-  @import "./src/css/variables";
+<style lang="scss" scoped>
+  @import "../../../css/variables";
 
   $edit-part-width: 400;
   $threshold: 850;
+
+  .table-text {
+    font-size: $font-size-medium-small;
+    color: $fg-primary-1;
+  }
 
   .wd-groups {
     display: flex;
