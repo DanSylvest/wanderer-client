@@ -2,7 +2,7 @@
   <div class="wd-group-settings-part">
     <div class="md-subheading wd-hint-accent">{{ TEXT.groupSettingsPart.title }}</div>
 
-    <md-field v-if="false">
+    <md-field>
       <label>{{ TEXT.groupSettingsPart.characterSelectLabel }}</label>
       <md-select md-dense v-model="selectedCharacterId" @md-selected="onSelected">
         <md-option v-for="{id, name} in characterIds_" :value="id" :key="id">{{ name }}</md-option>

@@ -1,6 +1,6 @@
 <template>
   <div class="wd-group-part">
-    <md-checkbox v-model="isCreateGroupFromExists">{{ TEXT.groupPart.selectTypeDescription }}</md-checkbox>
+    <md-checkbox v-if="false" v-model="isCreateGroupFromExists">{{ TEXT.groupPart.selectTypeDescription }}</md-checkbox>
 
     <transition name="fade">
       <div v-if="!isCreateGroupFromExists">
