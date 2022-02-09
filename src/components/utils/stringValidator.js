@@ -1,7 +1,7 @@
 export const stringValidator = ({
   val,
   minLength = 4,
-  regExp = /[^A-Za-zА-Яа-я0-9_\- ]/m,
+  regExp = /[^A-Za-zА-Яа-я0-9_\-,.: ]/m,
 }) => {
   if (minLength === 0 && val === '') {
     return true;
