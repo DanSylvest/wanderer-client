@@ -17,6 +17,7 @@ export const UserCharactersMixin = {
   },
   watch: {
     mapId (val) {
+      this.loadedUserCharacters = false;
       this.mapId_ = val;
       this.userCharactersData.delayedAttrUpdate.call();
     },
