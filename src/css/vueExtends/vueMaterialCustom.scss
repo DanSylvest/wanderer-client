@@ -1,6 +1,7 @@
 @import "src/css/variables";
 @import "~vue-material/dist/theme/engine";
 $helper-text: md-get-palette-color(green, 300);
+$helper-text-dark-gray: md-get-palette-color(gray, 300);
 
 .wd-color-positive {
     color: $fg-positive !important;

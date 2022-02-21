@@ -44,6 +44,7 @@ class MapController extends Emitter {
         this.map.on("offsetChanged", this.emit.bind(this, "offsetChanged"));
         this.map.on("markerIn", this.emit.bind(this, "markerIn"));
         this.map.on("markerOut", this.emit.bind(this, "markerOut"));
+        this.map.on("markerDragged", this.emit.bind(this, "markerDragged"));
         this.map.on("newChain", this.onNewChain.bind(this));
         this.map.clear();
 

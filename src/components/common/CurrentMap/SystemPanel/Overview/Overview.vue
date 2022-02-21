@@ -42,9 +42,7 @@
             <md-field class="wd-overview-description">
               <label>Description</label>
               <md-textarea @input="onDescriptionChange" v-model="description_" />
-              <span v-if="savingDescription" class="md-helper-text green">
-                Saving delay ({{ savingDelay }} seconds)... wait for save.
-              </span>
+              <delayed-saver :data="delayedData" @changed="onDelayedSaver" />
             </md-field>
           </md-card-content>
         </md-card>
@@ -56,19 +54,18 @@
 
 <script>
   import environment from '../../../../../js/core/map/environment';
-  import SpamFilter from '../../../../../js/env/spamFilter.js';
   import Routes from './Routes.vue';
-  import IntervalEmitter from '../../../../../js/env/intervalEmitter.js';
   import api from '../../../../../js/api.js';
   import helper from '../../../../../js/utils/helper.js';
   import SolarSystemMixin from '../../../../mixins/solarSystem.js';
   import eveHelper from '../../../../../js/eveHelper.js';
   import SolarSystemInfo from './SolarSystemInfo/SolarSystemInfo';
+  import DelayedSaver from '../../components/DelayedSaver';
 
   export default {
     name: 'Overview',
     mixins: [SolarSystemMixin],
-    components: { SolarSystemInfo, Routes },
+    components: { DelayedSaver, SolarSystemInfo, Routes },
     props: {
       isCompact: {
         type: Boolean,
@@ -77,9 +74,8 @@
     },
     data: function () {
       return {
-        savingDescription: false,
         lIsCompact: this.isCompact,
-        savingDelay: 3,
+        delayedData: undefined,
       };
     },
     watch: {
@@ -87,14 +83,7 @@
         this.lIsCompact = _newVal;
       },
     },
-    beforeDestroy () {
-      this._descIE.stop();
-    },
     mounted: function () {
-      this._descIE = new IntervalEmitter(3000, 100);
-      this._descIE.on('interval', delta => this.savingDelay = (delta / 1000).toFixed(1));
-
-      this._sfInput = new SpamFilter(this._inputChanged.bind(this), 3000);
       this.needToSave = true;
     },
     updated () {
@@ -139,10 +128,8 @@
     },
     methods: {
       watchAttrsUpdatedSolarSystem () {
-        this._sfInput.stop();
-        this._descIE.stop();
-        this.savingDescription = false;
         this.needToSave = true;
+        this.delayedData = undefined;
 
         SolarSystemMixin.methods.watchAttrsUpdatedSolarSystem.call(this);
       },
@@ -150,28 +137,18 @@
         SolarSystemMixin.methods.onLoadedSolarSystem.call(this);
       },
 
-      onHighlightRoute (route) {
-        this.$emit('highlight-route', route);
-      },
-      onDescriptionChange (event) {
-        if (!this.needToSave) {
-          this.needToSave = true;
-          return;
-        }
-
-        this._descIE.start();
-        this.savingDelay = 3;
-        this.savingDescription = true;
-        this._sfInput.call(event);
-      },
-      _inputChanged (description) {
-        this.savingDescription = false;
-
+      onDelayedSaver (description) {
         api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, { description })
           .then(
             helper.dummy,
             err => helper.errorHandler(this, err),
           );
+      },
+      onHighlightRoute (route) {
+        this.$emit('highlight-route', route);
+      },
+      onDescriptionChange (event) {
+        this.delayedData = event;
       },
     },
   };

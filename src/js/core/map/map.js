@@ -431,6 +431,7 @@ class Map extends Emitter{
       }.bind(this));
 
       this.render();
+      this.emit('markerDragged')
     }.bind(this));
   }
 

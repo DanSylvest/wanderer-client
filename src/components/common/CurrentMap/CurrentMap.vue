@@ -50,6 +50,12 @@
             </md-field>
           </div>
 
+          <delayed-saver
+            class="md-layout md-alignment-bottom-right"
+            :data="savingDelayCounter"
+            :delay="10"
+            @changed="onDelayedSaver"
+          />
           <transition name="fade">
             <md-speed-dial
               class="md-bottom-left"
@@ -66,11 +72,6 @@
                 <md-button class="md-icon-button" @click="onResetCamera">
                   <md-icon>search_off</md-icon>
                   <md-tooltip md-direction="right">Reset camera</md-tooltip>
-                </md-button>
-
-                <md-button class="md-icon-button" @click="onSaveClick">
-                  <md-icon>save</md-icon>
-                  <md-tooltip md-direction="right">Save systems position</md-tooltip>
                 </md-button>
               </md-speed-dial-content>
             </md-speed-dial>
@@ -183,6 +184,7 @@
   import eveHelper from '../../../js/eveHelper.js';
   import UserCharacters from './UserCharacters/UserCharacters';
   import MapCreateSimpleDialog from '../Maps/MapCreateSimpleDialog/MapCreateSimpleDialog';
+  import DelayedSaver from './components/DelayedSaver';
 
   export default {
     name: 'CurrentMap',
@@ -199,10 +201,12 @@
       SolarSystemContextMenu,
       ChainContextMenu,
       AppToolbar,
+      DelayedSaver,
     },
     props: [],
     data: function () {
       return {
+        savingDelayCounter: 0,
         systemPanelShow: false,
         systemPanelMapId: '',
         systemPanelSolarSystemId: '',
@@ -352,6 +356,7 @@
           this.mapController.on('markerOut', this._onMapMarkerOut.bind(this));
           this.mapController.on('removed', this._onMapRemoved.bind(this));
           this.mapController.on('error', this._onMapError.bind(this));
+          this.mapController.on('markerDragged', this._onMapMarkerDragged.bind(this));
 
           let offset = cookie.get(`offset_${ _mapId }`);
           if (offset) {
@@ -404,6 +409,14 @@
         this._currentOpenSystem = null;
         this.mapController.offSystemActive();
       },
+      onDelayedSaver () {
+        const positions = this.mapController.map.collectPositions();
+        api.eve.map.solarSystem.updatePositions(this.selectedMap, positions)
+          .then(
+            helper.dummy,
+            err => helper.errorHandler(this, err),
+          );
+      },
       _onSystemOpenInfo: function (_systemId) {
         this._offContexts();
         this.mapController.map.deselectAll();
@@ -446,6 +459,9 @@
       },
       _onMapError (errData) {
         helper.errorHandler(this, errData);
+      },
+      _onMapMarkerDragged () {
+        this.savingDelayCounter++;
       },
       _onSystemChange (_data) {
         switch (_data.type) {
@@ -680,14 +696,14 @@
       // },
 
       // this handler will save solar system positions
-      onSaveClick: function () {
-        let positions = this.mapController.map.collectPositions();
-        api.eve.map.solarSystem.updatePositions(this.selectedMap, positions)
-          .then(
-            helper.dummy,
-            err => helper.errorHandler(this, err),
-          );
-      },
+      // onSaveClick: function () {
+      //   let positions = this.mapController.map.collectPositions();
+      //   api.eve.map.solarSystem.updatePositions(this.selectedMap, positions)
+      //     .then(
+      //       helper.dummy,
+      //       err => helper.errorHandler(this, err),
+      //     );
+      // },
       onResetCamera () {
         this.mapController.map.resetOffset();
       },
@@ -745,6 +761,11 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+
+    .wd-delayed-saver {
+      margin-right: -4px;
+      margin-top: -9px;
+    }
 
     .wd-current-map__content {
       height: calc(100% - 49px);
