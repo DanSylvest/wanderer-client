@@ -2,14 +2,16 @@
  * Created by Aleksey Chichenkov <cublakhan257@gmail.com> on 5/21/20.
  */
 
-import checkToken   from "./checkToken";
-import register     from "./register";
-import getAuthToken from "./getAuthToken";
-import getAuthType  from "./getAuthType";
+import checkToken from './checkToken';
+import register from './register';
+import getAuthToken from './getAuthToken';
+import getAuthType from './getAuthType';
+import removeUser from './removeUser';
 
 export default {
-    checkToken: checkToken,
-    register: register,
-    getAuthToken: getAuthToken,
-    getAuthType: getAuthType
-}
+  checkToken,
+  register,
+  getAuthToken,
+  getAuthType,
+  removeUser,
+};

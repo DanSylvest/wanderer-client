@@ -12,7 +12,7 @@
                        :active="groupsAllowedButtonIsActive"></AppMenuItem>
           <AppMenuItem icon="person_add" title="Characters" @click="onCharClick"
                        :active="charactersButtonIsActive"></AppMenuItem>
-          <!--                    <AppMenuItem icon="build" title="Profile" @click="onProfileClick" :active="profileButtonIsActive"></AppMenuItem>-->
+          <AppMenuItem icon="build" title="Profile" @click="onProfileClick" :active="profileButtonIsActive"></AppMenuItem>
           <AppMenuItem icon="system_update_alt" title="Log out" @click="onLogOut"></AppMenuItem>
 
           <div class="wd-bottom-bar">

@@ -15,7 +15,7 @@ export default function (token) {
         _e.success ? p.resolve(_e.type) : p.reject(_e.error);
     }.bind(this));
 
-    this.send(id, ["api", "user", "getAuthType"], {token: token});
+    this.send(id, ["api", "user", "getAuthType"], {token});
 
     return p.native;
 }
