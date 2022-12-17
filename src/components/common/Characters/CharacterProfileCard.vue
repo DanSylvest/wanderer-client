@@ -72,7 +72,7 @@
     methods: {
       getCharImageUrlStyle,
       onRemoveClick: function () {
-        api.eve.character.remove()
+        api.eve.character.remove(this.lCharacterId)
           .then(
             () => this.$emit('removed'),
             err => helper.errorHandler(this, err),
