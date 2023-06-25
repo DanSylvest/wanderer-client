@@ -69,6 +69,7 @@
   import CorporationSearchItem from '../SearchItem/CorporationSearchItem';
   import AllianceSearchItem from '../SearchItem/AllianceSearchItem';
   import { isCharacter, isCorporation, isAlliance } from '../utils/helper';
+  import api from "../../../../js/api.js";
 
   const loadCachedPublicInfo = {
     character: getCachedCharacterPublicInfo,
@@ -79,6 +80,7 @@
   export default {
     name: 'SearchField',
     components: { AllianceSearchItem, CorporationSearchItem, MdAutocomplete2, CharacterSearchItem },
+    mixins: [],
     props: {
       type: {
         type: String,
@@ -165,7 +167,7 @@
       },
 
       async defaultSearch (searchString, type) {
-        const res = await getSearch({ search: searchString, categories: [type] });
+        const res = await api.eve.character.search([type], searchString);
 
         const itemsIds = res && res[type];
         // todo it happens if response is not 200
@@ -176,16 +178,18 @@
         const filteredCount = itemsIds.slice(0, 15);
 
         // here we load cached info of characters/corporations/alliances
-        const itemsInfo = await Promise.all(filteredCount.map(itemId => loadCachedPublicInfo[type](itemId)));
+        const itemsInfo = await Promise.allSettled(filteredCount.map(itemId => loadCachedPublicInfo[type](itemId)));
 
-        const updated = itemsInfo.map((info, i) => {
-          const match = info.name.match(searchString);
-          return {
-            itemId: filteredCount[i],
-            matchIndex: match ? match.index : Infinity,
-            ...info,
-          };
-        });
+        const updated = itemsInfo
+          .map(x => x.value)
+          .map((info, i) => {
+            const match = info.name.match(searchString);
+            return {
+              itemId: filteredCount[i],
+              matchIndex: match ? match.index : Infinity,
+              ...info,
+            };
+          });
 
         return updated.sort((a, b) => {
           const index = a.matchIndex - b.matchIndex;

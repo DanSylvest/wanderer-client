@@ -12,16 +12,18 @@ import remove from "./remove";
 import byUser from "./byUser";
 import subscribeLocation from "./subscribeLocation";
 import subscribeShip from "./subscribeShip";
+import search from "./search";
 
 export default {
-    add: add,
+    add,
+    list,
+    protectedInfo,
+    fastSearch,
+    online,
+    byUser,
+    remove,
+    subscribeLocation,
+    subscribeShip,
     refresh,
-    list: list,
-    protectedInfo: protectedInfo,
-    fastSearch: fastSearch,
-    online: online,
-    byUser: byUser,
-    remove: remove,
-    subscribeLocation: subscribeLocation,
-    subscribeShip: subscribeShip,
+    search
 }
