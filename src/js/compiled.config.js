@@ -4,6 +4,7 @@
 
 import extend from "./env/tools/extend";
 import mainConf from "./../conf/main";
+import customConf from '../conf/custom';
 
 let config = extend({}, mainConf);
 
@@ -14,6 +15,10 @@ try {
     console.log('JOipP', `customConf`, customConf)
 
     extend(config, customConf);
+
+    // eslint-disable-next-line no-console
+    console.log('JOipP', `config`, config)
+
 } catch (err) {
     // do nothing
 }
