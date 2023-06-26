@@ -60,7 +60,6 @@
 
 <script>
   import CharacterSearchItem from '../SearchItem/CharacterSearchItem';
-  import { getSearch } from '../../../../js/requests/getSearch';
   import { getCachedCharacterPublicInfo } from '../../../utils/characterSubscription';
   import { getCachedCorporationPublicInfo } from '../../../utils/corporationSubscription';
   import { getCachedAlliancePublicInfo } from '../../../utils/allianceSubscription';
@@ -68,8 +67,8 @@
   import MdAutocomplete2 from '../../../ui/MdAutocomplete/MdAutocomplete';
   import CorporationSearchItem from '../SearchItem/CorporationSearchItem';
   import AllianceSearchItem from '../SearchItem/AllianceSearchItem';
-  import { isCharacter, isCorporation, isAlliance } from '../utils/helper';
-  import api from "../../../../js/api.js";
+  import { isAlliance, isCharacter, isCorporation } from '../utils/helper';
+  import api from '../../../../js/api.js';
 
   const loadCachedPublicInfo = {
     character: getCachedCharacterPublicInfo,
