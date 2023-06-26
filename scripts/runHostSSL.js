@@ -13,8 +13,8 @@ console.log('SSL_KEY', process.env.SSL_PATH_KEY);
 
 // Загрузите SSL-сертификаты
 const options = {
-    key: fs.readFileSync(process.env.SSL_PATH_CERT),
-    cert: fs.readFileSync(process.env.SSL_PATH_KEY)
+    key: fs.readFileSync(process.env.SSL_PATH_KEY),
+    cert: fs.readFileSync(process.env.SSL_PATH_CERT)
 };
 
 
