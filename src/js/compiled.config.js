@@ -9,6 +9,10 @@ let config = extend({}, mainConf);
 
 try {
     const customConf = require("./../conf/custom");
+
+    // eslint-disable-next-line no-console
+    console.log('JOipP', `customConf`, customConf)
+
     extend(config, customConf);
 } catch (err) {
     // do nothing
