@@ -6,7 +6,7 @@ const fs = require('fs');
 
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 
-const port = process.env.HTTPS_PORT || 3000;
+const port = process.env.HTTP_PORT || 3000;
 
 console.log('SSL_CERT', process.env.SSL_PATH_CERT);
 console.log('SSL_KEY', process.env.SSL_PATH_KEY);
