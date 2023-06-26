@@ -6,6 +6,9 @@ import config from "./compiled.config";
 import API from "./utils/api";
 import api from "./api/_dir";
 
+// eslint-disable-next-line no-console
+console.log('JOipP', `config`, config)
+
 export default new API({
     protocol: config.connection.socket.proto,
     host: config.connection.socket.host,
