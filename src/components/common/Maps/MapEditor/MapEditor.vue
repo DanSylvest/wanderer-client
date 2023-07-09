@@ -18,7 +18,7 @@
               />
             </wd-tab>
 
-            <wd-tab id="tab-groups" wd-label="Groups" class="wd-tab wd-tab-groups wd fs box-sizing">
+            <wd-tab id="tab-groups" wd-label="Access lists" class="wd-tab wd-tab-groups wd fs box-sizing">
               <map-editor-groups
                 :map-id="lMapId"
                 :selected.sync="mapGroups"

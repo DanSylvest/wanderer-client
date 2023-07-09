@@ -1,7 +1,7 @@
 <template>
   <div>
     <searcher
-      type="group"
+      type="Access list"
       :items="groups"
       show-list-if-empty
       @changed="onChanged"
@@ -28,7 +28,7 @@
       <template #empty-state-list>
         <md-empty-state
           md-icon="manage_accounts"
-          md-label="Add group"
+          md-label="New Access list"
           md-description="Everyone in group get access to your map"
         />
       </template>

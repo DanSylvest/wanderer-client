@@ -35,6 +35,10 @@ echo "module.exports = {
   }
 }" > "$ROOT/src/conf/custom.js";
 
+echo '_____________ CLIENT INSTALL NPM START _____________'
+npm install;
+echo '_____________ CLIENT INSTALL NPM FINISH _____________'
+
 echo "" > "${ROOT}/${LOCKFILE}"
 
 echo "Starting..."

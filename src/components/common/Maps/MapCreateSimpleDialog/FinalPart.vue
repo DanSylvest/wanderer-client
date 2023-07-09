@@ -20,7 +20,7 @@
       </div>
 
       <div class="wd-column">
-        <div class="wd font-size-medium-large wd-padding-bottom">Group settings</div>
+        <div class="wd font-size-medium-large wd-padding-bottom">Access list settings</div>
 
         <wd-note title="name" class="wd-accent-title wd-custom-note-content">{{ groupName }}</wd-note>
         <wd-note title="description" class="wd-accent-title wd-custom-note-content">{{ groupDescription }}</wd-note>
@@ -163,7 +163,7 @@
 
         this.groupName = groupName;
         if (groupDescription === '') {
-          this.groupDescription = `This group was created in ${ currentTime }.`;
+          this.groupDescription = `This access list was created in ${ currentTime }.`;
         } else {
           this.groupDescription = groupDescription;
         }

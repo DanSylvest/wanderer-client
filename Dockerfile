@@ -8,7 +8,5 @@ RUN apk add nodejs npm
 
 COPY package.json package-lock.json ./
 
-RUN npm install
-
 #CMD ["sh", "-c", "/wait-for-it.sh db:5432 -- ./install.sh"]
 CMD ["./deploy/run.sh"]

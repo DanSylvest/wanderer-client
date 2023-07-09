@@ -31,7 +31,7 @@ export default function (_groupId, _options) {
         characters: _options.characters,
         corporations: _options.corporations,
         alliances: _options.alliances,
-        // moderators: _options.moderators,
+        moderators: _options.moderators,
     });
 
     return p.native;

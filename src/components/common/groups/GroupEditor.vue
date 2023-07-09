@@ -12,7 +12,7 @@
 
                 <transition name="fade" mode="out-in">
                   <span class="md-helper-text wd-hint-negative" v-if="!isValidName" key="first">
-                      * Group name should contain at least 3 symbols and begins with a symbol
+                      * Access List name should contain at least 3 symbols and begins with a symbol
                   </span>
                   <span class="md-helper-text wd-hint-positive" v-if="isValidName" key="second">Valid</span>
                 </transition>
@@ -40,6 +40,10 @@
 
             <wd-tab id="tab-alliances" wd-label="Alliances" class="wd-tab wd-tab-alliances wd fs box-sizing">
               <searcher type="alliance" :items="alliances" @changed="onAlliancesChanged" />
+            </wd-tab>
+
+            <wd-tab id="tab-managers" wd-label="Managers" class="wd-tab wd-tab-managers wd fs box-sizing">
+              <searcher type="character" :items="managers" @changed="onManagersChanged" />
             </wd-tab>
           </wd-tabs>
         </div>
@@ -82,6 +86,7 @@ export default {
       characters: [],
       corporations: [],
       alliances: [],
+      managers: [],
       // moderators: [],
       isDirty: false,
       valid: false,
@@ -120,6 +125,11 @@ export default {
       this.setDirty();
       this.validateEditForm();
     },
+    onManagersChanged (ids) {
+      this.managers = ids;
+      this.setDirty();
+      this.validateEditForm();
+    },
     onCorporationsChanged (ids) {
       this.corporations = ids;
       this.setDirty();
@@ -136,6 +146,7 @@ export default {
       this.characters = data.characters;
       this.corporations = data.corporations;
       this.alliances = data.alliances;
+      this.managers = data.moderators;
     },
     onLoadedGroupPublicInfo (data) {
       GroupPublicInfoMixin.methods.onLoadedGroupPublicInfo.call(this, data);
@@ -152,6 +163,7 @@ export default {
         characters: this.characters.map(x => x.toString()),
         corporations: this.corporations.map(x => x.toString()),
         alliances: this.alliances.map(x => x.toString()),
+        moderators: this.managers.map(x => x.toString()),
         // moderators: this.moderators,
       };
 

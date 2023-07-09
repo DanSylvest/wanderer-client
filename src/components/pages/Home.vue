@@ -3,17 +3,38 @@
     <App>
       <template v-slot:AppLeftMenu>
         <AppMenu>
-          <AppMenuItem icon="my_location" title="Map" @click="onCurrentMapClick"
-                       :active="currentMapButtonIsActive"></AppMenuItem>
-          <AppMenuItem icon="library_add" title="Maps" @click="onMapsClick" :active="mapsButtonIsActive"></AppMenuItem>
-          <AppMenuItem icon="groups" title="Own Groups" @click="onOwnGroupsClick"
-                       :active="groupsOwnButtonIsActive"></AppMenuItem>
-          <AppMenuItem icon="sensors" title="Available Groups" @click="onAllowedGroupsClick"
-                       :active="groupsAllowedButtonIsActive"></AppMenuItem>
-          <AppMenuItem icon="person_add" title="Characters" @click="onCharClick"
-                       :active="charactersButtonIsActive"></AppMenuItem>
+          <AppMenuItem
+            icon="my_location"
+            title="Map"
+            @click="onCurrentMapClick"
+            :active="currentMapButtonIsActive"
+          />
+          <AppMenuItem
+            icon="library_add"
+            title="Maps"
+            @click="onMapsClick"
+            :active="mapsButtonIsActive"
+          />
+          <AppMenuItem
+            icon="groups"
+            title="Access lists"
+            @click="onOwnGroupsClick"
+            :active="groupsOwnButtonIsActive"
+          />
+          <AppMenuItem
+            icon="sensors"
+            title="Characters tracking"
+            @click="onAllowedGroupsClick"
+            :active="groupsAllowedButtonIsActive"
+          />
+          <AppMenuItem
+            icon="person_add"
+            title="Characters"
+            @click="onCharClick"
+            :active="charactersButtonIsActive"
+          />
           <!--                    <AppMenuItem icon="build" title="Profile" @click="onProfileClick" :active="profileButtonIsActive"></AppMenuItem>-->
-          <AppMenuItem icon="system_update_alt" title="Log out" @click="onLogOut"></AppMenuItem>
+          <AppMenuItem icon="system_update_alt" title="Log out" @click="onLogOut" />
 
           <div class="wd-bottom-bar">
             <div class="wd-server-status">

@@ -61,7 +61,7 @@
         .wd-ui-tabs {
             .wd-ui-tabs__content {
                 width: 700px;
-                height: 350px;
+                height: 450px;
             }
         }
     }

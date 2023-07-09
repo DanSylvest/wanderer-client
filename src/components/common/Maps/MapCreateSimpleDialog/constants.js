@@ -18,11 +18,11 @@ export const TEXT = {
       description: '',
     },
     second: {
-      label: 'Select a group',
+      label: 'Access list info',
       description: '',
     },
     third: {
-      label: 'Group Settings',
+      label: 'Settings',
       description: '',
     },
     fourth: {
@@ -47,11 +47,11 @@ export const TEXT = {
   groupPart: {
     selectTypeDescription: 'Select group from exists or create new',
     name: {
-      label: 'Group name',
-      hint: '* Group name should contain at least 3 symbols and begins with a symbol.'
+      label: 'Access List name',
+      hint: '* Access List name should contain at least 3 symbols and begins with a symbol.'
     },
     description: {
-      label: 'Public group description',
+      label: 'Public Access List description',
       hint: 'You can leave this field empty.'
     },
   },

@@ -13,13 +13,15 @@
           >
             <template v-slot:toolbar>
               <div class="md-toolbar-section-start">
-                Groups (Owner/Moderator)
+                Access lists (Owner/Moderator)
               </div>
 
               <div class="md-toolbar-section-end">
                 <md-button class="md-dense md-primary md-raised" @click="onShowCreateDialog">
-                  <md-icon>add</md-icon>
-                  <span style="vertical-align: middle">Add group</span>
+                  <div class="wd-groups-add-button">
+                    <md-icon>library_add</md-icon>
+                    <span style="vertical-align: middle">New Access list</span>
+                  </div>
                 </md-button>
               </div>
             </template>
@@ -210,6 +212,12 @@
   .wd-groups {
     display: flex;
     width: 100%;
+
+    .wd-groups-add-button {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
 
     .wd-groups__info {
       transition: width 350ms, height 350ms;

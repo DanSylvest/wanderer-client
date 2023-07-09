@@ -18,9 +18,6 @@ class API extends Emitter {
             handlers: {}
         }, _options);
 
-        // eslint-disable-next-line no-console
-        console.log('API', `API`, this.options)
-
         this._status = "not_ready";
 
         Emitter.prototype.constructor.call(this);
