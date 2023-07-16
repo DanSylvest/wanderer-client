@@ -139,7 +139,7 @@
           :key="systemId"
           class="wd-layout-secondary"
         >
-          <system-card :solar-system-id="systemId" :map-id="mapId" :exists-on-map="true" />
+          <system-card :solar-system-id="systemId" :map-id="mapId" :exists-on-map="true" :show-info="true" />
         </tooltip>
 
         <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>

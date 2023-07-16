@@ -91,6 +91,7 @@
                                             :solar-system-id="routeSystem.solarSystemId.toString()"
                                             :is-load-char-data="false"
                                             class="wd-layout-secondary"
+                                            :show-info="true"
                                         ></system-card>
                                     </tooltip>
                                 </div>

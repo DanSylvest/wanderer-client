@@ -5,12 +5,27 @@
         <div class="wd-system-overview__card-header wd-system-overview__header">
           <div :class="securityClass + ' solar-system-security'">{{ info.security }}</div>
           <div class="solar-system-name">
-            <a v-if="solarSystemLink !== ''" target="_blank"
-               :href="solarSystemLink">{{ info.solarSystemName }}</a>
-            <span v-if="solarSystemLink === ''">{{ info.solarSystemName }}</span>
+            <span>{{ info.solarSystemName }}</span>
           </div>
-          <div class="constellation-name">{{ info.constellationName }}</div>
-          <div class="region-name">{{ info.regionName }}</div>
+          <div class="wd-icon-button-x1" @click="onCopyClick">
+            <md-tooltip>Copy solar system name</md-tooltip>
+            <md-icon class="wd-ssi-copy">content_copy</md-icon>
+          </div>
+
+          <div class="wd-ssi-external-links">
+            <a :href="zkbLink" target="_blank">
+              <md-tooltip>Open {{ info.solarSystemName }} system on zkillboard.com</md-tooltip>
+              <external-icon iconSrc="zkb.png" icon-width="16" icon-height="16" />
+            </a>
+            <a :href="anoikisLink" target="_blank">
+              <md-tooltip>Open {{ info.solarSystemName }} system on anoik.is</md-tooltip>
+              <external-icon iconSrc="anoikis.png" icon-width="16" icon-height="16" />
+            </a>
+            <a :href="dotlanLink" target="_blank">
+              <md-tooltip>Open {{ info.solarSystemName }} system on evemaps.dotlan.net</md-tooltip>
+              <external-icon iconSrc="dotlan.png" icon-width="16" icon-height="16" />
+            </a>
+          </div>
         </div>
       </md-card-header>
 
@@ -18,49 +33,52 @@
         <div class="wd-system-overview-content wd flex flex-justify-sb">
           <div class="wd-system-info wd f-width">
 
-            <div class="wd-system-info__system-item wd-solar-system-item">
-              <div class="wd fg-contrast wd-solar-system-item__title">Type</div>
-              <div class="wd fg-contrast wd-solar-system-item__content">
-                <span :class="typeDescriptionClass">{{ info.typeDescription }}</span>
+            <info-block title="Constellation & Region">
+              <div class="wd-ssi-const-region">
+                <div class="constellation-name">{{ info.constellationName }}</div> /
+                <div class="region-name">{{ info.regionName }}</div>
               </div>
-            </div>
+            </info-block>
 
-            <div class="wd-system-info__system-item wd-solar-system-item" v-if="status !== 0">
-              <div class="wd fg-contrast wd-solar-system-item__title">Status</div>
-              <div class="wd fg-contrast wd-solar-system-item__content">
-                <span :class="statusClass">{{ statusName }}</span>
-              </div>
-            </div>
+            <info-block title="Type">
+              <span :class="typeDescriptionClass">{{ info.typeDescription }}</span>
+            </info-block>
 
-            <div class="wd-system-info__system-item wd-solar-system-item"
-                 v-if="info.statics.length > 0">
-              <div class="wd fg-contrast wd-solar-system-item__title">Static</div>
-              <div class="text-right wd fg-contrast wd-statics wd-solar-system-item__content">
-                <div class="wd-static-item" v-for="item in getStaticsData(info.statics)"
-                     :key="item.wormholeClassID">
+            <info-block title="Status" v-if="status !== 0">
+              <span :class="statusClass">{{ statusName }}</span>
+            </info-block>
+
+            <info-block title="Static" v-if="info.statics.length > 0">
+              <div class="wd-statics">
+                <div
+                  class="wd-static-item"
+                  v-for="item in getStaticsData(info.statics)"
+                  :key="item.wormholeClassID"
+                >
                   <div class="wd-static-item__wormhole-id">{{ item.name }}</div>
-                  <div class="wd-static-item__wormhole-class"
-                       :class="getStaticClassColor(item.wormholeClassID)">
+                  <div
+                    class="wd-static-item__wormhole-class"
+                    :class="getStaticClassColor(item.wormholeClassID)"
+                  >
                     {{ getWormholeData(item.dest).shortName }}
                   </div>
                 </div>
               </div>
-            </div>
+            </info-block>
 
-            <div class="wd-system-info__system-item wd-solar-system-item"
-                 v-if="info.wanderers.length > 0">
-              <div class="wd fg-contrast wd-solar-system-item__title">Wandering</div>
-              <div class="text-right wd fg-contrast wd-statics wd-solar-system-item__content">
+            <info-block title="Static" v-if="info.statics.length > 0">
+              <div class="wd-statics">
                 <div class="wd-static-item" v-for="item in getStaticsData(info.wanderers)"
-                     :key="item.wormholeClassID">
+                  :key="item.wormholeClassID">
                   <div class="wd-static-item__wormhole-id">{{ item.name }}</div>
                   <div class="wd-static-item__wormhole-class"
-                       :class="getStaticClassColor(item.wormholeClassID)">
+                    :class="getStaticClassColor(item.wormholeClassID)">
                     {{ getWormholeData(item.dest).shortName }}
                   </div>
                 </div>
               </div>
-            </div>
+            </info-block>
+
           </div>
         </div>
       </md-card-content>
@@ -69,12 +87,16 @@
 </template>
 
 <script>
-import SolarSystemMixin from "../../../../../mixins/solarSystem";
-import environment from "../../../../../../js/core/map/environment";
-import eveHelper from "../../../../../../js/eveHelper";
+  import SolarSystemMixin from '../../../../../mixins/solarSystem';
+  import environment from '../../../../../../js/core/map/environment';
+  import eveHelper from '../../../../../../js/eveHelper';
+  import ExternalIcon from '@/components/ui/ExternalIcon';
+  import copyToClipboard from '@/js/env/copyToClipboard';
+  import InfoBlock from '@/components/ui/InfoBlock';
 
-export default {
+  export default {
   name: "SolarSystemInfo",
+  components: { InfoBlock, ExternalIcon },
   mixins: [SolarSystemMixin],
   computed: {
     info () {
@@ -90,6 +112,7 @@ export default {
       let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
       return `eve-system-status-color-${environment.statuses[status].id}`
     },
+
     statusName () {
       let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
       return environment.statuses[status].name;
@@ -97,15 +120,14 @@ export default {
     status () {
       return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
     },
-    solarSystemLink () {
-      if (eveHelper.isKnownSpace(this.info.systemClass)) {
-        return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
-      }
-      if (eveHelper.isWormholeSpace(this.info.systemClass)) {
-        return "http://anoik.is/systems/" + this.info.solarSystemName;
-      }
-
-      return "";
+    dotlanLink () {
+      return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
+    },
+    anoikisLink () {
+      return "http://anoik.is/systems/" + this.info.solarSystemName;
+    },
+    zkbLink () {
+      return "https://zkillboard.com/system/" + this.solarSystemId;
     },
   },
   methods: {
@@ -114,10 +136,58 @@ export default {
     getStaticClassColor: function (_staticClass) {
       return environment.wormholeClassStyles[_staticClass];
     },
+    onCopyClick () {
+      copyToClipboard(this.info.solarSystemName);
+    }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  .wd-system-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
 
+  .wd-ssi-external-links {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    width: 100%;
+
+    & > * {
+      line-height: initial;
+    }
+  }
+
+  .wd-system-overview__header {
+    .wd-ssi-external-links {
+      margin-left: 4px;
+    }
+  }
+
+  .wd-ssi-copy {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 16px !important;
+    cursor: pointer;
+  }
+
+  .wd-icon-button-x1 {
+    line-height: initial;
+    height: 16px;
+  }
+
+  .solar-system-name {
+    display: flex;
+    gap: 4px;
+  }
+
+  .wd-ssi-const-region {
+    display: flex;
+    gap: 4px;
+    user-select: text;
+  }
 </style>

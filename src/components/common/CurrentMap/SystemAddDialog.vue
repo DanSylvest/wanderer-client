@@ -128,7 +128,7 @@
                     return;
                 }
 
-                if(this.searchMatch.length >= 2) {
+                if(this.searchMatch.length >= 3) {
                     let pr = new CustomPromise();
                     this.systems = pr.native
                     this._spamFilter.call(this.searchMatch, pr);

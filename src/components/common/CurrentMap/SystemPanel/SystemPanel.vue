@@ -122,7 +122,7 @@ export default {
   },
   computed: {
     panelTitle () {
-      return `Solar system card - (${this.lSolarSystemId})`;
+      return `Solar system`;
     }
   },
   methods: {
@@ -193,7 +193,7 @@ const innerRefresh = function () {
   this._rtid = -1;
 
   let bounds = document.body.getBoundingClientRect();
-  this.panelWidth = bounds.width * 0.4 < 400 ? 400 : bounds.width * 0.45;
+  this.panelWidth = bounds.width * 0.3 < 400 ? 400 : bounds.width * 0.35;
   this.panelHeight = bounds.height - 69;
 
   this.isCompact = bounds.width <= 1400;
