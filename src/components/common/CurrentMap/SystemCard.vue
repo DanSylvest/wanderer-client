@@ -74,10 +74,7 @@
       };
     },
     methods: {
-      mounted () {
-        // eslint-disable-next-line no-console
-        console.log('JOipP', `this.showInfo`, this.showInfo);
-      },
+      mounted () {},
     },
     computed: {
       isStatusVisible () {

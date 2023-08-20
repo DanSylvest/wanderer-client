@@ -27,6 +27,7 @@ export default class SolarSystem extends SubscriptionProvider {
 
         this._addAccessData("isLocked");
         this._addAccessData("name");
+        this._addAccessData("userName");
         this._addAccessData("description");
         this._addAccessData("tag");
         this._addAccessData("status");

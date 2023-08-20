@@ -3,7 +3,7 @@
     <AppToolbar>
       <div class="wd-map-toolbar">
         <transition name="fade">
-          <user-characters v-show="!loadingMap" :map-id="selectedMap" />
+          <user-characters v-show="!loadingMap" :map-id="selectedMap" @click="handleCharInBar" />
         </transition>
       </div>
     </AppToolbar>
@@ -53,7 +53,7 @@
           <delayed-saver
             class="md-layout md-alignment-bottom-right"
             :data="savingDelayCounter"
-            :delay="10"
+            :delay="6"
             @changed="onDelayedSaver"
           />
           <transition name="fade">
@@ -150,11 +150,16 @@
         :solar-system-id="systemPanelSolarSystemId"
         @highlight-route="onHighlightRoute"
         @closed="onSystemInfoPanelClosed"
+        @changedPanelState="onChangePanelState"
       />
       <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
     </div>
 
     <map-create-simple-dialog :show.sync="showCreateSimpleDialog" />
+    <user-characters-provider
+      :map-id="selectedMap"
+      @onCharactersData="onUserCharactersChanged"
+    />
   </div>
 
 </template>
@@ -185,10 +190,13 @@
   import UserCharacters from './UserCharacters/UserCharacters';
   import MapCreateSimpleDialog from '../Maps/MapCreateSimpleDialog/MapCreateSimpleDialog';
   import DelayedSaver from './components/DelayedSaver';
+  import UserCharactersProvider from '@/components/common/CurrentMap/components/UserCharactersProvider';
+  import { requestSolarSystemId } from '@/components/requests/requestSolarSystem';
 
   export default {
     name: 'CurrentMap',
     components: {
+      UserCharactersProvider,
       MapCreateSimpleDialog,
       UserCharacters,
       ContextMenu,
@@ -208,6 +216,7 @@
       return {
         savingDelayCounter: 0,
         systemPanelShow: false,
+        systemPanelWidth: 0,
         systemPanelMapId: '',
         systemPanelSolarSystemId: '',
 
@@ -231,7 +240,7 @@
         systemContextMenuLockedItem: false,
         systemContextMenuMarkAsHub: true,
         isAutoAlignment: false,
-        characters: [],
+        userCharacters: [],
 
         rootCMActive: false,
         rootCMOffsetX: 0,
@@ -409,6 +418,9 @@
         this._currentOpenSystem = null;
         this.mapController.offSystemActive();
       },
+      onChangePanelState ({ panelWidth }) {
+        this.systemPanelWidth = panelWidth;
+      },
       onDelayedSaver () {
         const positions = this.mapController.map.collectPositions();
         api.eve.map.solarSystem.updatePositions(this.selectedMap, positions)
@@ -485,6 +497,18 @@
             this.mapController.offAllShade();
             break;
         }
+      },
+
+      onUserCharactersChanged (data) {
+        this.mapController?.updateUserCharactersInfo(data);
+      },
+
+      async handleCharInBar ({ charId }) {
+        const location = await requestSolarSystemId(charId);
+        this.mapController.moveCameraAtSolarSystem(
+          location,
+          { offsetRight: this.systemPanelShow ? this.systemPanelWidth : 0 },
+        );
       },
       /** *************************** **/
       /** ****** LOCAL METHODS ****** **/
@@ -782,7 +806,6 @@
       }
     }
   }
-
 
   .wd-map-toolbar {
     width: 100%;

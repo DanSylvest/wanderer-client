@@ -43,6 +43,8 @@ export const UserCharactersMixin = {
   methods: {
     _onLoadedUserCharacters () {
       this.loadedUserCharacters = true;
+
+      this.$emit('onUserCharactersChanged', this.userCharactersList);
     },
   },
 };

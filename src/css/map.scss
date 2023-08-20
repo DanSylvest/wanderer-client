@@ -11,7 +11,6 @@ $active-color: #7be1ff;
   font-family: sans-serif;
   font-size: 12px;
 
-
   & > .eve-marker-container {
     position: absolute;
     left: 0;
@@ -51,7 +50,6 @@ $active-color: #7be1ff;
       }
 
       &.system-status-unknown {
-
 
       }
 
@@ -155,6 +153,9 @@ $active-color: #7be1ff;
           .system-name {
             color: $fg-contrast;
             font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
           }
 
           .system-tag {
@@ -202,15 +203,21 @@ $active-color: #7be1ff;
             justify-content: flex-start;
             align-items: flex-end;
 
+            &.own {
+              & > .online-icon, & > .online-count {
+                color: $primary-color-2;
+              }
+            }
+
             .online-icon {
-              background-image: url("/img/people_white_24dp.svg");
+              //background-image: url("/img/people_white_24dp.svg");
               background-size: contain;
               background-repeat: no-repeat;
+              color: $fg-contrast;
 
               width: 13px;
               height: 13px;
               position: relative;
-              top: 1px;
             }
 
             .online-count {
@@ -247,7 +254,6 @@ $active-color: #7be1ff;
       }
     }
 
-
   }
 
   .hidden {
@@ -271,7 +277,6 @@ $active-color: #7be1ff;
   position: absolute;
   left: -10000px;
 }
-
 
 .map-link {
   stroke: $eve-link-color-default;
@@ -834,7 +839,6 @@ $active-color: #7be1ff;
   background-color: $eve-wh-type-color-thera;
 }
 
-
 .eve-kind-color-high {
   color: $eve-wh-type-color-high;
   fill: $eve-wh-type-color-high;
@@ -942,7 +946,6 @@ $active-color: #7be1ff;
 .eve-system-status-color-home {
   color: $eve-solar-system-status-color-home !important;
 }
-
 
 .wd-route-system-shape-triangle {
   clip-path: polygon(50% 0, 0 100%, 100% 100%);

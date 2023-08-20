@@ -50,7 +50,9 @@ class Marker extends Emitter{
               <div class="locked hidden"></div>
               <div class="marked-as-hub hidden"></div>
               <div class="online hidden">
-                <div class="online-icon"></div>    
+                <div class="online-icon">
+                  <img src="/img/people_white_24dp.svg" alt=""/>
+                </div>    
                 <div class="online-count">${ Number.randomInt(0, 199) }</div>                           
               </div>
             </div>
@@ -81,7 +83,10 @@ class Marker extends Emitter{
    * @param {Object} _data
    * @param {string} _data.tag
    * @param {boolean} _data.isLocked
+   * @param {boolean} _data.isHub
+   * @param {boolean} _data.hasOwn
    * @param {string} _data.name
+   * @param {string} _data.userName
    * @param {string} _data.regionName
    * @param {string} _data.security
    * @param {number} _data.systemClass
@@ -92,7 +97,7 @@ class Marker extends Emitter{
    * @param {Array} _data.statics
    */
   update (_data) {
-    let markerData = this.data;
+    const markerData = this.data;
     let markerEl = this.wrapper;
 
     if (!exists(_data.position) && !exists(markerData.position)) {
@@ -103,10 +108,7 @@ class Marker extends Emitter{
       markerEl.classRemove('hidden');
     }
 
-    if (exists(_data.name) && _data.name !== markerData.name) {
-      let systemNameEl = _ui.fromElement(markerEl.el.querySelector('.system-name'));
-      systemNameEl.text(_data.name);
-    }
+    this._updateName(_data);
 
     if (exists(_data.tag) && _data.tag !== markerData.tag) {
       let systemTagEl = _ui.fromElement(markerEl.el.querySelector('.system-tag'));
@@ -128,6 +130,13 @@ class Marker extends Emitter{
     if (exists(_data.isHub)) {
       let hubEl = _ui.fromElement(markerEl.el.querySelector('.marked-as-hub'));
       _data.isHub ? hubEl.classRemove('hidden') : hubEl.classAdd('hidden');
+    }
+
+    if (exists(_data.hasOwn)) {
+      let hubEl = _ui.fromElement(markerEl.el.querySelector('.online'));
+      let img = _ui.fromElement(markerEl.el.querySelector('.online-icon > img'));
+      img.el.setAttribute('src', `/img/people_${ _data.hasOwn ? 'orange' : 'white' }_24dp.svg`);
+      _data.hasOwn ? hubEl.classAdd('own') : hubEl.classRemove('own');
     }
 
     if (_data.effectName && _data.effectName !== '') {
@@ -187,6 +196,26 @@ class Marker extends Emitter{
     extend(this.data, _data);
   }
 
+  _updateName ({ name: newName, userName: newUserName }) {
+    const { name: prevName } = this.data;
+    const markerEl = this.wrapper;
+    const systemNameEl = _ui.fromElement(markerEl.el.querySelector('.system-name'));
+
+    if (newUserName != null && newUserName !== '') {
+      systemNameEl.text(newUserName);
+      return;
+    }
+
+    if (newUserName != null && newUserName === '') {
+      systemNameEl.text(prevName || newName);
+      return;
+    }
+
+    if (newName != null && newName !== prevName) {
+      systemNameEl.text(newName);
+    }
+  }
+
   /**
    *
    * @param _statics {Array<{type: String}>}
@@ -199,7 +228,7 @@ class Marker extends Emitter{
     staticsData.map(staticData => {
       let colorClass = environment.wormholeClassStyles[eveData.wormholeClassesNames[staticData.dest]];
       let wormholeClass = window.eveStaticData.wormholeClasses[staticData.dest];
-      let staticEl = _ui.fromText(`<div class='static ${ colorClass }'>${ wormholeClass.shortName }</div>`);
+      let staticEl = _ui.fromText(`<div class="static ${ colorClass }">${ wormholeClass.shortName }</div>`);
       el.append(staticEl);
     });
 
@@ -229,29 +258,33 @@ class Marker extends Emitter{
   }
 
   _onMarkerTouchStart (event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     this.emit('mousedown', extend(ActionObserver.copyTouchEvent(event), ActionObserver.copyTouch(event.touches[0])));
   }
 
   _onMarkerDown (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     this.emit('mousedown', _event);
   }
 
   _onMarkerContext (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     this.emit('contextmenu', _event);
   }
 
   _onMouseIn (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     let bounds = this.wrapper.el.getBoundingClientRect();
 
@@ -263,15 +296,17 @@ class Marker extends Emitter{
   }
 
   _onMouseOut (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     this.emit('mouseout', _event);
   }
 
   _onMouseInLazy (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     let bounds = this.wrapper.el.getBoundingClientRect();
     this.emit('mouseinLazy', {
@@ -282,8 +317,9 @@ class Marker extends Emitter{
   }
 
   _onMouseOutLazy (_event) {
-    if (!this._enableActions)
+    if (!this._enableActions) {
       return;
+    }
 
     this.emit('mouseoutLazy', _event);
   }
@@ -291,10 +327,11 @@ class Marker extends Emitter{
   enableShade (_bool) {
     this.data.shade = _bool;
 
-    if (_bool)
+    if (_bool) {
       this.wrapper.el.classList.add('shaded');
-    else
+    } else {
       this.wrapper.el.classList.remove('shaded');
+    }
 
   }
 
@@ -306,7 +343,9 @@ class Marker extends Emitter{
   }
 }
 
-export const _hide = (el, sel, bool) => _ui.fromElement(el.querySelector(sel))[bool ? 'classAdd' : 'classRemove']('hidden');
+export const _hide = (el, sel, bool) => _ui.fromElement(el.querySelector(sel))[bool
+  ? 'classAdd'
+  : 'classRemove']('hidden');
 export const _selEl = (el, sel) => _ui.fromElement(el.querySelector(sel));
 
 export default Marker;

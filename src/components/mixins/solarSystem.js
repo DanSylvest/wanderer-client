@@ -51,6 +51,9 @@ const SolarSystemMixin = {
     description () {
       return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].description;
     },
+    userName () {
+      return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].userName;
+    },
     signatures () {
       return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].signatures;
     },

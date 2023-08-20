@@ -50,32 +50,13 @@
 
             <info-block title="Static" v-if="info.statics.length > 0">
               <div class="wd-statics">
-                <div
-                  class="wd-static-item"
-                  v-for="item in getStaticsData(info.statics)"
-                  :key="item.wormholeClassID"
-                >
-                  <div class="wd-static-item__wormhole-id">{{ item.name }}</div>
-                  <div
-                    class="wd-static-item__wormhole-class"
-                    :class="getStaticClassColor(item.wormholeClassID)"
-                  >
-                    {{ getWormholeData(item.dest).shortName }}
-                  </div>
-                </div>
+                <wormhole-type v-for="type in sortStatics(info.statics)" :key="type" :wormhole-type="type" />
               </div>
             </info-block>
 
-            <info-block title="Static" v-if="info.statics.length > 0">
+            <info-block title="Wandering" v-if="info.wanderers.length > 0">
               <div class="wd-statics">
-                <div class="wd-static-item" v-for="item in getStaticsData(info.wanderers)"
-                  :key="item.wormholeClassID">
-                  <div class="wd-static-item__wormhole-id">{{ item.name }}</div>
-                  <div class="wd-static-item__wormhole-class"
-                    :class="getStaticClassColor(item.wormholeClassID)">
-                    {{ getWormholeData(item.dest).shortName }}
-                  </div>
-                </div>
+                <wormhole-type v-for="type in sortStatics(info.wanderers)" :key="type" :wormhole-type="type" />
               </div>
             </info-block>
 
@@ -93,10 +74,11 @@
   import ExternalIcon from '@/components/ui/ExternalIcon';
   import copyToClipboard from '@/js/env/copyToClipboard';
   import InfoBlock from '@/components/ui/InfoBlock';
+  import WormholeType from '@/components/common/components/WormholeType';
 
   export default {
   name: "SolarSystemInfo",
-  components: { InfoBlock, ExternalIcon },
+  components: { WormholeType, InfoBlock, ExternalIcon },
   mixins: [SolarSystemMixin],
   computed: {
     info () {
@@ -131,19 +113,20 @@
     },
   },
   methods: {
-    getStaticsData: statics => eveHelper.getStaticsData(statics),
-    getWormholeData: id => eveHelper.getWormholeData(id),
-    getStaticClassColor: function (_staticClass) {
-      return environment.wormholeClassStyles[_staticClass];
-    },
+    sortStatics: statics => eveHelper.sortStatics(statics),
     onCopyClick () {
       copyToClipboard(this.info.solarSystemName);
-    }
+    },
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  .wd-statics {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .wd-system-info {
     display: flex;
     flex-direction: column;

@@ -11,6 +11,7 @@ import Rectangle from '../../env/rectangle';
 import Marker from './marker';
 import Chain from './chain.js';
 import collideRect from '../../libs/d3/collideRect';
+import { anim } from '@/js/utils/anim';
 
 const d3 = require('d3-force');
 
@@ -31,6 +32,8 @@ const ST_INITAL = stCounter++;
 const ST_CONNECTING = stCounter++;
 
 class Map extends Emitter{
+  _currentMovingAnimation = null;
+
   constructor (_options) {
     let base = extend({
       container: null,
@@ -54,6 +57,7 @@ class Map extends Emitter{
 
     this._forceLinks = [];
     this._forceEnable = false;
+
 
     this._reqId = -1;
     this._refresHandler = this.refresh.bind(this);
@@ -144,17 +148,21 @@ class Map extends Emitter{
       let hAxis_min = savedAxis.x - v.x;
       let vAxis_min = savedAxis.y - v.y;
 
-      if (hAxis_min + this.magnifier.hAxis.range > BOUNDS.HORIZONTAL)
+      if (hAxis_min + this.magnifier.hAxis.range > BOUNDS.HORIZONTAL) {
         hAxis_min = BOUNDS.HORIZONTAL - this.magnifier.hAxis.range;
+      }
 
-      if (hAxis_min < -BOUNDS.HORIZONTAL)
+      if (hAxis_min < -BOUNDS.HORIZONTAL) {
         hAxis_min = -BOUNDS.HORIZONTAL;
+      }
 
-      if (vAxis_min + this.magnifier.vAxis.range > BOUNDS.VERTICAL)
+      if (vAxis_min + this.magnifier.vAxis.range > BOUNDS.VERTICAL) {
         vAxis_min = BOUNDS.VERTICAL - this.magnifier.vAxis.range;
+      }
 
-      if (vAxis_min < -BOUNDS.VERTICAL)
+      if (vAxis_min < -BOUNDS.VERTICAL) {
         vAxis_min = -BOUNDS.VERTICAL;
+      }
 
 
       this.magnifier.hAxis.min = /*savedAxis.x - v.x*/hAxis_min;
@@ -198,6 +206,42 @@ class Map extends Emitter{
     this.setOffset(-this.width / 2, -this.height / 2);
     this.render();
     this.emit('offsetChanged', new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
+  }
+
+  moveCameraAtSolarSystem (solarSystemId) {
+    this.magnifier.centerById(solarSystemId);
+    this.render();
+    this.emit('offsetChanged', new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
+  }
+
+  moveCameraAtSolarSystemAnim (solarSystemId, { offsetRight = 0 }) {
+    if (this._currentMovingAnimation?.solarSystemId === solarSystemId) {
+      return;
+    }
+    this._currentMovingAnimation?.cancel();
+
+    const obj = this.magnifier.getObject(solarSystemId);
+
+    const current = new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min);
+    const finish = new Vector2(obj.x - (this.magnifier.hAxis.range - offsetRight) / 2, obj.y - this.magnifier.vAxis.range / 2);
+    const delta = finish['-'](current);
+
+    this._currentMovingAnimation = {
+      solarSystemId,
+      cancel: anim(
+        alpha => {
+          const { x, y } = delta['*'](alpha)['+'](current);
+          this.setOffset(x, y);
+          this.render();
+        },
+        () => {
+          this._currentMovingAnimation = null;
+          this.emit('offsetChanged', new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min));
+        },
+        200,
+        'easeInQuad',
+      ),
+    };
   }
 
   createMarker (customId, _options) {
@@ -265,7 +309,10 @@ class Map extends Emitter{
         y: _data.position.y,
       });
       this._sfForce.call();
-    } else if (hasPositionNew && hasPositionOld && (_data.position.x !== marker.data.position.x || _data.position.y !== marker.data.position.y)) {
+    } else if (hasPositionNew && hasPositionOld && (_data.position.x
+      !== marker.data.position.x
+      || _data.position.y
+      !== marker.data.position.y)) {
       let obj = this.magnifier.objects().searchByObjectKey('id', _markerId);
       obj.x = _data.position.x;
       obj.y = _data.position.y;
@@ -324,8 +371,9 @@ class Map extends Emitter{
       this.shadeMarker(_event.subject.id, false);
 
       let currentMarker = this.findMarker(_event.mouse);
-      if (currentMarker)
+      if (currentMarker) {
         this.shadeMarker(currentMarker.id, false);
+      }
 
       this.tempChain.setPosition(source.x, source.y, _event.mouse.x, _event.mouse.y);
     }.bind(this));
@@ -431,7 +479,7 @@ class Map extends Emitter{
       }.bind(this));
 
       this.render();
-      this.emit('markerDragged')
+      this.emit('markerDragged');
     }.bind(this));
   }
 
@@ -444,6 +492,11 @@ class Map extends Emitter{
     marker.destructor();
 
     delete this._markers[_markerId];
+
+    if (this._movingAnimation[solarSystemId] != null) {
+      this._movingAnimation[solarSystemId]();
+
+    }
 
     this._forceLinks = this.forceLinks();
     this._sfForce.call();
@@ -659,8 +712,9 @@ class Map extends Emitter{
   }
 
   render () {
-    if (this._lock)
+    if (this._lock) {
       return;
+    }
 
     this._lock = true;
 
@@ -714,8 +768,9 @@ class Map extends Emitter{
       );
       let isIntersects = area.crossOrInside(markerRect);
 
-      if (isIntersects)
+      if (isIntersects) {
         selected.push(marker.markerId);
+      }
     }
 
     return selected;
@@ -742,8 +797,9 @@ class Map extends Emitter{
   selected () {
     let out = [];
     for (let markerId in this._markers) {
-      if (this._markers[markerId].data.isSelect)
+      if (this._markers[markerId].data.isSelect) {
         out.push(this._markers[markerId].data.customId);
+      }
     }
     return out;
   }

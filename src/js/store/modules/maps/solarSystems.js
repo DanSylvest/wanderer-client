@@ -15,6 +15,7 @@ let SolarSystemStore = MultipleValuesStore.extend({
     state: () => ({
         isLocked: null,
         name: null,
+        userName: null,
         description: null,
         tag: null,
         status: null,

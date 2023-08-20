@@ -96,6 +96,11 @@ class System extends Emitter{
     this._onDynamicDataChanged({ data: { isHub } });
   }
 
+  setHasOwn (hasOwn) {
+    this._data = extend(this._data, { hasOwn });
+    this._onDynamicDataChanged({ data: { hasOwn } });
+  }
+
   data () {
     return this._data;
   }

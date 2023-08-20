@@ -40,9 +40,15 @@
         <md-card>
           <md-card-content>
             <md-field class="wd-overview-description">
+              <label>Custom solar system name</label>
+              <md-input @input="onTitleChange" v-model="title_" />
+              <delayed-saver :data="delayedTitleData" @changed="onDelayedTitleSaver" :delay="1.5" />
+            </md-field>
+
+            <md-field class="wd-overview-description">
               <label>Description</label>
               <md-textarea @input="onDescriptionChange" v-model="description_" />
-              <delayed-saver :data="delayedData" @changed="onDelayedSaver" />
+              <delayed-saver :data="delayedDescriptionData" @changed="onDelayedDescriptionSaver" />
             </md-field>
           </md-card-content>
         </md-card>
@@ -75,7 +81,8 @@
     data: function () {
       return {
         lIsCompact: this.isCompact,
-        delayedData: undefined,
+        delayedTitleData: undefined,
+        delayedDescriptionData: undefined,
       };
     },
     watch: {
@@ -92,6 +99,10 @@
     computed: {
       description_: {
         get () {return this.description;},
+        set () { /* do nothing */ },
+      },
+      title_: {
+        get () {return this.userName;},
         set () { /* do nothing */ },
       },
 
@@ -129,7 +140,8 @@
     methods: {
       watchAttrsUpdatedSolarSystem () {
         this.needToSave = true;
-        this.delayedData = undefined;
+        this.delayedTitleData = undefined;
+        this.delayedDescriptionData = undefined;
 
         SolarSystemMixin.methods.watchAttrsUpdatedSolarSystem.call(this);
       },
@@ -137,8 +149,16 @@
         SolarSystemMixin.methods.onLoadedSolarSystem.call(this);
       },
 
-      onDelayedSaver (description) {
+      onDelayedDescriptionSaver (description) {
         api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, { description })
+          .then(
+            helper.dummy,
+            err => helper.errorHandler(this, err),
+          );
+      },
+
+      onDelayedTitleSaver (userName) {
+        api.eve.map.solarSystem.update(this.lMapId, this.lSolarSystemId, { userName })
           .then(
             helper.dummy,
             err => helper.errorHandler(this, err),
@@ -148,7 +168,10 @@
         this.$emit('highlight-route', route);
       },
       onDescriptionChange (event) {
-        this.delayedData = event;
+        this.delayedDescriptionData = event;
+      },
+      onTitleChange (event) {
+        this.delayedTitleData = event;
       },
     },
   };
@@ -165,28 +188,6 @@
   .wd-statics {
     display: flex;
     flex-wrap: wrap;
-
-    .wd-static-item {
-      white-space: nowrap;
-      display: flex;
-
-      .wd-static-item__wormhole-id {
-        font-size: 13px;
-      }
-
-      .wd-static-item__wormhole-class {
-        margin-left: 2px;
-        font-size: 11px;
-        display: flex;
-        align-items: flex-start;
-        margin-top: -1px;
-      }
-
-      &:not(:last-child) {
-        margin-right: 5px;
-      }
-    }
-
   }
 
   .wd-solar-system-item {

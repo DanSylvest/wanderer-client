@@ -45,7 +45,7 @@
         </AppMenu>
       </template>
 
-      <component ref="contentRef" :is="mainPageContent" @change-page="onChangePage"></component>
+      <component ref="contentRef" :is="mainPageContent" @change-page="onChangePage" />
     </App>
   </div>
 </template>
