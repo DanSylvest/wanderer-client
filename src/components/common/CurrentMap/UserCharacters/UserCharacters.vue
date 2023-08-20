@@ -8,7 +8,12 @@
       :key="item.charId"
       @click="handleIconClick(item)"
     >
-      <tooltip placement="bottom" :customPosition="false" class="wd wd-layout-secondary md-elevation-2">
+      <tooltip
+        placement="bottom"
+        :customPosition="false"
+        :delay="1000"
+        class="wd wd-layout-secondary md-elevation-2"
+      >
         <character-card :map-id="mapId_" :character-id="item.charId" />
       </tooltip>
     </div>
@@ -29,7 +34,7 @@
       getCharImageUrlStyle,
       handleIconClick ({ charId }) {
         this.$emit('click', { charId });
-      }
+      },
     },
   };
 </script>
