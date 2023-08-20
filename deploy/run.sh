@@ -19,6 +19,7 @@ echo "root path $ROOT";
 
 echo 'Create custom client config'
 echo "module.exports = {
+  logging: ${SHOW_LOGGING:-false},
   eve: {
     sso: {
       client: {

@@ -1,30 +1,10 @@
 <template>
   <div v-if="loadedSolarSystem" class="wd-system-overview wd off-user-select">
-    <div class="wd-content" :class="gridClass">
+    <div class="wd-content wd-grid-3">
       <solar-system-info
         class="wd-content__module wd-module-solar-system" :exists-on-map="true" :map-id="lMapId"
         :solar-system-id="lSolarSystemId"
       />
-
-      <!--       Effect   -->
-      <div class="wd-content__module wd-module-effect">
-        <md-card v-if="hasEffect">
-          <md-card-header>
-            <div class="wd-system-overview__card-header">
-              <div :class="effectClass">{{ info.effectName }}</div>
-            </div>
-          </md-card-header>
-
-          <md-card-content>
-            <div class="effect-bonuses-list">
-              <div v-for="{name, power, positive} in effectData" :key="name">
-                <span>{{ name }}</span>:
-                <span :class="positive ? 'wd-effect-positive' : 'wd-effect-negative'">{{ power }}</span>
-              </div>
-            </div>
-          </md-card-content>
-        </md-card>
-      </div>
 
       <!--       routes      -->
       <div class="wd-content__module wd-module-routes">
@@ -104,37 +84,6 @@
       title_: {
         get () {return this.userName;},
         set () { /* do nothing */ },
-      },
-
-      info () {
-        return this.$store.state.solarSystems[this.lSolarSystemId];
-      },
-      hasEffect () {
-        return this.info.effectName !== '';
-      },
-      effectClass () {
-        return environment.effects[this.info.effectName];
-      },
-      effectData () {
-        return eveHelper.extractEffects(this.info.effectName, this.info.effectPower);
-      },
-      gridClass () {
-        let full = !this.lIsCompact;
-        let effect = this.hasEffect;
-
-        if (full && effect) {
-          return 'wd-grid-1';
-        }
-
-        if (!full && effect) {
-          return 'wd-grid-2';
-        }
-
-        if (full && !effect || !full && !effect) {
-          return 'wd-grid-3';
-        }
-
-        return '';
       },
     },
     methods: {
@@ -225,78 +174,6 @@
       width: 100%;
     }
 
-    &.wd-grid-1 {
-      & > .wd-content__module {
-        transition: height 200ms;
-        height: auto;
-        width: 100%;
-
-        &.wd-module-solar-system {
-          grid-column-start: 1;
-          grid-column-end: 3;
-          grid-row-start: 1;
-          grid-row-end: 2;
-        }
-
-        &.wd-module-effect {
-          grid-column-start: 3;
-          grid-column-end: 6;
-          grid-row-start: 1;
-          grid-row-end: 2;
-        }
-
-        &.wd-module-routes {
-          grid-column-start: 1;
-          grid-column-end: 6;
-          grid-row-start: 2;
-          grid-row-end: 3;
-        }
-
-        &.wd-module-description {
-          grid-column-start: 1;
-          grid-column-end: 6;
-          grid-row-start: 3;
-          grid-row-end: 4;
-        }
-      }
-    }
-
-    &.wd-grid-2 {
-      & > .wd-content__module {
-        transition: height 200ms;
-        height: auto;
-        width: 100%;
-
-        &.wd-module-solar-system {
-          grid-column-start: 1;
-          grid-column-end: 2;
-          grid-row-start: 1;
-          grid-row-end: 2;
-        }
-
-        &.wd-module-effect {
-          grid-column-start: 1;
-          grid-column-end: 2;
-          grid-row-start: 3;
-          grid-row-end: 4;
-        }
-
-        &.wd-module-routes {
-          grid-column-start: 1;
-          grid-column-end: 2;
-          grid-row-start: 2;
-          grid-row-end: 3;
-        }
-
-        &.wd-module-description {
-          grid-column-start: 1;
-          grid-column-end: 2;
-          grid-row-start: 4;
-          grid-row-end: 5;
-        }
-      }
-    }
-
     &.wd-grid-3 {
       & > .wd-content__module {
         transition: height 200ms;
@@ -310,10 +187,6 @@
           grid-row-end: 2;
         }
 
-        &.wd-module-effect {
-          display: none;
-        }
-
         &.wd-module-routes {
           grid-column-start: 1;
           grid-column-end: 2;
@@ -329,8 +202,6 @@
         }
       }
     }
-
-
   }
 
   .wd-system-overview {
@@ -338,6 +209,7 @@
 
     .wd-info-block {
       display: flex;
+      justify-content: initial;
     }
 
     & > *:not(:last-child) {
@@ -411,22 +283,6 @@
         height: 150px;
       }
     }
-
-    .effect-bonuses-list {
-      & > div {
-        font: $font-primary;
-        color: $fg-contrast;
-      }
-
-      & .wd-effect-positive {
-        color: $fg-positive;
-      }
-
-      & .wd-effect-negative {
-        color: $fg-negative;
-      }
-    }
-
 
     height: 100%;
     overflow-y: auto;

@@ -146,7 +146,6 @@ export default {
          * @returns {{charId: string, name: *}[]}
          */
         userOnlineCharacters() {
-            console.log('wChars', this.wChars)
             let out = [];
             for (const charId of this.wChars) {
                 out.push(this.$store.state.characters[charId].publicInfo)

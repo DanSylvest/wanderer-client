@@ -32,20 +32,16 @@
       <md-card-content>
         <div class="wd-system-overview-content wd flex flex-justify-sb">
           <div class="wd-system-info wd f-width">
-
             <info-block title="Constellation & Region">
               <div class="wd-ssi-const-region">
-                <div class="constellation-name">{{ info.constellationName }}</div> /
+                <div class="constellation-name">{{ info.constellationName }}</div>
+                /
                 <div class="region-name">{{ info.regionName }}</div>
               </div>
             </info-block>
 
             <info-block title="Type">
               <span :class="typeDescriptionClass">{{ info.typeDescription }}</span>
-            </info-block>
-
-            <info-block title="Status" v-if="status !== 0">
-              <span :class="statusClass">{{ statusName }}</span>
             </info-block>
 
             <info-block title="Static" v-if="info.statics.length > 0">
@@ -60,6 +56,13 @@
               </div>
             </info-block>
 
+            <info-block title="Status" v-if="status !== 0">
+              <span :class="statusClass">{{ statusName }}</span>
+            </info-block>
+
+            <info-block title="Effect" v-if="hasEffect">
+              <effect-compact :name="effectName" :power="effectPower" />
+            </info-block>
           </div>
         </div>
       </md-card-content>
@@ -75,50 +78,60 @@
   import copyToClipboard from '@/js/env/copyToClipboard';
   import InfoBlock from '@/components/ui/InfoBlock';
   import WormholeType from '@/components/common/components/WormholeType';
+  import EffectCompact from '@/components/common/components/EffectCompact';
 
   export default {
-  name: "SolarSystemInfo",
-  components: { WormholeType, InfoBlock, ExternalIcon },
-  mixins: [SolarSystemMixin],
-  computed: {
-    info () {
-      return this.$store.state.solarSystems[this.lSolarSystemId];
-    },
-    securityClass () {
-      return environment.securityForegroundClasses[this.info.security];
-    },
-    typeDescriptionClass () {
-      return environment.wormholeClassStyles[this.info.systemClass];
-    },
-    statusClass () {
-      let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
-      return `eve-system-status-color-${environment.statuses[status].id}`
-    },
+    name: 'SolarSystemInfo',
+    components: { EffectCompact, WormholeType, InfoBlock, ExternalIcon },
+    mixins: [SolarSystemMixin],
+    computed: {
+      info () {
+        return this.$store.state.solarSystems[this.lSolarSystemId];
+      },
+      hasEffect () {
+        return this.info.effectName !== '';
+      },
+      effectName () {
+        return this.info.effectName;
+      },
+      effectPower () {
+        return this.info.effectPower;
+      },
+      securityClass () {
+        return environment.securityForegroundClasses[this.info.security];
+      },
+      typeDescriptionClass () {
+        return environment.wormholeClassStyles[this.info.systemClass];
+      },
+      statusClass () {
+        let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+        return `eve-system-status-color-${ environment.statuses[status].id }`;
+      },
 
-    statusName () {
-      let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
-      return environment.statuses[status].name;
+      statusName () {
+        let status = this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+        return environment.statuses[status].name;
+      },
+      status () {
+        return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+      },
+      dotlanLink () {
+        return 'https://evemaps.dotlan.net/system/' + this.info.solarSystemName;
+      },
+      anoikisLink () {
+        return 'http://anoik.is/systems/' + this.info.solarSystemName;
+      },
+      zkbLink () {
+        return 'https://zkillboard.com/system/' + this.solarSystemId;
+      },
     },
-    status () {
-      return this.$store.state.maps[this.lMapId].solarSystems[this.lSolarSystemId].status;
+    methods: {
+      sortStatics: statics => eveHelper.sortStatics(statics),
+      onCopyClick () {
+        copyToClipboard(this.info.solarSystemName);
+      },
     },
-    dotlanLink () {
-      return "https://evemaps.dotlan.net/system/" + this.info.solarSystemName;
-    },
-    anoikisLink () {
-      return "http://anoik.is/systems/" + this.info.solarSystemName;
-    },
-    zkbLink () {
-      return "https://zkillboard.com/system/" + this.solarSystemId;
-    },
-  },
-  methods: {
-    sortStatics: statics => eveHelper.sortStatics(statics),
-    onCopyClick () {
-      copyToClipboard(this.info.solarSystemName);
-    },
-  }
-}
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -128,8 +141,8 @@
   }
 
   .wd-system-info {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 5px;
   }
 
