@@ -16,12 +16,11 @@
 <script>
   import environment from '@/js/core/map/environment';
   import eveHelper from '@/js/eveHelper';
-  import Tooltip from '@/components/ui/Tooltip';
   import EffectInfo from '@/components/common/components/EffectInfo';
 
   export default {
     name: 'EffectCompact',
-    components: { EffectInfo, Tooltip },
+    components: { EffectInfo },
     props: {
       name: {
         type: String,

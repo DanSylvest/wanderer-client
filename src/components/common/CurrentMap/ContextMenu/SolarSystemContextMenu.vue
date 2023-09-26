@@ -41,21 +41,22 @@
       :c-is-submenu="true" v-show="isSystemInKSpace"
     >
       <!-- Show sub-items instant if more than one character are attached -->
-      <context-menu-item
-        v-if="userOnlineCharacters.length > 1"
-        v-for="{name, charId} in userOnlineCharacters" :c-is-submenu="true" :c-title="name"
-        :key="charId"
-      >
-        <context-menu-item c-title="Set Destination" c-icon="near_me" @click="onSetDestination(charId)" />
+      <template v-if="userOnlineCharacters.length > 1">
         <context-menu-item
-          c-title="Add Waypoint Front" c-icon="call_missed"
-          @click="onAddWaypointFront(charId)"
-        />
-        <context-menu-item
-          c-title="Add Waypoint Back" c-icon="call_missed_outgoing"
-          @click="onAddWaypointBack(charId)"
-        />
-      </context-menu-item>
+          v-for="{name, charId} in userOnlineCharacters" :c-is-submenu="true" :c-title="name"
+          :key="charId"
+        >
+          <context-menu-item c-title="Set Destination" c-icon="near_me" @click="onSetDestination(charId)" />
+          <context-menu-item
+            c-title="Add Waypoint Front" c-icon="call_missed"
+            @click="onAddWaypointFront(charId)"
+          />
+          <context-menu-item
+            c-title="Add Waypoint Back" c-icon="call_missed_outgoing"
+            @click="onAddWaypointBack(charId)"
+          />
+        </context-menu-item>
+      </template>
 
       <!-- Show sub-items instant if only one character are attached -->
       <template v-if="userOnlineCharacters.length === 1">

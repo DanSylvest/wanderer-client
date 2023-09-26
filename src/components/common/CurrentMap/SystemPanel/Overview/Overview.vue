@@ -39,12 +39,10 @@
 </template>
 
 <script>
-  import environment from '../../../../../js/core/map/environment';
   import Routes from './Routes.vue';
   import api from '../../../../../js/api.js';
   import helper from '../../../../../js/utils/helper.js';
   import SolarSystemMixin from '../../../../mixins/solarSystem.js';
-  import eveHelper from '../../../../../js/eveHelper.js';
   import SolarSystemInfo from './SolarSystemInfo/SolarSystemInfo';
   import DelayedSaver from '../../components/DelayedSaver';
 

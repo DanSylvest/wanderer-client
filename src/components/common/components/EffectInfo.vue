@@ -1,8 +1,9 @@
+<!-- eslint-ignore vue/require-v-for-key -->
 <template>
   <div class="effect-bonuses-list">
     <template v-for="{ name, power, positive } in effectData">
-      <span>{{ name }}</span>
-      <span :class="positive ? 'wd-effect-positive' : 'wd-effect-negative'">{{ power }}</span>
+      <span :key="name">{{ name }}</span>
+      <span :key="`${name}_type`" :class="positive ? 'wd-effect-positive' : 'wd-effect-negative'">{{ power }}</span>
     </template>
   </div>
 </template>
