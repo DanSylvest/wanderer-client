@@ -223,7 +223,10 @@ class Map extends Emitter{
     const obj = this.magnifier.getObject(solarSystemId);
 
     const current = new Vector2(this.magnifier.hAxis.min, this.magnifier.vAxis.min);
-    const finish = new Vector2(obj.x - (this.magnifier.hAxis.range - offsetRight) / 2, obj.y - this.magnifier.vAxis.range / 2);
+    const finish = new Vector2(
+      obj.x - (this.magnifier.hAxis.range - offsetRight) / 2,
+      obj.y - this.magnifier.vAxis.range / 2,
+    );
     const delta = finish['-'](current);
 
     this._currentMovingAnimation = {
@@ -492,11 +495,6 @@ class Map extends Emitter{
     marker.destructor();
 
     delete this._markers[_markerId];
-
-    if (this._movingAnimation[solarSystemId] != null) {
-      this._movingAnimation[solarSystemId]();
-
-    }
 
     this._forceLinks = this.forceLinks();
     this._sfForce.call();
