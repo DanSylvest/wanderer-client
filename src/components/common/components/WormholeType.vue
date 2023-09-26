@@ -32,7 +32,6 @@
 <script>
   import environment from '@/js/core/map/environment';
   import eveHelper from '@/js/eveHelper';
-  import Tooltip from '@/components/ui/Tooltip';
 
   const prepareMass = (mass) => {
     if (mass === 0) {
@@ -44,9 +43,6 @@
 
   export default {
     name: 'WormholeType',
-    components: {
-      Tooltip,
-    },
     props: {
       wormholeType: {
         type: String,
