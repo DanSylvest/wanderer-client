@@ -25,7 +25,8 @@ export default {
         a4: 22,
         a5: 23,
         ccp4: 24,
-        pochven: 25
+        pochven: 25,
+        zarzakh: 10100,
     },
     effects: {
         dazhLiminalityLocus: "Dazh Liminality Locus",

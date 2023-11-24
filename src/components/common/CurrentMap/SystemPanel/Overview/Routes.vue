@@ -399,7 +399,9 @@
                 }
             },
             getBackgroundClass (data){
-                if (eveHelper.isKnownSpace(data.systemClass)) {
+                if(eveHelper.isZarzakhSpace(data.systemClass)) {
+                    return environment.systemClassBackgroundStyles[data.systemClass];
+                } else if (eveHelper.isKnownSpace(data.systemClass)) {
                     return environment.securityBackgroundClasses[data.security];
                 } else if (eveHelper.isWormholeSpace(data.systemClass)) {
                     return environment.wormholeClassBackgroundStyles[data.systemClass];

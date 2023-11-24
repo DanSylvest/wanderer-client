@@ -128,7 +128,8 @@ export default {
    a4: 22,
    a5: 23,
    ccp4: 24,
-   pochven: 25
+   pochven: 25,
+   zarzakh: 10100,
    */
 
   systemClassStyles: {
@@ -158,6 +159,7 @@ export default {
     '23': 'eve-kind-color-abyss',
     '24': 'eve-kind-color-penalty',
     '25': 'eve-kind-color-pochven',
+    '10100': 'eve-kind-color-zarzakh',
   },
 
   wormholeClassStyles: {
@@ -187,6 +189,7 @@ export default {
     '23': 'eve-kind-color-abyss',
     '24': 'eve-kind-color-penalty',
     '25': 'eve-wh-type-color-null',
+    '10100': 'eve-wh-type-color-thera',
   },
 
   systemClassBackgroundStyles: {
@@ -216,6 +219,7 @@ export default {
     '23': 'eve-kind-background-abyss',
     '24': 'eve-kind-background-penalty',
     '25': 'eve-kind-background-pochven',
+    '10100': 'eve-kind-background-zarzakh',
   },
 
   wormholeClassBackgroundStyles: {
@@ -236,6 +240,7 @@ export default {
     '17': 'eve-wh-type-background-drifter',
     '18': 'eve-wh-type-background-drifter',
     '25': 'eve-wh-type-background-null',
+    '10100': 'eve-wh-type-background-null',
   },
 
   // kindBackgroundClasses : {

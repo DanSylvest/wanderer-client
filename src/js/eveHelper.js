@@ -26,6 +26,7 @@ export default {
       case eveData.wormholeClassesNames.hs:
       case eveData.wormholeClassesNames.ls:
       case eveData.wormholeClassesNames.ns:
+      case eveData.wormholeClassesNames.zarzakh:
         return true;
     }
 
@@ -46,6 +47,14 @@ export default {
   isPochvenSpace (wormholeClassID) {
     switch (wormholeClassID) {
       case eveData.wormholeClassesNames.pochven:
+        return true;
+    }
+
+    return false;
+  },
+  isZarzakhSpace (wormholeClassID) {
+    switch (wormholeClassID) {
+      case eveData.wormholeClassesNames.zarzakh:
         return true;
     }
 

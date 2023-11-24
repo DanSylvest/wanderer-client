@@ -838,6 +838,9 @@ $active-color: #7be1ff;
 .eve-wh-type-background-thera {
   background-color: $eve-wh-type-color-thera;
 }
+.eve-wh-type-background-zarzakh {
+  background-color: $eve-wh-type-color-zarzakh;
+}
 
 .eve-kind-color-high {
   color: $eve-wh-type-color-high;
@@ -880,6 +883,11 @@ $active-color: #7be1ff;
   fill: $eve-wh-type-color-c6;
 }
 
+.eve-kind-color-zarzakh {
+  color: $eve-wh-type-color-zarzakh;
+  fill: $eve-wh-type-color-zarzakh;
+}
+
 .eve-kind-background-high {
   background-color: $eve-wh-type-color-high;
 }
@@ -910,6 +918,10 @@ $active-color: #7be1ff;
 
 .eve-kind-background-pochven {
   background-color: $eve-wh-type-color-c6;
+}
+
+.eve-kind-background-zarzakh {
+  background-color: $eve-wh-type-color-zarzakh;
 }
 
 .eve-system-status-color-unknown {
