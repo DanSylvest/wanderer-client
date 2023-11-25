@@ -330,11 +330,11 @@
 
     width: 0;
     height: 0;
-    transition: width 450ms, height 250ms;
+    //transition: width 450ms, height 250ms;
 
     &.transition-left {
       left: 0;
-      transition: left 250ms;
+      //transition: left 250ms;
     }
 
     .wd-tooltip__content {

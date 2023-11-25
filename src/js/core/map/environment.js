@@ -325,6 +325,11 @@ export default {
     { title: 'End of life', icon: 'error_outline', id: 1 },
   ],
 
+  timeStatusesMap: {
+    whole: { title: 'Set EOL', icon: 'done_all', id: 0 },
+    eol: { title: 'Set whole', icon: 'error_outline', id: 1 },
+  },
+
   massStatuses: [
     { title: 'Whole', icon: 'done', id: 0 },
     { title: 'Less than half', icon: 'trending_down', id: 1 },

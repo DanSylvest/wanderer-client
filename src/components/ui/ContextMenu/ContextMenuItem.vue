@@ -1,7 +1,7 @@
 <template>
     <md-content
         class="wd-context-item c-small-padding md-hover wd cursor-pointer flex flex-align-center flex-justify-sb"
-        :class="{active: smActive, 'item-activated': active}"
+        :class="{active: smActive, 'item-activated': cActive}"
         @click="onClick"
     >
         <div class="wd-context-item-content wd nowrap flex flex-align-center">
@@ -59,7 +59,6 @@
                 icon: this.cIcon,
                 iconClass: this.cIconClass,
                 isSubmenu: this.cIsSubmenu,
-                active: this.cActive,
             }
         },
         mounted: function () {
