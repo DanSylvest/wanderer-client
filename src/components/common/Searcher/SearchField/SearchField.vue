@@ -106,7 +106,7 @@
     mounted () {
       this._searchCaller = new SpamFilter(this._makeSearch.bind(this), 50);
     },
-    beforeDestroy () {
+    beforeUnmount () {
       this._searchCaller.destructor();
     },
     computed: {

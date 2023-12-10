@@ -1,6 +1,6 @@
 <template>
     <div class="wd off-user-select" >
-        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
+        <md-dialog v-model:md-active="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
             <md-dialog-title>Filtering and setting routes</md-dialog-title>
 
             <div class="wd box-sizing wd-routes-dialog wd-dialog-content off-user-select">
@@ -55,7 +55,7 @@
         },
         mounted: function () {
         },
-        beforeDestroy() {
+        beforeUnmount() {
         },
         watch: {
             activated: function (val) {

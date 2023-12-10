@@ -1,6 +1,6 @@
 <template>
   <context-menu
-    :c-activated.sync="localShow" :c-offset-x="offset.x" :c-offset-y="offset.y"
+    v-model:c-activated="localShow" :c-offset-x="offset.x" :c-offset-y="offset.y"
     @c-closed="onClosedSystemContext"
   >
     <context-menu-item c-title="Tag system" c-icon="spellcheck" :c-is-submenu="true">

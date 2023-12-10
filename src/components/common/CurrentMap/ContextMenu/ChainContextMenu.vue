@@ -1,7 +1,7 @@
 <template>
   <div>
     <context-menu
-      :c-activated.sync="lShow"
+      v-model:c-activated="lShow"
       :c-offset-x="lOffset.x"
       :c-offset-y="lOffset.y"
       @c-closed="onClosedLinkContext"

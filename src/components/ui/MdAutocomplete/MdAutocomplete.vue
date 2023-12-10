@@ -1,6 +1,6 @@
 <template>
   <md-field class="md-autocomplete" :class="fieldClasses" :md-inline="isBoxLayout">
-    <md-menu md-direction="bottom-start" :md-dense="mdDense" md-align-trigger md-full-width :md-active.sync="showMenu">
+    <md-menu md-direction="bottom-start" :md-dense="mdDense" md-align-trigger md-full-width v-model:md-active="showMenu">
 
       <transition name="fade" duration="350">
         <div v-if="mdLoading" class="md-ac-loader" key="loader">

@@ -21,7 +21,7 @@
             <wd-tab id="tab-groups" wd-label="Access lists" class="wd-tab wd-tab-groups wd fs box-sizing">
               <map-editor-groups
                 :map-id="lMapId"
-                :selected.sync="mapGroups"
+                v-model:selected="mapGroups"
                 @validWithData="onMapGroupsValid"
                 @invalid="onMapGroupsInvalid"
               />

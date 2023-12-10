@@ -21,7 +21,7 @@ const GroupOwnInfoMixin = {
         this.groupOwnInfoData = Object.create(null);
         createDelayedUpdater.call(this);
     },
-    beforeDestroy() {
+    beforeUnmount() {
         destroyDelayedUpdater.call(this);
         delete this.groupOwnInfoData;
     },

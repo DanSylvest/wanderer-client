@@ -43,7 +43,7 @@
       this._sfInput = new SpamFilter(inputChanged.bind(this), this.delay * 1000);
       this.needToSave = true;
     },
-    beforeDestroy () {
+    beforeUnmount () {
       this.stop();
     },
     methods: {

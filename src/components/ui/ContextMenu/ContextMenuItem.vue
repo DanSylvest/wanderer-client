@@ -11,7 +11,7 @@
 
         <md-icon v-if="isSubmenu" class="wd-arrow wd font-size-medium">play_arrow</md-icon>
 
-        <context-menu ref="submenu" :c-activated.sync="smActive" :c-offset-x="smX" :c-offset-y="smY" @c-closed="onSmClosed">
+        <context-menu ref="submenu" v-model:c-activated="smActive" :c-offset-x="smX" :c-offset-y="smY" @c-closed="onSmClosed">
             <slot></slot>
         </context-menu>
     </md-content>
@@ -77,7 +77,7 @@
         updated: function () {
             this.spamFilter.call();
         },
-        beforeDestroy: function () {
+        beforeUnmount: function () {
             this.mouseObserver.destructor();
             this.spamFilter.destructor();
         },

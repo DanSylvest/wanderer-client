@@ -1,6 +1,6 @@
 <template>
     <div class="wd off-user-select" >
-        <md-dialog :md-active.sync="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
+        <md-dialog v-model:md-active="showEditDialog" @md-opened="onEditDialogOpened" @md-closed="onDialogClosed" class="wd-medium-dialog">
             <md-dialog-title>Add system</md-dialog-title>
 
             <div class="wd box-sizing wd-dialog-content off-user-select">
@@ -79,7 +79,7 @@
             this._passChange = false;
             this._spamFilter = new SpamFilter(this._makeSearch.bind(this), 500);
         },
-        beforeDestroy() {
+        beforeUnmount() {
             this._otid !== -1 && clearTimeout(this._otid);
             this._otid = -1;
         },

@@ -132,8 +132,8 @@
         </template>
       </wd-table>
     </md-card>
-    <system-add-dialog :activated.sync="isSystemAddDialogActivated" @system-selected="onSystemSelected" />
-    <routes-settings :activated.sync="isSettingsDialogActivated" :settings="routeSettings" @edited="onRoutesEdited" />
+    <system-add-dialog v-model:activated="isSystemAddDialogActivated" @system-selected="onSystemSelected" />
+    <routes-settings v-model:activated="isSettingsDialogActivated" :settings="routeSettings" @edited="onRoutesEdited" />
   </div>
 </template>
 
@@ -196,7 +196,7 @@
       this._attrUpdatedSF = new SpamFilter(this._watchAttrsUpdated.bind(this), 10);
       this.isValidAttrs() && this._attrUpdatedSF.call();
     },
-    beforeDestroy () {
+    beforeUnmount () {
       this._attrUpdatedSF.stop();
       this._attrUpdatedSF = null;
 

@@ -93,7 +93,7 @@
             transform: rotateZ(0deg);
             position: absolute;
             left: 3px;
-            background-image: url("/img/arrow.svg");
+            background-image: url("@/assets/arrow.svg");
             width: 15px;
             height: 15px;
 

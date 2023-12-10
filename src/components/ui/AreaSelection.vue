@@ -21,7 +21,7 @@
             this.parent = this.$el.parentElement;
             this._createActionObserver();
         },
-        beforeDestroy: function () {
+        beforeUnmount: function () {
 
         },
         methods: {

@@ -57,7 +57,7 @@
       </md-empty-state>
 
       <div style="width: 1000px;">
-        <md-dialog :md-active.sync="saveSigsDialogActive">
+        <md-dialog v-model:md-active="saveSigsDialogActive">
           <md-dialog-title>Some of signatures was not found in paste list</md-dialog-title>
 
           <span style="margin: 0 20px;">Do you want to remove it?</span>
@@ -71,12 +71,12 @@
       <input type="text" class="c-hidden-input">
     </div>
 
-    <md-dialog :md-active.sync="showFilterDialog">
+    <md-dialog v-model:md-active="showFilterDialog">
       <md-dialog-title>Filter signatures</md-dialog-title>
 
       <div class="wd-filter-content">
-        <template v-for="item in filterTypes">
-          <md-checkbox :key="item.title" v-model="item.value">{{ item.title }}</md-checkbox>
+        <template v-for="item in filterTypes" :key="item.title">
+          <md-checkbox v-model="item.value">{{ item.title }}</md-checkbox>
         </template>
       </div>
 
@@ -128,7 +128,7 @@
 
       this._loadFilterData();
     },
-    beforeDestroy: function () {
+    beforeUnmount: function () {
 
       this._rtid !== -1 && clearTimeout(this._rtid);
       this._rtid = -1;

@@ -25,7 +25,7 @@ export const OnlineCharactersMixin = {
     this.onlineCharactersData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     unsubscribeData.call(this);
     destroyDelayedUpdater.call(this);
     delete this.onlineCharactersData;

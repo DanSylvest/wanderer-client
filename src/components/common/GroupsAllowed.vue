@@ -95,7 +95,7 @@
         return this.dialogLoading && !this.dialogActive;
       },
     },
-    beforeDestroy () {
+    beforeUnmount () {
       exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
       this._loadingTimeout = null;
     },

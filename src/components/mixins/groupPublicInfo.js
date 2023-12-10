@@ -21,7 +21,7 @@ const GroupPublicInfoMixin = {
         this.groupPublicInfoData = Object.create(null);
         createDelayedUpdater.call(this);
     },
-    beforeDestroy() {
+    beforeUnmount() {
         destroyDelayedUpdater.call(this);
         delete this.groupPublicInfoData;
     },

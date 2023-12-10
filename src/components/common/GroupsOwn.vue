@@ -85,7 +85,7 @@
       </md-empty-state>
     </transition>
 
-    <group-create-dialog :show.sync="showCreateDialog" @success="onGroupCreated" />
+    <group-create-dialog v-model:show="showCreateDialog" @success="onGroupCreated" />
   </div>
 
 </template>
@@ -127,7 +127,7 @@
         selectedGroups: [],
       };
     },
-    beforeDestroy () {
+    beforeUnmount () {
       exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
       this._loadingTimeout = null;
     },

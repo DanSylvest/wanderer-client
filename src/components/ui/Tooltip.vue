@@ -95,7 +95,7 @@
       this._delayedUpdateOffsetsSF = new SpamFilter(this._delayedUpdateOffsets.bind(this), 10);
       this._delayedUpdateSF = new SpamFilter(this._delayedUpdate.bind(this), this.delay);
     },
-    beforeDestroy: function () {
+    beforeUnmount: function () {
       this._delayedUpdateOffsetsSF.stop();
       this._delayedUpdateSF.stop();
 

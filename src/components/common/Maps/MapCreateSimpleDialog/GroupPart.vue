@@ -3,25 +3,27 @@
     <md-checkbox v-if="false" v-model="isCreateGroupFromExists">{{ TEXT.groupPart.selectTypeDescription }}</md-checkbox>
 
     <transition name="fade">
-      <div v-if="!isCreateGroupFromExists">
-        <md-field md-clearable>
-          <label>{{ TEXT.groupPart.name.label }}</label>
-          <md-input v-model="name" @input="onEditFormChange" @change="onEditFormChange" />
-          <transition name="fade">
+      <template v-if="!isCreateGroupFromExists">
+        <div>
+          <md-field md-clearable>
+            <label>{{ TEXT.groupPart.name.label }}</label>
+            <md-input v-model="name" @input="onEditFormChange" @change="onEditFormChange" />
+            <transition name="fade">
           <span class="wd-hint-negative md-helper-text" v-if="!isValidName">
             {{ TEXT.groupPart.name.hint }}
           </span>
-          </transition>
-        </md-field>
+            </transition>
+          </md-field>
 
-        <md-field md-clearable>
-          <label>{{ TEXT.groupPart.description.label }}</label>
-          <md-textarea v-model="description" @input="onEditFormChange" @change="onEditFormChange" />
-          <span class="wd-hint md-helper-text">{{ TEXT.groupPart.description.hint }}</span>
-        </md-field>
-      </div>
+          <md-field md-clearable>
+            <label>{{ TEXT.groupPart.description.label }}</label>
+            <md-textarea v-model="description" @input="onEditFormChange" @change="onEditFormChange" />
+            <span class="wd-hint md-helper-text">{{ TEXT.groupPart.description.hint }}</span>
+          </md-field>
+        </div>
+      </template>
 
-      <div v-if="isCreateGroupFromExists"></div>
+      <template v-else><div></div></template>
     </transition>
   </div>
 </template>

@@ -3,7 +3,7 @@
     <popup
       @mousedown="focus" @mouseup="focus"
       ref="infoPanel"
-      :c-activated.sync="showPopup"
+      v-model:c-activated="showPopup"
       :c-width="panelWidth"
       :c-height="panelHeight"
       :c-title="panelTitle"
@@ -98,7 +98,7 @@
       this._rtid = -1;
       this._so = new SizeObserver(null, this.refresh.bind(this));
     },
-    beforeDestroy: function () {
+    beforeUnmount: function () {
       this._attrUpdatedSF.stop();
       this.showPopup = false;
       this._rtid !== -1 && clearTimeout(this._rtid);

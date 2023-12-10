@@ -2,12 +2,12 @@
   <div class="wd off-user-select">
     <md-dialog
       md-dynamic-height
-      :md-active.sync="showEditDialog"
+      v-model:md-active="showEditDialog"
       @md-closed="hide"
     >
       <md-dialog-title>{{ TEXT.dialogTitle }}</md-dialog-title>
 
-      <md-steppers :md-active-step.sync="activeStep" md-linear md-dynamic-height>
+      <md-steppers v-model:md-active-step="activeStep" md-linear md-dynamic-height>
         <md-step
           id="first"
           :md-label="TEXT.steps.first.label"
@@ -133,7 +133,7 @@
     mounted () {
       store.registerModule(['mapCreateSimpleDialogStore'], MapCreateSimpleDialogStore);
     },
-    beforeDestroy () {
+    beforeUnmount () {
       store.unregisterModule(['mapCreateDialog']);
     },
     watch: {

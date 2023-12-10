@@ -98,7 +98,7 @@
       <div style="height: 0">
         <!-- CHAIN CONTEXT MENU -->
         <chain-context-menu
-          :show.sync="linkCMActive"
+          v-model:show="linkCMActive"
           :map-id="selectedMap"
           :chain-id="currentChainId"
           :offset="currentChainOffset"
@@ -106,14 +106,14 @@
 
         <!-- SOLAR SYSTEM CONTEXT MENU -->
         <solar-system-context-menu
-          :show.sync="systemCMActive"
+          v-model:show="systemCMActive"
           :data="solarSystemContextData"
           @contextActivated="onSolarSystemContextActivated"
         />
 
         <!-- SOLAR SYSTEMS CONTEXT MENU -->
         <context-menu
-          :c-activated.sync="systemsCMActive"
+          v-model:c-activated="systemsCMActive"
           :c-offset-x="systemsCMOffsetX"
           :c-offset-y="systemsCMOffsetY"
           @c-closed="onClosedSystemsContext"
@@ -123,7 +123,7 @@
 
         <!-- ROOT CONTAINER CONTEXT MENU -->
         <context-menu
-          :c-activated.sync="rootCMActive"
+          v-model:c-activated="rootCMActive"
           :c-offset-x="rootCMOffsetX"
           :c-offset-y="rootCMOffsetY"
           @c-closed="onRootCMClosed"
@@ -142,10 +142,10 @@
           <system-card :solar-system-id="systemId" :map-id="mapId" :exists-on-map="true" :show-info="true" />
         </tooltip>
 
-        <system-add-dialog :activated.sync="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
+        <system-add-dialog v-model:activated="isActiveSystemAddDialog" @system-selected="onSystemAdd"></system-add-dialog>
       </div>
       <system-panel
-        :show.sync="systemPanelShow"
+        v-model:show="systemPanelShow"
         :map-id="systemPanelMapId"
         :solar-system-id="systemPanelSolarSystemId"
         @highlight-route="onHighlightRoute"
@@ -155,7 +155,7 @@
       <area-selection @selection-completed="onSelectionCompleted" @selection-started="onSelectionStarted" />
     </div>
 
-    <map-create-simple-dialog :show.sync="showCreateSimpleDialog" />
+    <map-create-simple-dialog v-model:show="showCreateSimpleDialog" />
     <user-characters-provider
       :map-id="selectedMap"
       @onCharactersData="onUserCharactersChanged"
@@ -279,7 +279,7 @@
           },
         );
     },
-    beforeDestroy: function () {
+    beforeUnmount: function () {
       this.initMapTid !== -1 && clearTimeout(this.initMapTid);
 
       if (this.__tid) {

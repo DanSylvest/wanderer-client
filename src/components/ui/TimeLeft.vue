@@ -25,7 +25,7 @@
             this.update();
             this.startTimer();
         },
-        beforeDestroy: function () {
+        beforeUnmount: function () {
             this._tid !== -1 && clearTimeout(this._tid);
             this._tid = -1;
             this.date = null;

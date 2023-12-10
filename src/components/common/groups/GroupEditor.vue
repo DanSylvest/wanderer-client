@@ -11,10 +11,15 @@
                 <md-input v-model="name" @input="onEditFormChange" @change="onEditFormChange" />
 
                 <transition name="fade" mode="out-in">
-                  <span class="md-helper-text wd-hint-negative" v-if="!isValidName" key="first">
-                      * Access List name should contain at least 3 symbols and begins with a symbol
-                  </span>
-                  <span class="md-helper-text wd-hint-positive" v-if="isValidName" key="second">Valid</span>
+                  <template v-if="!isValidName">
+                    <span class="md-helper-text wd-hint-negative">
+                        * Access List name should contain at least 3 symbols and begins with a symbol
+                    </span>
+                  </template>
+
+                  <template v-else>
+                    <span class="md-helper-text wd-hint-positive">Valid</span>
+                  </template>
                 </transition>
               </md-field>
 

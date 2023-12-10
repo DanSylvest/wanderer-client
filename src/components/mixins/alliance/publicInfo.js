@@ -25,7 +25,7 @@ const AlliancePublicInfoMixin = {
     this.allypiData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     unsubscribeData.call(this);
     destroyDelayedUpdater.call(this);
     delete this.allypiData;

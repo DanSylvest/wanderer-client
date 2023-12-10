@@ -20,7 +20,7 @@ class API extends Emitter {
 
         this._status = "not_ready";
 
-        Emitter.prototype.constructor.call(this);
+        // Emitter.prototype.constructor.call(this);
 
         this._handlers = {};
     }

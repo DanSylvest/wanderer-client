@@ -21,7 +21,7 @@ const MapGroupsMixin = {
         this.mapGroupsData = Object.create(null);
         createDelayedUpdater.call(this);
     },
-    beforeDestroy() {
+    beforeUnmount() {
         destroyDelayedUpdater.call(this);
         delete this.mapGroupsData;
     },

@@ -29,7 +29,7 @@ const CharacterMixin = {
     this.characterData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     unsubscribeData.call(this);
     destroyDelayedUpdater.call(this);
     delete this.characterData;

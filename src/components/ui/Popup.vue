@@ -88,7 +88,7 @@
 
             this.$emit("mounted");
         },
-        beforeDestroy: function () {
+        beforeUnmount: function () {
             this._tid !== -1 && clearTimeout(this._tid);
             this._tid = -1;
 

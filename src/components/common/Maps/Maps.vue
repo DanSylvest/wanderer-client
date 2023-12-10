@@ -94,7 +94,7 @@
       </md-empty-state>
     </transition>
 
-    <map-create-simple-dialog :show.sync="showCreateSimpleDialog" @success="onMapCreated" />
+    <map-create-simple-dialog v-model:show="showCreateSimpleDialog" @success="onMapCreated" />
   </div>
 </template>
 
@@ -131,7 +131,7 @@
         showCreateSimpleDialog: false,
       };
     },
-    beforeDestroy () {
+    beforeUnmount () {
       exists(this._loadingTimeout) && clearTimeout(this._loadingTimeout);
       this._loadingTimeout = null;
     },

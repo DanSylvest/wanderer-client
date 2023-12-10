@@ -21,7 +21,7 @@ const MapInfoMixin = {
     this.mapInfoData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     destroyDelayedUpdater.call(this);
     delete this.mapInfoData;
   },

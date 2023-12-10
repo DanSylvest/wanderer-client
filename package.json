@@ -5,12 +5,13 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "buildDev": "vue-cli-service build --mode development",
     "lint": "vue-cli-service lint",
+    "buildDev": "vue-cli-service build --mode development",
     "host": "node scripts/runHost.js",
     "host:ssl": "node scripts/runHostSSL.js"
   },
   "dependencies": {
+    "@vue/compat": "^3.1.0",
     "axios": "^0.21.1",
     "core-js": "^3.15.2",
     "d3-force": "^3.0.0",
@@ -21,23 +22,24 @@
     "is-promise": "^4.0.0",
     "node-sass": "^6.0.1",
     "path": "^0.12.7",
-    "vue": "^2.6.14",
+    "vue": "^3.1.0",
     "vue-material": "^1.0.0-beta-15",
     "vue-notification": "^1.3.20",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.13",
-    "@vue/cli-plugin-eslint": "^4.5.13",
-    "@vue/cli-service": "^4.5.13",
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-plugin-eslint": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "@vue/compiler-sfc": "^3.1.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
+    "eslint": "^7.32.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-vue": "^9.19.2",
     "html-webpack-plugin": "^4.5.2",
     "postcss": "^8.3.6",
     "postcss-loader": "^4.3.0",
-    "sass-loader": "^10.2.0",
-    "vue-template-compiler": "^2.6.14"
+    "sass-loader": "^10.2.0"
   },
   "eslintConfig": {
     "root": true,

@@ -13,7 +13,7 @@ const MapsMixin = {
     this.mapsData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     destroyDelayedUpdater.call(this);
     delete this.mapsData;
   },

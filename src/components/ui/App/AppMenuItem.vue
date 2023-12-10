@@ -54,7 +54,7 @@
             this.__clickHandler = this.$emit.bind(this, "click");
             this.$el.addEventListener("click", this.__clickHandler);
         },
-        beforeDestroy() {
+        beforeUnmount() {
             this.$el.removeEventListener("click", this.__clickHandler);
             delete this.__clickHandler;
         },

@@ -27,7 +27,7 @@ const RelatedMapsByGroupMixin = {
     this.groupData = Object.create(null);
     createDelayedUpdater.call(this);
   },
-  beforeDestroy () {
+  beforeUnmount () {
     destroyDelayedUpdater.call(this);
     delete this.groupData;
   },
