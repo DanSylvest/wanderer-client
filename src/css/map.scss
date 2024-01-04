@@ -22,13 +22,10 @@ $active-color: #7be1ff;
       top: 0;
       width: 140px;
       height: 37px;
-      padding: 2px;
 
       box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.2);
       box-sizing: border-box;
       border-radius: 7px;
-      border: 1px solid $border-color-primary-5;
-      background-color: $bg-secondary;
       transition: opacity 400ms;
       opacity: 1;
 
@@ -53,204 +50,271 @@ $active-color: #7be1ff;
 
       }
 
-      &.system-status-friendly {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
-        }
-      }
-
-      &.system-status-warning {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);
-        }
-      }
-
-      &.system-status-targetPrimary {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);
-        }
-      }
-
-      &.system-status-targetSecondary {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);
-        }
-      }
-
-      &.system-status-dangerousPrimary {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);
-        }
-      }
-
-      &.system-status-dangerousSecondary {
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);
-        }
-      }
-
-      &.system-status-lookingFor {
-        background-image: linear-gradient(45deg, #45ff8f5c, #457fff);
-
-        & > .eve-marker-body {
-          //background-image: linear-gradient(45deg, $eve-solar-system-status-lookingFor, transparent);
-        }
-      }
-
-      &.system-status-home {
-        background-image: linear-gradient(-52deg, #ffd22ed1, #8bff34);
-
-        & > .eve-marker-body {
-          background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
-        }
-      }
-
-      & > .eve-marker-body {
-        transition: background-color 200ms;
-        background-color: $bg-3;
+      & > .eve-marker-bookmarks {
+        position: absolute;
         width: 100%;
+        z-index: 0;
+        display: flex;
+        left: 4px;
+
+        & > .bookmark {
+          width: 16px;
+          height: 22px;
+          position: relative;
+          top: -14px;
+          border-radius: 5px;
+          color: #ffffff;
+          font-size: 9px;
+          text-align: center;
+          padding-top: 3px;
+          font-weight: bolder;
+
+          &:not(:first-child) {
+            box-shadow: inset 4px -3px 4px rgba(0, 0, 0, .3);
+          }
+        }
+      }
+
+      & > .eve-marker-content {
+        padding: 2px;
+        border-radius: 7px;
         height: 100%;
-        box-sizing: border-box;
-        border-radius: 5px;
-        cursor: pointer;
+        border: 1px solid $border-color-primary-5;
+        background-color: $bg-secondary;
+        z-index: 1;
+        position: relative;
 
-        &.triglavian {
-          background-image: linear-gradient(223deg, #a5000052, transparent);
-        }
-
-        &.edencom {
-          background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);
-        }
-
-        &:hover {
-          background-color: $bg-3-major;
-        }
-
-        & > .eve-marker-first-row {
-          height: 50%;
-          display: flex;
-          justify-content: flex-start;
-          padding-left: 4px;
-          padding-right: 4px;
-          padding-top: 2px;
-
-          & > *:not(:last-child) {
-            margin-right: 3px;
-          }
-
-          .effect-color {
-            width: 8px;
-            height: 8px;
-            margin-top: 3px;
-            box-sizing: border-box;
-            border-radius: 2px;
-          }
-
-          .system-type {
-            font-weight: bold;
-          }
-
-          .system-name {
-            color: $fg-contrast;
-            font-weight: bold;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-wrap: nowrap;
-          }
-
-          .system-tag {
-            color: $fg-contrast;
-            text-shadow: 0 0 3px $fg-contrast;
-            font-weight: bold;
+        &.system-status-friendly {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
           }
         }
 
-        & > .eve-marker-second-row {
-          height: 50%;
-          display: flex;
-          justify-content: space-between;
-          padding-bottom: 2px;
-          padding-right: 4px;
-          padding-left: 4px;
+        &.system-status-warning {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-warning, transparent);
+          }
+        }
 
-          .extra {
+        &.system-status-targetPrimary {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-targetPrimary, transparent);
+          }
+        }
+
+        &.system-status-targetSecondary {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-targetSecondary, transparent);
+          }
+        }
+
+        &.system-status-dangerousPrimary {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousPrimary, transparent);
+          }
+        }
+
+        &.system-status-dangerousSecondary {
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-dangerousSecondary, transparent);
+          }
+        }
+
+        &.system-status-lookingFor {
+          background-image: linear-gradient(45deg, #45ff8f5c, #457fff);
+
+          & > .eve-marker-body {
+            //background-image: linear-gradient(45deg, $eve-solar-system-status-lookingFor, transparent);
+          }
+        }
+
+        &.system-status-home {
+          background-image: linear-gradient(-52deg, #ffd22ed1, #8bff34);
+
+          & > .eve-marker-body {
+            background-image: linear-gradient(45deg, $eve-solar-system-status-friendly, transparent);
+          }
+        }
+
+        & > .eve-marker-body {
+          transition: background-color 200ms;
+          background-color: $bg-3;
+          width: 100%;
+          height: 100%;
+          box-sizing: border-box;
+          border-radius: 5px;
+          cursor: pointer;
+          position: relative;
+          z-index: 1;
+
+          &.triglavian {
+            background-image: linear-gradient(223deg, #a5000052, transparent);
+          }
+
+          &.edencom {
+            background-image: linear-gradient(223deg, rgba(0, 151, 165, 0.32), transparent);
+          }
+
+          &:hover {
+            background-color: $bg-3-major;
+          }
+
+          & > .eve-marker-first-row {
+            height: 50%;
             display: flex;
             justify-content: flex-start;
-            align-items: flex-end;
-          }
+            padding-left: 4px;
+            padding-right: 4px;
+            padding-top: 2px;
 
-          .locked {
-            background-image: url("./../images/svg/lock.svg");
-            background-repeat: no-repeat;
-            background-size: contain;
-            width: 12px;
-            height: 12px;
-            position: relative;
-          }
-
-          .marked-as-hub {
-            background-image: url("/img/my_location_black_24dp.svg");
-            background-size: contain;
-            background-repeat: no-repeat;
-
-            width: 12px;
-            height: 12px;
-            margin-right: 2px;
-          }
-
-          .online {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-end;
-
-            &.own {
-              & > .online-icon, & > .online-count {
-                color: $primary-color-2;
-              }
+            & > *:not(:last-child) {
+              margin-right: 3px;
             }
 
-            .online-icon {
-              //background-image: url("/img/people_white_24dp.svg");
-              background-size: contain;
-              background-repeat: no-repeat;
-              color: $fg-contrast;
+            .effect-color {
+              width: 8px;
+              height: 8px;
+              margin-top: 3px;
+              box-sizing: border-box;
+              border-radius: 2px;
+            }
 
-              width: 13px;
-              height: 13px;
+            .system-type {
+              font-weight: bold;
+            }
+
+            .system-name {
+              color: $fg-contrast;
+              font-weight: bold;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-wrap: nowrap;
+            }
+
+            .system-tag {
+              color: $fg-contrast;
+              text-shadow: 0 0 3px $fg-contrast;
+              font-weight: bold;
+            }
+          }
+
+          & > .eve-marker-second-row {
+            height: 50%;
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 2px;
+            padding-right: 4px;
+            padding-left: 4px;
+
+            .extra {
+              display: flex;
+              justify-content: flex-start;
+              align-items: flex-end;
+            }
+
+            .locked {
+              background-image: url("./../images/svg/lock.svg");
+              background-repeat: no-repeat;
+              background-size: contain;
+              width: 12px;
+              height: 12px;
               position: relative;
             }
 
-            .online-count {
-              font-size: 11px;
-              color: $fg-contrast;
-              margin-left: 2px;
-            }
-          }
+            .marked-as-hub {
+              background-image: url("/img/my_location_black_24dp.svg");
+              background-size: contain;
+              background-repeat: no-repeat;
 
-          .wormhole-statics {
-            display: flex;
-            justify-content: flex-end;
-
-            & > .static {
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-            }
-
-            & > .static:not(:last-child) {
+              width: 12px;
+              height: 12px;
               margin-right: 2px;
             }
+
+            .online {
+              display: flex;
+              justify-content: flex-start;
+              align-items: flex-end;
+
+              &.own {
+                & > .online-icon, & > .online-count {
+                  color: $primary-color-2;
+                }
+              }
+
+              .online-icon {
+                //background-image: url("/img/people_white_24dp.svg");
+                background-size: contain;
+                background-repeat: no-repeat;
+                color: $fg-contrast;
+
+                width: 13px;
+                height: 13px;
+                position: relative;
+              }
+
+              .online-count {
+                font-size: 11px;
+                color: $fg-contrast;
+                margin-left: 2px;
+              }
+            }
+
+            .kills {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+
+              &.own {
+                & > .kills-icon, & > .kills-count {
+                  color: $primary-color-2;
+                }
+              }
+
+              .kills-icon {
+                //background-image: url("/img/people_white_24dp.svg");
+                background-size: contain;
+                background-repeat: no-repeat;
+                color: $fg-negative;
+
+                width: 10px;
+                height: 10px;
+                position: relative;
+                font-size: 10px;
+              }
+
+              .kills-count {
+                font-size: 11px;
+                color: $fg-contrast;
+                margin-left: 2px;
+              }
+            }
+
+            .wormhole-statics {
+              display: flex;
+              justify-content: flex-end;
+
+              & > .static {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+              }
+
+              & > .static:not(:last-child) {
+                margin-right: 2px;
+              }
+            }
+
+            .region {
+              display: flex;
+              justify-content: flex-start;
+              align-items: flex-end;
+              color: $fg-primary-1;
+              font-size: 10px;
+            }
           }
 
-          .region {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-end;
-            color: $fg-primary-1;
-            font-size: 10px;
-          }
         }
-
       }
     }
 
@@ -838,6 +902,7 @@ $active-color: #7be1ff;
 .eve-wh-type-background-thera {
   background-color: $eve-wh-type-color-thera;
 }
+
 .eve-wh-type-background-zarzakh {
   background-color: $eve-wh-type-color-zarzakh;
 }
@@ -966,4 +1031,24 @@ $active-color: #7be1ff;
 .wd-route-system-shape-circle {
   border-radius: 40%;
   //margin-left: 1px;
+}
+
+.wd-marker-bookmark-color-shattered {
+  background-color: #7600b5;
+}
+
+.wd-marker-bookmark-color-a0 {
+  background-color: #3d94af;
+}
+
+.wd-marker-bookmark-color-normal {
+  background-color: #529652;
+}
+
+.wd-marker-bookmark-color-warn {
+  background-color: #f1a400;
+}
+
+.wd-marker-bookmark-color-danger {
+  background-color: #9d3c39;
 }

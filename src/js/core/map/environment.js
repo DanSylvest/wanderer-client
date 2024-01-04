@@ -101,6 +101,13 @@ export default {
   //     "7" : "eve-kind-color-pochven",
   // },
 
+  markerBookmarkColorsClasses: {
+    shattered: 'wd-marker-bookmark-color-shattered',
+    a0: 'wd-marker-bookmark-color-a0',
+    activityNormal: 'wd-marker-bookmark-color-normal',
+    activityWarn: 'wd-marker-bookmark-color-warn',
+    activityDanger: 'wd-marker-bookmark-color-danger',
+  },
 
   /**
    ccp1: -1,
@@ -460,4 +467,14 @@ export default {
     'Venal': 'Venal',
     'Wicked Creek': 'Wicked C.',
   },
+
+  sunTypes: {
+    'a0': 3801,
+  },
+
+  activityTypeIds: [
+    'activityNormal',
+    'activityWarn',
+    'activityDanger',
+  ],
 };

@@ -287,8 +287,8 @@ class Map extends Emitter{
   updateMarker (_markerId, _data) {
     let marker = this._markers[_markerId];
 
-    let hasPositionOld = exists(marker.data.position);
-    let hasPositionNew = exists(_data.position);
+    let hasPositionOld = exists(marker?.data?.position);
+    let hasPositionNew = exists(_data?.position);
 
     if (hasPositionOld && exists(_data.isLocked) && _data.isLocked !== marker.data.isLocked) {
       let obj = this.magnifier.objects().searchByObjectKey('id', _markerId);

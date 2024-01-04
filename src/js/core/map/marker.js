@@ -38,26 +38,33 @@ class Marker extends Emitter{
   createMarker () {
     this.wrapper = _ui.fromText(`
       <div class="eve-marker">
-        <div class="eve-marker-body">
-          <div class="eve-marker-first-row off-events">
-            <div class="effect-color hidden"></div>
-            <div class="system-type"></div>
-            <div class="system-name"></div>
-            <div class="system-tag"></div>
-          </div>
-          <div class="eve-marker-second-row off-events">
-            <div class="extra">
-              <div class="locked hidden"></div>
-              <div class="marked-as-hub hidden"></div>
-              <div class="online hidden">
-                <div class="online-icon">
-                  <img src="/img/people_white_24dp.svg" alt=""/>
-                </div>    
-                <div class="online-count">${ Number.randomInt(0, 199) }</div>                           
-              </div>
+        <div class="eve-marker-bookmarks"></div>
+        <div class="eve-marker-content">
+          <div class="eve-marker-body">
+            <div class="eve-marker-first-row off-events">
+              <div class="effect-color hidden"></div>
+              <div class="system-type"></div>
+              <div class="system-name"></div>
+              <div class="system-tag"></div>
             </div>
-            <div class="wormhole-statics"></div>
-            <div class="region hidden"></div>
+            <div class="eve-marker-second-row off-events">
+              <div class="extra">
+                <div class="locked hidden"></div>
+                <div class="marked-as-hub hidden"></div>
+                <div class="online hidden">
+                  <div class="online-icon">
+                    <img src="/img/people_white_24dp.svg" alt=""/>
+                  </div>    
+                  <div class="online-count">${ Number.randomInt(0, 199) }</div>                           
+                </div>
+                <div class="kills hidden">
+                  <i class="kills-icon fa-solid fa-skull-crossbones"></i>
+                  <div class="kills-count">${ Number.randomInt(0, 199) }</div>                           
+                </div>
+              </div>
+              <div class="wormhole-statics"></div>
+              <div class="region hidden"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +101,11 @@ class Marker extends Emitter{
    * @param {number} _data.effectType
    * @param {string} _data.effectName
    * @param {number} _data.classTitle
+   * @param {string} _data.isShattered
    * @param {Array} _data.statics
+   * @param {number} _data.sunTypeId
+   * @param {string} _data.activityState
+   * @param {number} _data.killsCount
    */
   update (_data) {
     const markerData = this.data;
@@ -123,8 +134,9 @@ class Marker extends Emitter{
     }
 
     if (exists(_data.status)) {
-      markerEl.classRemove.apply(markerEl, environment.statuses.map(x => `system-status-${ x.id }`));
-      markerEl.classAdd(`system-status-${ environment.statuses[_data.status].id }`);
+      let el = _ui.fromElement(markerEl.el.querySelector('.eve-marker-content'));
+      el.classRemove.apply(el, environment.statuses.map(x => `system-status-${ x.id }`));
+      el.classAdd(`system-status-${ environment.statuses[_data.status].id }`);
     }
 
     if (exists(_data.isHub)) {
@@ -193,6 +205,46 @@ class Marker extends Emitter{
       el.classRemove('hidden');
     }
 
+    if (exists(_data.isShattered) && _data.isShattered === true) {
+      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-burst"></i>' });
+      // this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-bolt" title="shattered"></i>' });
+    }
+
+    if (exists(_data.sunTypeId) && _data.sunTypeId === environment.sunTypes.a0) {
+      this._addBookmark({ colorId: 'a0', text: 'A0' });
+    }
+
+    if (exists(_data.killsCount) && _data.killsCount !== markerData.killsCount) {
+      let onlineEl = _ui.fromElement(markerEl.el.querySelector('.kills'));
+      let onlineCountEl = _ui.fromElement(markerEl.el.querySelector('.kills-count'));
+      onlineCountEl.text(_data.killsCount === 200 ? `${ _data.killsCount }+` : _data.killsCount);
+      _data.killsCount === 0 ? onlineEl.classAdd('hidden') : onlineEl.classRemove('hidden');
+    }
+
+    if (exists(_data.activityState) && _data.activityState !== markerData.activityState) {
+      environment.activityTypeIds.map(x => this._removeBookmark(x));
+      switch (_data.activityState) {
+        case 'active':
+          this._addBookmark({
+            colorId: 'activityNormal',
+            text: '<i class="fa-solid fa-bolt"></i>',
+          });
+          break;
+        case 'warn':
+          this._addBookmark({
+            colorId: 'activityWarn',
+            text: '<i class="fa-solid fa-bolt"></i>',
+          });
+          break;
+        case 'danger':
+          this._addBookmark({
+            colorId: 'activityDanger',
+            text: '<i class="fa-solid fa-bolt"></i>',
+          });
+          break;
+      }
+    }
+
     extend(this.data, _data);
   }
 
@@ -239,6 +291,33 @@ class Marker extends Emitter{
     //     let staticEl = _ui.fromText(`<div class='static ${colorClass}'>${wormholeClass.shortName}</div>`)
     //     el.append(staticEl);
     // }
+  }
+
+  _addBookmark ({ colorId = '', text = '' } = {}) {
+    if (colorId === '') {
+      return;
+    }
+
+    let el = _ui.fromElement(this.wrapper.el.querySelector('.eve-marker-bookmarks'));
+
+    const colorClass = environment.markerBookmarkColorsClasses[colorId];
+
+    const bookmarkEl = _ui.fromText(`
+      <div class="bookmark ${ colorClass }">${ text }</div>
+    `);
+
+    el.append(bookmarkEl);
+  }
+
+  _removeBookmark (colorId) {
+    let res = _ui.fromElement(this.wrapper.el.querySelector('.eve-marker-bookmarks'));
+    const colorClass = environment.markerBookmarkColorsClasses[colorId];
+
+    res.el.children.forEach((child) => {
+      if ([...child.classList.values()].includes(colorClass)) {
+        res.el.removeChild(child);
+      }
+    });
   }
 
   select (_isSelect) {

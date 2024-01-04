@@ -96,6 +96,7 @@ const _ui = function (_tag) {
         args.map(className => el.classList.contains(className) && el.classList.remove(className))
     };
 
+    /** @type HTMLElement */
     Object.defineProperty(this, "el", {
         get: function () {
             return el;
