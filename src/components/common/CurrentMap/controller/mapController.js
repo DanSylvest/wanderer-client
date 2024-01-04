@@ -6,7 +6,7 @@ import exists from '../../../../js/env/tools/exists';
 import CustomPromise from '../../../../js/env/promise.js';
 import helper from '../../../../js/utils/helper.js';
 import cache from '../../../../js/cache/cache.js';
-import { ZkbDataProvider } from '@/components/common/CurrentMap/controller/zkbDataProvider';
+// import { ZkbDataProvider } from '@/components/common/CurrentMap/controller/zkbDataProvider';
 
 class MapController extends Emitter{
   systemsWithOwn = {};
@@ -19,7 +19,7 @@ class MapController extends Emitter{
 
     this.systems = Object.create(null);
     this.links = Object.create(null);
-    this.zkbProvider = new ZkbDataProvider();
+    // this.zkbProvider = new ZkbDataProvider();
 
     this.allowedCharacters = [];
     this.hubs = [];
@@ -52,18 +52,18 @@ class MapController extends Emitter{
     this.map.on('newChain', this.onNewChain.bind(this));
     this.map.clear();
 
-    this.zkbProvider.init();
-    this.zkbProvider.on('loaded', () => {
-      const data = this.zkbProvider.getZkbSystemsInfo();
-      data.forEach(x => {
-        const system = this.getSystem(x.systemId);
-        if (!system) {
-          return;
-        }
-
-        this.map.updateMarker(system.markerId, { activityState: x.type, killsCount: x.kills.length });
-      });
-    });
+    // this.zkbProvider.init();
+    // this.zkbProvider.on('loaded', () => {
+    //   const data = this.zkbProvider.getZkbSystemsInfo();
+    //   data.forEach(x => {
+    //     const system = this.getSystem(x.systemId);
+    //     if (!system) {
+    //       return;
+    //     }
+    //
+    //     this.map.updateMarker(system.markerId, { activityState: x.type, killsCount: x.kills.length });
+    //   });
+    // });
 
     let initPromise = new CustomPromise();
 
@@ -195,7 +195,7 @@ class MapController extends Emitter{
           prarr.push(this.systems[systemId].init());
         }
         Promise.all(prarr).then(() => this.map.enableForce(true));
-        this.zkbProvider.setSystems(_data.list);
+        // this.zkbProvider.setSystems(_data.list);
 
         break;
       }
@@ -204,7 +204,7 @@ class MapController extends Emitter{
         this.systems[_data.solarSystemId].init();
         this.systems[_data.solarSystemId].setIsHub(this.hubs.includes(_data.solarSystemId));
 
-        this.zkbProvider.addSystem(_data.solarSystemId);
+        // this.zkbProvider.addSystem(_data.solarSystemId);
 
         if (exists(this.systemsWithOwn[_data.solarSystemId])) {
           this.systems[_data.solarSystemId].setHasOwn(this.systemsWithOwn[_data.solarSystemId]);
@@ -212,7 +212,7 @@ class MapController extends Emitter{
         break;
       case 'removed':
         if (this.systems[_data.solarSystemId]) {
-          this.zkbProvider.removeSystem(_data.solarSystemId);
+          // this.zkbProvider.removeSystem(_data.solarSystemId);
           this.systems[_data.solarSystemId].deinit();
           delete this.systems[_data.solarSystemId];
         }
