@@ -206,7 +206,7 @@ class Marker extends Emitter{
     }
 
     if (exists(_data.isShattered) && _data.isShattered === true) {
-      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-burst"></i>' });
+      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-brands fa-sith"></i>' });
       // this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-bolt" title="shattered"></i>' });
     }
 
