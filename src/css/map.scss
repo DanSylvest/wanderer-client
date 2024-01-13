@@ -58,7 +58,7 @@ $active-color: #7be1ff;
         left: 4px;
 
         & > .bookmark {
-          width: 16px;
+          //width: 16px;
           height: 22px;
           position: relative;
           top: -14px;
@@ -68,6 +68,8 @@ $active-color: #7be1ff;
           text-align: center;
           padding-top: 3px;
           font-weight: bolder;
+          padding-left: 3px;
+          padding-right: 3px;
 
           &:not(:first-child) {
             box-shadow: inset 4px -3px 4px rgba(0, 0, 0, .3);
@@ -235,6 +237,8 @@ $active-color: #7be1ff;
               display: flex;
               justify-content: flex-start;
               align-items: flex-end;
+              gap: 1px;
+              margin-left: 1px;
 
               &.own {
                 & > .online-icon, & > .online-count {
@@ -256,7 +260,6 @@ $active-color: #7be1ff;
               .online-count {
                 font-size: 11px;
                 color: $fg-contrast;
-                margin-left: 2px;
               }
             }
 
@@ -264,6 +267,8 @@ $active-color: #7be1ff;
               display: flex;
               justify-content: flex-start;
               align-items: center;
+              gap: 2px;
+              margin-left: 2px;
 
               &.own {
                 & > .kills-icon, & > .kills-count {
@@ -277,16 +282,15 @@ $active-color: #7be1ff;
                 background-repeat: no-repeat;
                 color: $fg-negative;
 
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 position: relative;
-                font-size: 10px;
+                font-size: 8px;
               }
 
               .kills-count {
                 font-size: 11px;
-                color: $fg-contrast;
-                margin-left: 2px;
+                color: $fg-negative;
               }
             }
 
@@ -326,6 +330,25 @@ $active-color: #7be1ff;
 
   .eve-zInd-top {
     z-index: 1;
+  }
+}
+
+.wd-bookmark-kills-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -2px;
+  gap: 1px;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 1);
+
+  & > .icon {
+    width: 8px;
+    height: 8px;
+    font-size: 8px;
+  }
+
+  & > .text {
+    font-size: 11px;
   }
 }
 
@@ -1034,7 +1057,7 @@ $active-color: #7be1ff;
 }
 
 .wd-marker-bookmark-color-shattered {
-  background-color: #7600b5;
+  background-color: #833ca4;
 }
 
 .wd-marker-bookmark-color-a0 {
@@ -1042,13 +1065,13 @@ $active-color: #7be1ff;
 }
 
 .wd-marker-bookmark-color-normal {
-  background-color: #529652;
+  background-color: #ffa200;
 }
 
 .wd-marker-bookmark-color-warn {
-  background-color: #f1a400;
+  background-color: #f15600;
 }
 
 .wd-marker-bookmark-color-danger {
-  background-color: #9d3c39;
+  background-color: #d10600;
 }

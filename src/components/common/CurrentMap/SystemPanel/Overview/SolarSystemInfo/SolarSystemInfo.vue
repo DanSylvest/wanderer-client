@@ -79,6 +79,7 @@
   import InfoBlock from '@/components/ui/InfoBlock';
   import WormholeType from '@/components/common/components/WormholeType';
   import EffectCompact from '@/components/common/components/EffectCompact';
+  import helper from '@/js/utils/helper';
 
   export default {
     name: 'SolarSystemInfo',
@@ -129,6 +130,11 @@
       sortStatics: statics => eveHelper.sortStatics(statics),
       onCopyClick () {
         copyToClipboard(this.info.solarSystemName);
+        helper.infoMessage(
+          this,
+          `Solar system name "${ this.info.solarSystemName }" successful copied to clipboard`,
+          { type: 'neutral', title: 'Copy' },
+        );
       },
     },
   };

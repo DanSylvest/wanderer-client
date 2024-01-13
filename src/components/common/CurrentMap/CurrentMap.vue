@@ -553,6 +553,11 @@
             break;
           case 'copyName':
             copyToClipboard(systemInfo.name);
+            helper.infoMessage(
+              this,
+              `Solar system name "${ systemInfo.name }" successful copied to clipboard`,
+              { type: 'neutral', title: 'Copy' },
+            );
             break;
           case 'markAsHub':
             if (event.data) {

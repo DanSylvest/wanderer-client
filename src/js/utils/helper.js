@@ -15,12 +15,12 @@ const helper = {
             type: 'error'
         });
     },
-    infoMessage (context, message) {
+    infoMessage (context, message, { title = 'Notification', type = 'success' } = {}) {
         context.$notify({
             group: 'mainNotifications',
-            title: 'Notification',
+            title,
             text: message,
-            type: 'success'
+            type
         });
     },
     dummy (){},

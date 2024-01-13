@@ -58,7 +58,7 @@ class Marker extends Emitter{
                   <div class="online-count">${ Number.randomInt(0, 199) }</div>                           
                 </div>
                 <div class="kills hidden">
-                  <i class="kills-icon fa-solid fa-skull-crossbones"></i>
+                  <i class="kills-icon fa-solid fa-skull"></i>
                   <div class="kills-count">${ Number.randomInt(0, 199) }</div>                           
                 </div>
               </div>
@@ -205,44 +205,31 @@ class Marker extends Emitter{
       el.classRemove('hidden');
     }
 
+    if (
+      exists(_data.activityState) && (
+        _data.activityState !== markerData.activityState || _data.killsCount !== markerData.killsCount)
+    ) {
+      environment.activityTypeIds.map(x => this._removeBookmark(x));
+      const rendered = renderCountOfKills(_data.activityState, _data.killsCount);
+      switch (_data.activityState) {
+        case 'active':
+          this._addBookmark({ colorId: 'activityNormal', text: rendered });
+          break;
+        case 'warn':
+          this._addBookmark({ colorId: 'activityWarn', text: rendered });
+          break;
+        case 'danger':
+          this._addBookmark({ colorId: 'activityDanger', text: rendered });
+          break;
+      }
+    }
+
     if (exists(_data.isShattered) && _data.isShattered === true) {
-      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-brands fa-sith"></i>' });
-      // this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-bolt" title="shattered"></i>' });
+      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-burst"  title="Shattered system"></i>' });
     }
 
     if (exists(_data.sunTypeId) && _data.sunTypeId === environment.sunTypes.a0) {
-      this._addBookmark({ colorId: 'a0', text: 'A0' });
-    }
-
-    if (exists(_data.killsCount) && _data.killsCount !== markerData.killsCount) {
-      let onlineEl = _ui.fromElement(markerEl.el.querySelector('.kills'));
-      let onlineCountEl = _ui.fromElement(markerEl.el.querySelector('.kills-count'));
-      onlineCountEl.text(_data.killsCount === 200 ? `${ _data.killsCount }+` : _data.killsCount);
-      _data.killsCount === 0 ? onlineEl.classAdd('hidden') : onlineEl.classRemove('hidden');
-    }
-
-    if (exists(_data.activityState) && _data.activityState !== markerData.activityState) {
-      environment.activityTypeIds.map(x => this._removeBookmark(x));
-      switch (_data.activityState) {
-        case 'active':
-          this._addBookmark({
-            colorId: 'activityNormal',
-            text: '<i class="fa-solid fa-bolt"></i>',
-          });
-          break;
-        case 'warn':
-          this._addBookmark({
-            colorId: 'activityWarn',
-            text: '<i class="fa-solid fa-bolt"></i>',
-          });
-          break;
-        case 'danger':
-          this._addBookmark({
-            colorId: 'activityDanger',
-            text: '<i class="fa-solid fa-bolt"></i>',
-          });
-          break;
-      }
+      this._addBookmark({ colorId: 'a0', text: '<span title="System with reach asteroid belt">A0</span>' });
     }
 
     extend(this.data, _data);
@@ -426,5 +413,13 @@ export const _hide = (el, sel, bool) => _ui.fromElement(el.querySelector(sel))[b
   ? 'classAdd'
   : 'classRemove']('hidden');
 export const _selEl = (el, sel) => _ui.fromElement(el.querySelector(sel));
+
+const renderCountOfKills = (activityState, killsCount) => {
+  return `
+    <div class="wd-bookmark-kills-count" title="Count of kills for last hour \n0-5: Active (Yellow).\n5-30 Warning (Orange).\n30+ Dangerous (Red)">
+      <i class="fa-solid fa-skull icon"></i> 
+      <span class="text">${ killsCount }</span>
+    </div>`;
+};
 
 export default Marker;

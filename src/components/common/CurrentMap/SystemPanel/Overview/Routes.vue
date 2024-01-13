@@ -88,6 +88,7 @@
                   :class="getBackgroundClass(routeSystem) + ' ' + getShapeClass(routeSystem)"
                   v-for="routeSystem in row.systems"
                   v-bind:key="routeSystem.solarSystemId"
+                  @click="handleCopySysName(routeSystem.solarSystemName)"
                 >
                   <tooltip
                     placement="top"
@@ -156,6 +157,7 @@
   import RoutesSettings from './Routes/RoutesSettings.vue';
   import cookie from '../../../../../js/env/cookie.js';
   import eveHelper from '../../../../../js/eveHelper.js';
+  import copyToClipboard from '../../../../../js/env/copyToClipboard.js';
 
   export default {
     name: 'Routes',
@@ -281,6 +283,17 @@
           delete this._unsubscribeHubs;
         }
       },
+
+      handleCopySysName (solarSystemName) {
+        copyToClipboard(solarSystemName);
+
+        helper.infoMessage(
+          this,
+          `Solar system name "${ solarSystemName }" successful copied to clipboard`,
+          { type: 'neutral', title: 'Copy' },
+        );
+      },
+
       _onSubscribedAll () {
         this.subscribed = true;
 
@@ -533,6 +546,7 @@
         height: 9px;
         margin-right: 2px;
         margin-bottom: 2px;
+        cursor: pointer;
 
         transition: box-shadow 200ms;
         box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
