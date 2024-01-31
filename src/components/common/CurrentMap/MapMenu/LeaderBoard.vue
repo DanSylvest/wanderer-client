@@ -68,10 +68,7 @@
 
         const res = await api.eve.map.leaderboard(this.mapId);
 
-        this.leaders = [
-          ...res.activity,
-          ...Array.from({ length: 100 }).map((_, i) => res.activity[0]),
-        ];
+        this.leaders = res.activity;
       }
     }
   };
