@@ -3,7 +3,10 @@
     <AppToolbar>
       <div class="wd-map-toolbar">
         <transition name="fade">
-          <user-characters v-show="!loadingMap" :map-id="selectedMap" @click="handleCharInBar" />
+          <div v-show="!loadingMap" >
+            <MapMenu :map-id="selectedMap" />
+            <user-characters :map-id="selectedMap" @click="handleCharInBar" />
+          </div>
         </transition>
       </div>
     </AppToolbar>
@@ -192,6 +195,7 @@
   import DelayedSaver from './components/DelayedSaver';
   import UserCharactersProvider from '@/components/common/CurrentMap/components/UserCharactersProvider';
   import { requestSolarSystemId } from '@/components/requests/requestSolarSystem';
+  import MapMenu from '@/components/common/CurrentMap/MapMenu/MapMenu';
 
   export default {
     name: 'CurrentMap',
@@ -210,6 +214,7 @@
       ChainContextMenu,
       AppToolbar,
       DelayedSaver,
+      MapMenu,
     },
     props: [],
     data: function () {
@@ -821,6 +826,13 @@
     padding: 5px 5px;
     box-sizing: border-box;
     color: $fg-primary;
+
+    & > div {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 
   .wd-characters-icons {

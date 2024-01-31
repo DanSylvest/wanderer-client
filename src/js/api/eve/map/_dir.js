@@ -20,6 +20,7 @@ import subscribeAllowedCharacters from "./subscribeAllowedCharacters";
 import waypoint from "./waypoint";
 import updateWatchStatus from "./updateWatchStatus";
 import groups from "./groups.js";
+import leaderboard from "./leaderboard.js";
 
 export default {
     link,
@@ -40,4 +41,5 @@ export default {
     waypoint,
     updateWatchStatus,
     groups,
+    leaderboard,
 }
