@@ -34,7 +34,7 @@ class Magnifier{
       x: _options.x,
       y: _options.y,
       id: _options.id,
-      isLocked: _options.isLocked,
+      lock: _options.isLocked,
       fx: _options.fx,
       fy: _options.fy,
     });
@@ -42,6 +42,17 @@ class Magnifier{
 
   setObjects (_objects) {
     this._objects = _objects || [];
+  }
+
+  updateObject (id, data) {
+    const obj = this.getObject(parseInt(id));
+    if (!obj) {
+      return;
+    }
+
+    Object.keys(data).forEach(x => {
+      obj[x] = data[x];
+    });
   }
 
   removeObject (_id) {
@@ -80,7 +91,7 @@ class Magnifier{
     return out;
   }
 
-  getObject(id) {
+  getObject (id) {
     const object = this._objects.find(x => x.id === id);
     if (!object) {
       return null;

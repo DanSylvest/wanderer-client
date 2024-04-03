@@ -128,6 +128,9 @@ Vector2.prototype = {
     },
     isInsideRect: function (x, y, w, h) {
         return this.x >= x && this.x < x + w && this.y >= y && this.y < y + h;
+    },
+    toString() {
+       return `{ x: ${this.x}, y: ${this.y} }`;
     }
 };
 Vector2.addition = function (_v1, _v2) {

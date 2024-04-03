@@ -276,6 +276,7 @@ class Map extends Emitter{
         fy: base.isLocked ? base.position.y : null,
         x: base.position.x,
         y: base.position.y,
+        lock: base.isLocked,
       });
     }
 
@@ -311,6 +312,11 @@ class Map extends Emitter{
         x: _data.position.x,
         y: _data.position.y,
       });
+
+      if (exists(_data.isLocked)) {
+        this.magnifier.updateObject(_markerId, { lock: _data.isLocked });
+      }
+
       this._sfForce.call();
     } else if (hasPositionNew && hasPositionOld && (_data.position.x
       !== marker.data.position.x
@@ -419,6 +425,13 @@ class Map extends Emitter{
     }.bind(this));
 
     let dragOffset = new Vector2();
+
+    /** @type Marker[] */
+    const selectedMarkers = this.selectedMarkers();
+    let markersForDrag;
+
+    let deltas = selectedMarkers.map(() => new Vector2());
+
     this._ao.on('dragStart', function (_event) {
       if (this._markers[_event.subject.id].data.isLocked) {
         return;
@@ -435,6 +448,12 @@ class Map extends Emitter{
       let subjectPos = new Vector2(_event.subject.x, _event.subject.y);
       dragOffset = virtual['-'](subjectPos);
 
+      markersForDrag = (selectedMarkers.length > 0 ? selectedMarkers : [_event.subject.id]);
+      deltas = markersForDrag.map(mid => {
+        const mrk = this._markers[mid];
+        return virtual['-'](new Vector2(mrk.data.position.x, mrk.data.position.y));
+      });
+
       this.render();
     }.bind(this));
 
@@ -444,14 +463,22 @@ class Map extends Emitter{
       }
 
       let virtual = this.magnifier.convertToVirtual(_event.mouse);
-      virtual['-='](dragOffset);
 
-      _event.subject.fx = virtual.x;
-      _event.subject.fy = virtual.y;
+      markersForDrag.forEach((mid, i) => {
+        const diff = virtual['-'](deltas[i]);
+        const mrk = this._markers[mid];
 
-      let marker = this._markers[_event.subject.id];
-      marker.data.position.x = virtual.x;
-      marker.data.position.y = virtual.y;
+        if (mrk.data.isLocked) {
+          return;
+        }
+
+        mrk.data.position.x = diff.x;
+        mrk.data.position.y = diff.y;
+
+        const mObject = this.magnifier.getObject(parseInt(mid));
+        mObject.fx = diff.x;
+        mObject.fy = diff.y;
+      });
 
       this.render();
 
@@ -473,6 +500,17 @@ class Map extends Emitter{
         _event.subject.fx = null;
         _event.subject.fy = null;
       }
+
+      markersForDrag.forEach((mid, i) => {
+        const mrk = this._markers[mid];
+        if (mrk.data.isLocked) {
+          return;
+        }
+
+        const mObject = this.magnifier.getObject(parseInt(mid));
+        mObject.fx = null;
+        mObject.fy = null;
+      });
 
       requestAnimationFrame(function () {
         if (this._ao) {
@@ -637,6 +675,9 @@ class Map extends Emitter{
     this.simulation = null;
 
     if (this._forceEnable) {
+      // eslint-disable-next-line no-console
+      console.log('JOipP', `this.magnifier.objects()`, this.magnifier.objects());
+
       this.simulation = d3.forceSimulation(this.magnifier.objects());
       this.simulation.force('kek2', collideRect(w, h));
 
@@ -797,6 +838,16 @@ class Map extends Emitter{
     for (let markerId in this._markers) {
       if (this._markers[markerId].data.isSelect) {
         out.push(this._markers[markerId].data.customId);
+      }
+    }
+    return out;
+  }
+
+  selectedMarkers () {
+    let out = [];
+    for (let markerId in this._markers) {
+      if (this._markers[markerId].data.isSelect) {
+        out.push(markerId);
       }
     }
     return out;

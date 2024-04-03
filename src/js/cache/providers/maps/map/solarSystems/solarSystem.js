@@ -31,6 +31,7 @@ export default class SolarSystem extends SubscriptionProvider {
         this._addAccessData("description");
         this._addAccessData("tag");
         this._addAccessData("status");
+        this._addAccessData("labels");
         this._addAccessData("signatures");
         this._addAccessData("position");
         this._addAccessData("onlineCount");

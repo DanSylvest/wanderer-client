@@ -89,6 +89,7 @@ class Marker extends Emitter{
    *
    * @param {Object} _data
    * @param {string} _data.tag
+   * @param {string} _data.labels
    * @param {boolean} _data.isLocked
    * @param {boolean} _data.isHub
    * @param {boolean} _data.hasOwn
@@ -213,23 +214,37 @@ class Marker extends Emitter{
       const rendered = renderCountOfKills(_data.activityState, _data.killsCount);
       switch (_data.activityState) {
         case 'active':
-          this._addBookmark({ colorId: 'activityNormal', text: rendered });
+          this._addBookmark({ primary: true, colorId: 'activityNormal', text: rendered });
           break;
         case 'warn':
-          this._addBookmark({ colorId: 'activityWarn', text: rendered });
+          this._addBookmark({ primary: true, colorId: 'activityWarn', text: rendered });
           break;
         case 'danger':
-          this._addBookmark({ colorId: 'activityDanger', text: rendered });
+          this._addBookmark({ primary: true, colorId: 'activityDanger', text: rendered });
           break;
       }
     }
 
+    if(exists(_data.labels) && _data.labels !== markerData.labels) {
+      const selectedLabels = eveHelper.extractLabels(_data.labels)
+      environment.labels.map(x => this._removeBookmark(x.id));
+
+      environment.labels.map(x => {
+        const label = selectedLabels.find(l => x.id === l);
+        if(!label) {
+          return;
+        }
+
+        this._addBookmark({ colorId: x.id, text: x.shortName });
+      })
+    }
+
     if (exists(_data.isShattered) && _data.isShattered === true) {
-      this._addBookmark({ colorId: 'shattered', text: '<i class="fa-solid fa-burst"  title="Shattered system"></i>' });
+      this._addBookmark({ primary: true, colorId: 'shattered', text: '<i class="fa-solid fa-burst"  title="Shattered system"></i>' });
     }
 
     if (exists(_data.sunTypeId) && _data.sunTypeId === environment.sunTypes.a0) {
-      this._addBookmark({ colorId: 'a0', text: '<span title="System with reach asteroid belt">A0</span>' });
+      this._addBookmark({ primary: true, colorId: 'a0', text: '<span title="System with reach asteroid belt">A0</span>' });
     }
 
     extend(this.data, _data);
@@ -280,7 +295,7 @@ class Marker extends Emitter{
     // }
   }
 
-  _addBookmark ({ colorId = '', text = '' } = {}) {
+  _addBookmark ({ colorId = '', text = '', primary = false } = {}) {
     if (colorId === '') {
       return;
     }
@@ -293,7 +308,11 @@ class Marker extends Emitter{
       <div class="bookmark ${ colorClass }">${ text }</div>
     `);
 
-    el.append(bookmarkEl);
+    if(primary) {
+      el.prepend(bookmarkEl);
+    } else {
+      el.append(bookmarkEl);
+    }
   }
 
   _removeBookmark (colorId) {

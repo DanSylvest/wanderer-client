@@ -23,6 +23,14 @@
           @click="onTagClick(item.tagName)"
         />
       </context-menu-item>
+      <context-menu-item
+        c-icon="edit"
+        :c-active="item.active"
+        :c-title="`${item.tagName.toString()}`"
+        v-for="item in letters.slice(0,3)"
+        :key="item.uid"
+        @click="onTagClick(item.tagName)"
+      />
     </context-menu-item>
     <context-menu-item c-title="Status" c-icon="report_problem" :c-is-submenu="true">
       <context-menu-item
@@ -35,6 +43,18 @@
         @click="onStatusClick(index)"
       />
     </context-menu-item>
+
+    <context-menu-item c-title="Label" c-icon="spellcheck" :c-is-submenu="true">
+      <context-menu-item
+        c-icon="edit"
+        :c-active="item.active"
+        :c-title="`${item.name.toString()}`"
+        v-for="item in labels"
+        :key="item.uid"
+        @click="onLabelClick(item.id)"
+      />
+    </context-menu-item>
+
     <context-menu-item c-title="Copy name" c-icon="content_copy" @click="onSystemCopyName" />
     <context-menu-item
       v-if="userOnlineCharacters.length > 0" c-title="Waypoints" c-icon="call_split"
@@ -116,6 +136,7 @@
           return {
             offset: { x: 0, y: 0 },
             tag: '',
+            selectedLabels: [],
             status: -1,
             isSystemInKSpace: false,
             markAsHub: false,
@@ -140,6 +161,7 @@
         this.solarSystemId = val.solarSystemId;
         this.tag = val.tag;
         this.status = val.status;
+        this.selectedLabels = val.selectedLabels;
         this.isLocked = val.isLocked;
         this.isSystemInKSpace = val.isSystemInKSpace;
         this.reload();
@@ -154,6 +176,7 @@
         offset: this.data.offset,
         markAsHub: this.data.markAsHub,
         tag: this.data.tag,
+        selectedLabels: this.data.selectedLabels,
         status: this.data.status,
         solarSystemId: this.data.solarSystemId,
         isLocked: this.data.isLocked,
@@ -161,6 +184,7 @@
         letters: [],
         digits: [],
         statuses: [],
+        labels: [],
         wChars: [],
       };
     },
@@ -226,8 +250,15 @@
           tagName: x,
         }));
 
+
         this.statuses = environment.statuses.slice().map((x, i) => {
           x.active = i === this.status;
+          x.uid = uuidCounter++;
+          return x;
+        });
+
+        this.labels = environment.labels.slice().map((x) => {
+          x.active = this.selectedLabels.includes(x.id);
           x.uid = uuidCounter++;
           return x;
         });
@@ -242,6 +273,12 @@
         this.$emit('contextActivated', {
           type: 'status',
           data: status,
+        });
+      },
+      onLabelClick (labels) {
+        this.$emit('contextActivated', {
+          type: 'labels',
+          data: labels,
         });
       },
       onClosedSystemContext () {

@@ -66,6 +66,13 @@ const _ui = function (_tag) {
         return this;
     }
 
+    this.prepend = function (_element) {
+        if(_element instanceof _ui) {
+            el.prepend(_element.el);
+        }
+        return this;
+    }
+
     this.remove = function (_element) {
         if(_element instanceof _ui) {
             el.removeChild(_element.el);

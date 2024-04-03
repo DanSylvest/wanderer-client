@@ -232,6 +232,7 @@
           offset: { x: 0, y: 0 },
           tag: '',
           status: -1,
+          selectedLabels: [],
           isSystemInKSpace: false,
           markAsHub: false,
           isLocked: false,
@@ -534,6 +535,7 @@
           offset: { x: x + 10, y: y + 10 },
           tag: systemInfo.tag,
           status: systemInfo.status,
+          selectedLabels: eveHelper.extractLabels(systemInfo.labels),
           isSystemInKSpace: eveHelper.isKnownSpace(systemInfo.systemClass),
           markAsHub: this.mapController.hubs.indexOf(this._currentContextSystem) === -1,
           isLocked: systemInfo.isLocked,
@@ -547,6 +549,24 @@
           case 'tag':
             systemInfo.tag = event.data;
             api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, { tag: event.data })
+              .then(
+                helper.dummy,
+                err => helper.errorHandler(this, err),
+              );
+            break;
+          case 'labels':
+            if(event.data === "clear") {
+              systemInfo.labels = ""
+            } else {
+              const labels = eveHelper.extractLabels(systemInfo.labels)
+              const newLabels = labels.includes(event.data)
+                ? labels.filter(x => x !== event.data)
+                : [...labels, event.data]
+
+              systemInfo.labels = newLabels.join(",");
+            }
+
+            api.eve.map.solarSystem.update(this.selectedMap, this._currentContextSystem, { labels: systemInfo.labels || "" })
               .then(
                 helper.dummy,
                 err => helper.errorHandler(this, err),

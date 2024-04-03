@@ -123,4 +123,5 @@ export default {
       .sort((a, b) => a.wormholeClassID - b.wormholeClassID)
       .map(x => x.name)
   },
+  extractLabels: (labels) => labels?.split(",").filter(x => x !== '') || []
 };

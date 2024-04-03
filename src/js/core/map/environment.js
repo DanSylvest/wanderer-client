@@ -107,6 +107,13 @@ export default {
     activityNormal: 'wd-marker-bookmark-color-normal',
     activityWarn: 'wd-marker-bookmark-color-warn',
     activityDanger: 'wd-marker-bookmark-color-danger',
+
+
+    average: 'wd-marker-bookmark-color-average',
+    ytirium: 'wd-marker-bookmark-color-ytirium',
+    l1: 'wd-marker-bookmark-color-l1',
+    l2: 'wd-marker-bookmark-color-l2',
+    l3: 'wd-marker-bookmark-color-l3',
   },
 
   /**
@@ -293,7 +300,7 @@ export default {
 
 
   statuses: [
-    { id: 'unknown', name: 'unknown', icon: 'block' },
+    { id: 'unknown', name: 'Clear', icon: 'block' },
     { id: 'home', name: 'Home', icon: 'invert_colors' },
     { id: 'friendly', name: 'Friendly', icon: 'invert_colors' },
     { id: 'lookingFor', name: 'Looking for', icon: 'invert_colors' },
@@ -302,6 +309,15 @@ export default {
     { id: 'targetSecondary', name: 'Target secondary', icon: 'invert_colors' },
     { id: 'dangerousPrimary', name: 'Dangerous primary', icon: 'invert_colors' },
     { id: 'dangerousSecondary', name: 'Dangerous secondary', icon: 'invert_colors' },
+  ],
+
+  labels: [
+    { id: 'clear',   name: 'Clear',   shortName: '',    icon: '' },
+    { id: 'average', name: 'Average', shortName: 'AVG', icon: '' },
+    { id: 'ytirium', name: 'Ytirium', shortName: 'YT',  icon: '' },
+    { id: 'l1',      name: 'Label 1', shortName: 'L1',  icon: '' },
+    { id: 'l2',      name: 'Label 2', shortName: 'L2',  icon: '' },
+    { id: 'l3',      name: 'Label 3', shortName: 'L3',  icon: '' },
   ],
 
   statusesNames: {

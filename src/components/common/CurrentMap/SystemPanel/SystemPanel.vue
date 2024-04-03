@@ -195,11 +195,9 @@
     this._rtid = -1;
 
     let bounds = document.body.getBoundingClientRect();
-    this.panelWidth = bounds.width * 0.3 < 400 ? 400 : bounds.width * 0.35;
+    this.panelWidth = bounds.width * 0.3 < 400 ? 400 : 550;
     this.panelHeight = bounds.height - 100;
-
     this.$emit('changedPanelState', { panelWidth: this.panelWidth });
-
     this.isCompact = bounds.width <= 1400;
   };
 </script>
