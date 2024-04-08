@@ -424,7 +424,7 @@ class Map extends Emitter{
       this._onMarkerClick(_event.subject.id, _event.originalEvent);
     }.bind(this));
 
-    let dragOffset = new Vector2();
+    // let dragOffset = new Vector2();
 
     /** @type Marker[] */
     const selectedMarkers = this.selectedMarkers();
@@ -445,8 +445,8 @@ class Map extends Emitter{
       this.simulation.alphaTarget(0.3).restart();
 
       let virtual = this.magnifier.convertToVirtual(_event.mouse);
-      let subjectPos = new Vector2(_event.subject.x, _event.subject.y);
-      dragOffset = virtual['-'](subjectPos);
+      // let subjectPos = new Vector2(_event.subject.x, _event.subject.y);
+      // dragOffset = virtual['-'](subjectPos);
 
       markersForDrag = (selectedMarkers.length > 0 ? selectedMarkers : [_event.subject.id]);
       deltas = markersForDrag.map(mid => {
@@ -501,7 +501,7 @@ class Map extends Emitter{
         _event.subject.fy = null;
       }
 
-      markersForDrag.forEach((mid, i) => {
+      markersForDrag.forEach((mid) => {
         const mrk = this._markers[mid];
         if (mrk.data.isLocked) {
           return;
@@ -675,9 +675,6 @@ class Map extends Emitter{
     this.simulation = null;
 
     if (this._forceEnable) {
-      // eslint-disable-next-line no-console
-      console.log('JOipP', `this.magnifier.objects()`, this.magnifier.objects());
-
       this.simulation = d3.forceSimulation(this.magnifier.objects());
       this.simulation.force('kek2', collideRect(w, h));
 
