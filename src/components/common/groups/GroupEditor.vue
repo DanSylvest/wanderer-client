@@ -225,7 +225,7 @@ let validateName = function (_nickname, _allowLength) {
   if (_nickname.length < _allowLength)
     return false;
 
-  return !!_nickname.match(/[A-Za-z_][A-Za-z_\- ]*?/m);
+  return !!_nickname.match(/[A-Za-z0-9_][A-Za-z0-9_\- ]*?/m);
 };
 </script>
 
