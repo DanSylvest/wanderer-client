@@ -1,8 +1,14 @@
 <template>
   <div>
-    <md-button class="md-icon-button" @click="showDialog = true">
-      <md-icon>leaderboard</md-icon>
-    </md-button>
+    <div class="map-menu-left-icons">
+      <md-button class="md-icon-button" @click="showDialog = true">
+        <md-icon>leaderboard</md-icon>
+      </md-button>
+
+      <md-button v-if="showExport" class="md-icon-button" @click="exportMap()">
+        <md-icon>ios_share</md-icon>
+      </md-button>
+    </div>
 
     <md-dialog :md-active.sync="showDialog">
       <md-dialog-title>Activity of characters of current map</md-dialog-title>
@@ -20,6 +26,18 @@
 
 <script>
   import LeaderBoard from '@/components/common/CurrentMap/MapMenu/LeaderBoard';
+  import api from '../../../../js/api';
+
+  function saveFile(content, fileName, contentType) {
+    const a = document.createElement('a');
+    const file = new Blob([content], { type: contentType });
+
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  }
 
   export default {
     name: 'MapMenu',
@@ -36,11 +54,21 @@
       return {
         lMapId: this.mapId,
         showDialog: false,
+        showExport: false
       };
     },
     watch: {
-      mapId () {
+      async mapId () {
         this.lMapId = this.mapId;
+
+        const isOwner = await api.eve.map.exportMap(this.mapId, true);
+        this.showExport = isOwner;
+      }
+    },
+    methods: {
+      async exportMap () {
+        const result = await api.eve.map.exportMap(this.mapId);
+        saveFile(JSON.stringify(result), 'mapdata.json', "text/plain")
       }
     }
   };
@@ -57,5 +85,11 @@
 
   .character-cell {
     padding-left: 10px;
+  }
+
+  .map-menu-left-icons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
   }
 </style>

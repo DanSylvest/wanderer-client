@@ -21,6 +21,7 @@ import waypoint from "./waypoint";
 import updateWatchStatus from "./updateWatchStatus";
 import groups from "./groups.js";
 import leaderboard from "./leaderboard.js";
+import exportMap from "./export.js";
 
 export default {
     link,
@@ -42,4 +43,5 @@ export default {
     updateWatchStatus,
     groups,
     leaderboard,
+    exportMap,
 }
